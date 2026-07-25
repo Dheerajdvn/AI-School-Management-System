@@ -1,0 +1,30 @@
+@import "./base/reset.css";
+@import "./base/typography.css";
+@import "./base/variables.css";
+
+@import "./themes/light.css";
+@import "./themes/dark.css";
+
+@import "./layout/layout.css";
+@import "./layout/sidebar.css";
+@import "./layout/topbar.css";
+
+@import "./components/buttons.css";
+@import "./components/cards.css";
+@import "./components/forms.css";
+@import "./components/tables.css";
+@import "./components/modals.css";
+@import "./components/dropdown.css";
+@import "./components/badges.css";
+@import "./components/chat.css";
+
+@import "./pages/dashboard.css";
+@import "./pages/landing.css";
+@import "./pages/login.css";
+@import "./pages/profile.css";
+@import "./pages/settings.css";
+@import "./pages/documents.css";
+@import "./pages/unauthorized.css";
+
+@import "./utilities/animations.css";
+@import "./utilities/responsive.css";

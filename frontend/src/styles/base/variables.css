@@ -1,0 +1,24 @@
+:root {
+  --primary: #4F46E5;
+  --primary-hover: #4338ca;
+  --primary-rgb: 79, 70, 229;
+  --accent: #06b6d4;
+  --bg: #F8FAFC;
+  --surface: #FFFFFF;
+  --card: #FFFFFF;
+  --sidebar-bg: #FFFFFF;
+  --sidebar-text: #0F172A;
+  --text: #0F172A;
+  --muted: #64748B;
+  --border: #E2E8F0;
+  --input-bg: #FFFFFF;
+  --input-border: #CBD5E1;
+  --table-hover: #F1F5F9;
+  --modal-bg: #FFFFFF;
+  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 20px 35px -10px rgba(0, 0, 0, 0.08);
+  --sidebar-w: 260px;
+  --radius-card: 20px;
+  --radius-btn: 10px;
+  --radius-input: 8px;
+}

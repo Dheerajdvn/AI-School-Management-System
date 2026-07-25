@@ -23,20 +23,22 @@ export default function KnowledgeDashboard() {
     setLoading(true)
     try {
       // Fetch documents
-      const docs = await knowledgeService.getDocuments({ limit: 5, sortBy: 'date' })
-      setRecentUploads(docs || [])
+      const res = await knowledgeService.getDocuments({ limit: 5, sortBy: 'date' })
+      const docs = res?.content || res?.data || (Array.isArray(res) ? res : [])
+      const docList = Array.isArray(docs) ? docs : []
+      setRecentUploads(docList)
       
       // Fetch collections
       const collections = await knowledgeService.getCollections()
       
       // Calculate stats
-      const totalDocs = docs?.length || 0
-      const indexedDocs = docs?.filter(d => d.status === 'Indexed' || d.status === 'indexed').length || 0
+      const totalDocs = docList.length
+      const indexedDocs = docList.filter(d => d.status === 'Indexed' || d.status === 'indexed' || d.processingStatus === 'COMPLETED').length
       
       // Calculate documents by type
       const typeCount = {}
-      docs?.forEach(doc => {
-        const type = doc.type?.toUpperCase() || 'UNKNOWN'
+      docList.forEach(doc => {
+        const type = (doc.documentType || doc.type)?.toUpperCase() || 'UNKNOWN'
         typeCount[type] = (typeCount[type] || 0) + 1
       })
       const typeArray = Object.entries(typeCount).map(([type, count]) => ({
@@ -47,7 +49,7 @@ export default function KnowledgeDashboard() {
       
       setStats({
         totalDocuments: totalDocs,
-        indexedDocuments: indexedDocs,
+        indexedDocuments: indexedDocs > 0 ? indexedDocs : totalDocs,
         collections: collections?.length || 0,
         aiSearches: 0,
       })
@@ -157,13 +159,18 @@ export default function KnowledgeDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {recentUploads.map((doc) => (
-                      <tr key={doc.id}>
-                        <td className="fw-medium">{doc.name}</td>
-                        <td><span className="badge bg-secondary">{doc.type}</span></td>
-                        <td><small>{doc.date}</small></td>
-                      </tr>
-                    ))}
+                    {recentUploads.map((doc) => {
+                      const docName = doc.originalFilename || doc.filename || doc.name || doc.title || 'Untitled'
+                      const docType = doc.documentType || doc.type || 'OTHER'
+                      const dateVal = doc.uploadTime ? new Date(doc.uploadTime).toLocaleDateString() : doc.date || doc.createdAt || 'N/A'
+                      return (
+                        <tr key={doc.id}>
+                          <td className="fw-medium">{docName}</td>
+                          <td><span className="badge bg-secondary">{docType}</span></td>
+                          <td><small>{dateVal}</small></td>
+                        </tr>
+                      )
+                    })}
                   </tbody>
                 </table>
               </div>

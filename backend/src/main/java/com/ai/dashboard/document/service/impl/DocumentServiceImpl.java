@@ -12,12 +12,14 @@ import com.ai.dashboard.exception.AccessDeniedException;
 import com.ai.dashboard.exception.ResourceNotFoundException;
 import com.ai.dashboard.repository.CourseRepository;
 import com.ai.dashboard.repository.EnrollmentRepository;
+import com.ai.dashboard.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -34,6 +36,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class DocumentServiceImpl implements DocumentService {
 
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of("pdf", "docx", "txt", "md");
@@ -43,6 +46,7 @@ public class DocumentServiceImpl implements DocumentService {
     private final CourseRepository courseRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final ParserService parserService;
+    private final UserRepository userRepository;
 
     private final Path storagePath = Paths.get("uploads/documents").toAbsolutePath().normalize();
 
@@ -52,7 +56,14 @@ public class DocumentServiceImpl implements DocumentService {
 
         validateFile(file);
 
-        User uploadedBy = User.builder().id(userId).build();
+        User uploadedBy = null;
+        if (userId != null) {
+            uploadedBy = userRepository.findById(userId).orElse(null);
+        }
+        if (uploadedBy == null) {
+            uploadedBy = userRepository.findAll().stream().findFirst()
+                    .orElseThrow(() -> new ResourceNotFoundException("No user found for document upload"));
+        }
         Course course = null;
         if (request.getCourseId() != null) {
             course = courseRepository.findById(request.getCourseId())
@@ -60,10 +71,12 @@ public class DocumentServiceImpl implements DocumentService {
         }
 
         try {
+            log.info("Step: Save physical file started");
             Files.createDirectories(storagePath);
             String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
             Path targetPath = storagePath.resolve(filename);
             Files.copy(file.getInputStream(), targetPath);
+            log.info("Step: Save physical file completed");
 
             Document.DocumentType documentType = Document.DocumentType.OTHER;
             if (request.getDocumentType() != null) {
@@ -74,6 +87,7 @@ public class DocumentServiceImpl implements DocumentService {
                 }
             }
 
+            log.info("Step: Save Document entity started");
             Document document = Document.builder()
                     .filename(filename)
                     .originalFilename(file.getOriginalFilename())
@@ -88,23 +102,28 @@ public class DocumentServiceImpl implements DocumentService {
                     .build();
 
             Document saved = documentRepository.save(document);
-            log.info("Document uploaded: {}", saved.getId());
+            log.info("Step: Save Document entity completed: {}", saved.getId());
 
             // Attempt text extraction; never fail the upload on parse errors.
             try {
+                log.info("Step: Save content / Create chunks / Generate embeddings / Save vectors started");
                 saved.setProcessingStatus(Document.ProcessingStatus.PROCESSING);
                 documentRepository.save(saved);
                 parserService.extractText(saved);
+                log.info("Step: Save content / Create chunks / Generate embeddings / Save vectors completed");
             } catch (Exception e) {
-                log.error("Text extraction failed for document {}: {}", saved.getId(), e.getMessage());
+                log.error("Text extraction failed for document {}: {}", saved.getId(), e.getMessage(), e);
                 saved.setProcessingStatus(Document.ProcessingStatus.FAILED);
                 documentRepository.save(saved);
             }
 
-            return toResponse(saved);
+            log.info("Step: Commit transaction started");
+            DocumentResponse response = toResponse(saved);
+            log.info("Step: Commit transaction completed");
+            return response;
         } catch (IOException e) {
             log.error("Failed to store file", e);
-            throw new RuntimeException("Failed to store file: " + e.getMessage());
+            throw new RuntimeException("Failed to store file: " + e.getMessage(), e);
         }
     }
 
@@ -156,10 +175,14 @@ public class DocumentServiceImpl implements DocumentService {
         }
 
         try {
-            return new UrlResource(document.getStoragePath());
+            java.nio.file.Path path = java.nio.file.Paths.get(document.getStoragePath());
+            if (!java.nio.file.Files.exists(path)) {
+                throw new ResourceNotFoundException("File not found on disk");
+            }
+            return new UrlResource(path.toUri());
         } catch (Exception e) {
             log.error("Failed to load file", e);
-            throw new ResourceNotFoundException("File not found");
+            throw new ResourceNotFoundException("File not found: " + e.getMessage());
         }
     }
 

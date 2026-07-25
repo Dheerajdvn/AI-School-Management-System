@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { ThemeProvider } from './context/ThemeContext'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import RoleProtectedRoute from './components/auth/RoleProtectedRoute'
 import Sidebar from './components/Sidebar'
@@ -116,15 +117,15 @@ const ROLE_STUDENT = 'ROLE_STUDENT'
 /**
  * Role-based sidebar component that displays navigation based on user role
  */
-function RoleBasedSidebar() {
+function RoleBasedSidebar({ open, onClose }) {
   const { user } = useAuth()
-  return <Sidebar user={user} />
+  return <Sidebar user={user} open={open} onClose={onClose} />
 }
 
 /**
  * Role-based topbar component that displays title based on current route
  */
-function RoleBasedTopbar() {
+function RoleBasedTopbar({ onMenu }) {
   const { user } = useAuth()
   const { pathname } = useLocation()
   
@@ -196,18 +197,22 @@ function RoleBasedTopbar() {
   
   const title = TITLES[pathname] || 'AI Student Dashboard'
   
-  return <Topbar title={title} />
+  return <Topbar title={title} onMenu={onMenu} />
 }
 
 /**
  * Layout component wrapping protected pages with sidebar and topbar
  */
 function ProtectedLayout({ children }) {
+  const [sidebarOpen, setSidebarOpen] = React.useState(true)
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen)
+  const closeSidebar = () => setSidebarOpen(false)
+
   return (
     <div className="app-shell">
-      <RoleBasedSidebar />
-      <div className="main">
-        <RoleBasedTopbar />
+      <RoleBasedSidebar open={sidebarOpen} onClose={closeSidebar} />
+      <div className={`main ${!sidebarOpen ? 'expanded' : ''}`}>
+        <RoleBasedTopbar onMenu={toggleSidebar} />
         <div className="content">
           {children}
         </div>
@@ -221,9 +226,11 @@ function ProtectedLayout({ children }) {
  */
 export default function App() {
   return (
-    <AuthProvider>
-      <AppRoutes />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </ThemeProvider>
   )
 }
 

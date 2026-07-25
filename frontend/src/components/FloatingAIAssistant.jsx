@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { aiChatService } from '../services/aiService'
+import { AiApi } from '../services/api'
 
 const STORAGE_KEY = 'floating_ai_assistant_pos'
 const FAB_SIZE = 56
@@ -147,15 +148,10 @@ export default function FloatingAIAssistant() {
     let isMounted = true
     const checkHealth = async () => {
       try {
-        const res = await fetch('/api/actuator/health')
-        if (!isMounted) return
-        if (!res.ok) {
-          setIsHealthy(false)
-          return
+        const res = await AiApi.health()
+        if (isMounted) {
+          setIsHealthy(!!res?.llmAvailable)
         }
-        const data = await res.json()
-        const up = data.status === 'UP' && data.components?.ollama?.status === 'UP'
-        setIsHealthy(up)
       } catch {
         if (isMounted) setIsHealthy(false)
       }

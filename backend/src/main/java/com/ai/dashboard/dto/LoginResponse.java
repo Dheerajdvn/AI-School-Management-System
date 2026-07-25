@@ -16,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class LoginResponse {
 
+    private Long id;
     private String token;
     private String tokenType;
     private String username;

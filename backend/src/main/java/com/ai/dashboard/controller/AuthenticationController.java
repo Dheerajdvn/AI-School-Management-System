@@ -82,7 +82,6 @@ public class AuthenticationController {
 
         userRepository.save(user);
         log.info("User registered successfully: {}", user.getUsername());
-        // Do NOT log password
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("User registered", buildLoginResponse(user)));
@@ -100,9 +99,8 @@ public class AuthenticationController {
         String token = jwtService.generateToken(userDetails, user != null ? user.getId() : null);
 
         log.info("User logged in successfully: {}", request.getUsername());
-        // Do NOT log password or token
 
-        return ResponseEntity.ok(ApiResponse.success("Login successful", buildLoginResponse(userDetails, token)));
+        return ResponseEntity.ok(ApiResponse.success("Login successful", buildLoginResponse(userDetails, user != null ? user.getId() : null, token)));
     }
 
     @PostMapping("/assign-role/{userId}")
@@ -123,7 +121,6 @@ public class AuthenticationController {
         userRepository.save(user);
 
         log.info("Assigned role {} to user {}", request.getRoleName(), user.getUsername());
-        // Do NOT log sensitive user details
 
         return ApiResponse.success("Role assigned", buildLoginResponse(user));
     }
@@ -138,6 +135,7 @@ public class AuthenticationController {
                 .format(Instant.now().plusSeconds(86400));
 
         return LoginResponse.builder()
+                .id(user.getId())
                 .token(jwtService.generateToken(createUserDetails(user), user.getId()))
                 .tokenType("Bearer")
                 .username(user.getUsername())
@@ -147,7 +145,7 @@ public class AuthenticationController {
                 .build();
     }
 
-    private LoginResponse buildLoginResponse(UserDetails userDetails, String token) {
+    private LoginResponse buildLoginResponse(UserDetails userDetails, Long userId, String token) {
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(auth -> auth.getAuthority())
                 .collect(Collectors.toList());
@@ -157,6 +155,7 @@ public class AuthenticationController {
                 .format(Instant.now().plusSeconds(86400));
 
         return LoginResponse.builder()
+                .id(userId)
                 .token(token)
                 .tokenType("Bearer")
                 .username(userDetails.getUsername())

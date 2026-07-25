@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useTheme } from '../context/ThemeContext'
+import { AiApi } from '../services/api'
 
 /**
  * Modern SaaS-style landing page for the AI School Management Platform.
- * Premium design with gradient cards and animated elements.
+ * Premium design inspired by Vercel, Linear, Cursor, and Google AI Studio.
  */
 export default function HomePage() {
+  const { theme, toggleTheme } = useTheme()
   const [isAiHealthy, setIsAiHealthy] = useState(false)
 
   useEffect(() => {
@@ -13,14 +16,10 @@ export default function HomePage() {
 
     const checkHealth = async () => {
       try {
-        const res = await fetch('/api/actuator/health')
-        if (!res.ok) {
-          if (isMounted) setIsAiHealthy(false)
-          return
+        const res = await AiApi.health()
+        if (isMounted) {
+          setIsAiHealthy(!!res?.llmAvailable)
         }
-        const data = await res.json()
-        const up = data.status === 'UP' && data.components?.ollama?.status === 'UP'
-        if (isMounted) setIsAiHealthy(up)
       } catch (err) {
         if (isMounted) setIsAiHealthy(false)
       }
@@ -34,228 +33,106 @@ export default function HomePage() {
       clearInterval(interval)
     }
   }, [])
+
   const features = [
-    { icon: 'bi-building-fill', title: 'School Management', color: 'school', description: 'Centralize school operations and administration' },
-    { icon: 'bi-people-fill', title: 'Student Management', color: 'student', description: 'Track student records, enrollments, and academic progress' },
-    { icon: 'bi-person-badge-fill', title: 'Teacher Management', color: 'teacher', description: 'Manage teacher profiles, courses, and performance' },
-    { icon: 'bi-book-fill', title: 'Courses', color: 'course', description: 'Create and organize course curriculum and materials' },
-    { icon: 'bi-journal-text', title: 'Assignments', color: 'assignment', description: 'Assign tasks, track submissions and provide feedback' },
-    { icon: 'bi-upload', title: 'Submissions', color: 'submission', description: 'Collect, review and grade student work' },
-    { icon: 'bi-folder-fill', title: 'Document Management', color: 'document', description: 'Store and share educational resources securely' },
-    { icon: 'bi-graph-up-arrow', title: 'Analytics', color: 'analytics', description: 'Gain insights with comprehensive reporting' },
-    { icon: 'bi-robot', title: 'AI Assistant', color: 'ai', description: 'AI-powered tutoring and automated assistance' },
-    { icon: 'bi-shield-lock', title: 'Security', color: 'security', description: 'Enterprise-grade authentication and data protection' },
+    { icon: 'bi-building-fill', title: 'School Management', description: 'Centralize multi-campus school operations and administration with real-time sync.' },
+    { icon: 'bi-people-fill', title: 'Student Intelligence', description: 'Track student records, automated attendance, and predictive academic progress.' },
+    { icon: 'bi-person-badge-fill', title: 'Educator Workspace', description: 'Empower teachers with lesson planning assistants, automated grading, and gradebooks.' },
+    { icon: 'bi-book-fill', title: 'Curriculum & Courses', description: 'Organize structured syllabi, study materials, and interactive course catalogs.' },
+    { icon: 'bi-journal-text', title: 'Smart Assignments', description: 'Deploy assignments, track live submissions, and provide AI-driven rubric feedback.' },
+    { icon: 'bi-robot', title: 'AI Tutor & Assistant', description: 'Provide students 24/7 personalized tutoring and RAG-powered document question answering.' },
+    { icon: 'bi-graph-up-arrow', title: 'Executive Analytics', description: 'Gain actionable insights with real-time dashboards and predictive performance charts.' },
+    { icon: 'bi-shield-lock', title: 'Enterprise Security', description: 'Robust role-based access control, encrypted data stores, and comprehensive audit logs.' },
   ]
 
-  const roles = [
-    {
-      icon: 'bi-person-gear',
-      title: 'Main Admin',
-      color: 'admin',
-      description: 'System-wide administrator with full access to manage schools, users, and platform settings.',
-    },
-    {
-      icon: 'bi-building-gear',
-      title: 'School Admin',
-      color: 'admin2',
-      description: 'Manages a specific school - handles teachers, students, courses, and documents.',
-    },
-    {
-      icon: 'bi-person-workspace',
-      title: 'Teacher',
-      color: 'teacher',
-      description: 'Creates assignments, grades submissions, and uses AI assistant for teaching support.',
-    },
-    {
-      icon: 'bi-person-video2',
-      title: 'Student',
-      color: 'student',
-      description: 'Views courses, submits assignments, and interacts with AI tutor for learning assistance.',
-    },
+  const aiCapabilities = [
+    { icon: 'bi-chat-dots-fill', title: 'Generative AI Tutor', desc: 'Conversational assistant providing adaptive explanations for every student.' },
+    { icon: 'bi-search', title: 'RAG Document Search', desc: 'Instant semantic search across thousands of uploaded syllabus & textbook pages.' },
+    { icon: 'bi-journal-check', title: 'Automated Grading', desc: 'AI-assisted homework grading and constructive feedback generation.' },
+    { icon: 'bi-cpu-fill', title: 'Multi-Model Support', desc: 'Seamlessly switch between Ollama local LLMs and OpenAI-compatible endpoints.' },
   ]
 
-  const aiFeatures = [
-    {
-      icon: 'bi-robot',
-      title: 'AI Tutor',
-      color: 'ai1',
-      description: 'Personalized AI-powered tutoring for students 24/7',
-    },
-    {
-      icon: 'bi-search-heart',
-      title: 'AI Document Search',
-      color: 'ai2',
-      description: 'Intelligent search through educational materials using RAG',
-    },
-    {
-      icon: 'bi-pencil-square',
-      title: 'AI Assignment Assistant',
-      color: 'ai3',
-      description: 'Smart assignment creation and grading assistance',
-    },
-    {
-      icon: 'bi-chat-dots',
-      title: 'AI Question Answering',
-      color: 'ai4',
-      description: 'Natural language interface for instant answers',
-    },
+  const faqItems = [
+    { q: 'How does AI School OS secure student data?', a: 'We employ enterprise-grade encryption at rest and in transit, strict RBAC, and zero-data-retention local LLM options via Ollama.' },
+    { q: 'Can we connect custom AI models?', a: 'Yes! The platform supports pluggable LLM provider strategies including OpenAI, Anthropic, Google Gemini, and local Ollama instances.' },
+    { q: 'Is there multi-campus support?', a: 'Absolutely. Principals and main administrators can manage multiple schools, academic years, and departments from a unified command center.' },
   ]
 
-  // Smooth scroll helper
   const scrollToSection = (sectionId) => {
     document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' })
   }
 
   return (
-    <div className="home-page">
+    <div className="home-page" style={{ background: 'var(--bg)', color: 'var(--text)', minHeight: '100vh' }}>
       {/* Navigation Bar */}
-      <nav className="navbar navbar-expand-lg navbar-dark bg-white shadow-sm py-3 sticky-top">
-        <div className="container-fluid px-4">
-          <Link className="navbar-brand d-flex align-items-center" to="/">
-            <i className="bi bi-mortarboard-fill text-primary fs-3 me-2" />
-            <span className="fs-4 fw-bold text-dark">AI School Platform</span>
-          </Link>
-          <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span className="navbar-toggler-icon" />
-          </button>
-          <div className="collapse navbar-collapse" id="navbarNav">
-            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-              <li className="nav-item">
-                <a className="nav-link text-dark" href="#home" onClick={(e) => { e.preventDefault(); scrollToSection('home') }}>Home</a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link text-dark" href="#features" onClick={(e) => { e.preventDefault(); scrollToSection('features') }}>Features</a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link text-dark" href="#ai-section" onClick={(e) => { e.preventDefault(); scrollToSection('ai-section') }}>AI Assistant</a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link text-dark" href="#roles" onClick={(e) => { e.preventDefault(); scrollToSection('roles') }}>Roles</a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link text-dark" href="#about" onClick={(e) => { e.preventDefault(); scrollToSection('about') }}>About</a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link text-dark" href="#contact" onClick={(e) => { e.preventDefault(); scrollToSection('contact') }}>Contact</a>
-              </li>
-            </ul>
-            <div className="d-flex">
-              <Link to="/login" className="btn btn-outline-primary">
-                <i className="bi bi-box-arrow-in-right me-1" />
-                Login
-              </Link>
+      <nav className="navbar navbar-expand-lg navbar-dark bg-card border-bottom py-3 sticky-top shadow-sm" style={{ borderColor: 'var(--border)' }}>
+        <div className="container px-4">
+          <Link className="navbar-brand d-flex align-items-center gap-2" to="/">
+            <div className="brand-icon-wrapper">
+              <i className="bi bi-cpu-fill text-white" />
             </div>
+            <span className="fs-5 fw-bold" style={{ color: 'var(--text)' }}>AI School OS</span>
+          </Link>
+          <div className="d-flex align-items-center gap-3 ms-auto">
+            <button
+              className="btn btn-icon rounded-circle"
+              onClick={toggleTheme}
+              title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
+            >
+              <i className={`bi ${theme === 'light' ? 'bi-moon-stars' : 'bi-sun'} fs-6`} />
+            </button>
+            <Link to="/login" className="btn btn-primary px-4 rounded-pill">
+              <i className="bi bi-box-arrow-in-right me-1" />
+              Sign In
+            </Link>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section - Premium AI SaaS Design */}
-      <section id="home" className="hero-section text-white py-5 py-md-6">
-        <div className="container py-5 position-relative">
-          {/* Animated Background Shapes */}
-          <div className="hero-shapes">
-            <div className="hero-shape shape-1" />
-            <div className="hero-shape shape-2" />
-            <div className="hero-shape shape-3" />
+      {/* Hero Section */}
+      <section id="home" className="hero-section py-5 py-md-6 text-center position-relative overflow-hidden">
+        <div className="container py-5 position-relative z-1">
+          <div className="mx-auto" style={{ maxWidth: '800px' }}>
+            <div className="badge enterprise-badge mb-3 px-3 py-2 rounded-pill shadow-sm" style={{ background: 'var(--surface)', color: 'var(--text)', borderColor: 'var(--border)' }}>
+              <span className="pulse-dot me-1" /> Enterprise AI School Management Platform v2.4
+            </div>
+            <h1 className="display-3 fw-bold mb-4 tracking-tight" style={{ color: 'var(--text)' }}>
+              The AI-First Operating System for <span className="text-primary">Modern Education</span>
+            </h1>
+            <p className="lead text-muted mb-5 fs-5">
+              Transform campus administration, empower educators with generative AI, and deliver personalized learning at scale with enterprise security.
+            </p>
+            <div className="d-flex flex-wrap justify-content-center gap-3">
+              <Link to="/login" className="btn btn-primary btn-lg px-5 rounded-pill shadow-lg">
+                <i className="bi bi-rocket-takeoff me-2" /> Get Started
+              </Link>
+              <button className="btn btn-outline-secondary btn-lg px-4 rounded-pill" onClick={() => scrollToSection('features')}>
+                Explore Capabilities
+              </button>
+            </div>
           </div>
-          
-          <div className="row align-items-center py-4">
-            <div className="col-lg-6 position-relative" style={{ zIndex: 2 }}>
-              <h1 className="display-4 fw-bold mb-3 lh-sm">
-                Transform Education with <span className="text-gradient">AI Excellence</span>
-              </h1>
-              <p className="lead mb-4 opacity-90 fs-5">
-                The future of school management is here. Streamline operations, enhance learning, 
-                and empower educators with our intelligent platform powered by RAG and Ollama.
-              </p>
-              <div className="d-flex flex-wrap gap-3">
-                <button 
-                  className="btn btn-light btn-lg px-4 shadow-sm hover-lift"
-                  onClick={() => scrollToSection('features')}
+        </div>
+      </section>
+
+      {/* Features Grid with Theme-Aware Cards */}
+      <section id="features" className="py-5 py-md-6 border-top" style={{ borderColor: 'var(--border)' }}>
+        <div className="container px-4">
+          <div className="text-center mx-auto mb-5" style={{ maxWidth: '700px' }}>
+            <h2 className="fw-bold mb-3" style={{ color: 'var(--text)' }}>Engineered for Excellence</h2>
+            <p className="text-muted">Designed following principles from Linear, Vercel, and Cursor to deliver lightning-fast response and pristine user experience.</p>
+          </div>
+          <div className="row g-4">
+            {features.map((f, i) => (
+              <div key={i} className="col-md-6 col-lg-3">
+                <div 
+                  className="card h-100 p-4 border rounded-4 shadow-sm hover-lift" 
+                  style={{ background: 'var(--card)', color: 'var(--text)', borderColor: 'var(--border)', minHeight: '220px' }}
                 >
-                  <i className="bi bi-stars me-2" />
-                  Explore Platform
-                </button>
-              </div>
-            </div>
-            <div className="col-lg-6 d-none d-lg-block mt-5 mt-lg-0 position-relative" style={{ zIndex: 2 }}>
-              {/* Floating Glassmorphism Cards */}
-              <div className="hero-visual">
-                <div className="glass-card card-1">
-                  <i className="bi bi-graph-up-arrow fs-1 text-primary mb-2" />
-                  <h6 className="mb-0">AI Analytics</h6>
-                </div>
-                <div className="glass-card card-2 position-relative">
-                  <i className="bi bi-robot fs-1 text-info mb-2" />
-                  <h6 className="mb-0">AI Assistant</h6>
-                  <span className={`ai-pulse-dot ${isAiHealthy ? 'healthy' : 'unhealthy'}`} />
-                </div>
-                <div className="glass-card card-3">
-                  <i className="bi bi-people fs-1 text-success mb-2" />
-                  <h6 className="mb-0">Student Portal</h6>
-                </div>
-                <div className="glass-card card-4">
-                  <i className="bi bi-building-fill fs-1 text-warning mb-2" />
-                  <h6 className="mb-0">School Management</h6>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* AI Section */}
-      <section id="ai-section" className="py-5 bg-white">
-        <div className="container py-4">
-          <div className="text-center mb-5">
-            <h2 className="fw-bold mb-3">AI-Powered Learning</h2>
-            <p className="text-muted fs-5">Transform education with intelligent assistance</p>
-          </div>
-          <div className="row g-4">
-            {aiFeatures.map((feature, index) => (
-              <div key={index} className="col-md-6 col-lg-3">
-                <div className={`ai-card ai-card-${feature.color} h-100 border-0 shadow-sm hover-lift`}>
-                  <div className="card-body text-center p-4">
-                    <div className="mb-3">
-                      <i className={`${feature.icon} fs-1 ai-icon-${feature.color}`} />
-                    </div>
-                    <h5 className="fw-bold mb-2">{feature.title}</h5>
-                    <p className="text-muted mb-0 small">{feature.description}</p>
-                    <a href="#" className="stretched-link text-decoration-none small d-inline-flex align-items-center mt-2">
-                      Learn more <i className="bi bi-arrow-right ms-1" />
-                    </a>
+                  <div className="icon-box mb-3 fs-2 text-primary bg-primary bg-opacity-10 rounded-3 d-inline-flex p-2 align-items-center justify-content-center" style={{ width: '50px', height: '50px' }}>
+                    <i className={`bi ${f.icon}`} />
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="text-center mt-4">
-            <small className="text-muted">Powered by RAG + Ollama technology</small>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="py-5 bg-light">
-        <div className="container py-4">
-          <div className="text-center mb-5">
-            <h2 className="fw-bold mb-3">Powerful Features</h2>
-            <p className="text-muted">Everything you need for modern school management</p>
-          </div>
-          <div className="row g-4">
-            {features.map((feature, index) => (
-              <div key={index} className="col-md-6 col-lg-4 col-xl-3">
-                <div className={`feature-card feature-card-${feature.color} h-100 border-0 shadow-sm hover-lift`}>
-                  <div className="card-body text-center p-4">
-                    <div className="mb-3">
-                      <i className={`${feature.icon} fs-1 feature-icon-${feature.color}`} />
-                    </div>
-                    <h5 className="fw-bold mb-2">{feature.title}</h5>
-                    <p className="text-muted mb-0 small">{feature.description}</p>
-                    <a href="#" className="stretched-link text-decoration-none small d-inline-flex align-items-center mt-2">
-                      Learn more <i className="bi bi-arrow-right ms-1" />
-                    </a>
-                  </div>
+                  <h5 className="fw-bold mb-2" style={{ color: 'var(--text)' }}>{f.title}</h5>
+                  <p className="small mb-0 text-muted">{f.description}</p>
                 </div>
               </div>
             ))}
@@ -263,24 +140,25 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Who Can Use Section */}
-      <section id="roles" className="py-5 bg-white">
-        <div className="container py-4">
-          <div className="text-center mb-5">
-            <h2 className="fw-bold mb-3">Who Can Use This Platform</h2>
-            <p className="text-muted">Role-based access for everyone in your institution</p>
+      {/* AI Powered Features Section with Theme-Aware Cards */}
+      <section id="ai-section" className="py-5 py-md-6 border-top" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
+        <div className="container px-4">
+          <div className="text-center mx-auto mb-5" style={{ maxWidth: '700px' }}>
+            <h2 className="fw-bold mb-3" style={{ color: 'var(--text)' }}>Generative AI at Your Fingertips</h2>
+            <p className="text-muted">Equipped with state-of-the-art RAG engines and multi-provider model routing.</p>
           </div>
           <div className="row g-4">
-            {roles.map((role, index) => (
-              <div key={index} className="col-md-6 col-lg-3">
-                <div className={`role-card role-card-${role.color} h-100 border-0 shadow-sm hover-lift`}>
-                  <div className="card-body p-4">
-                    <div className="text-center mb-3">
-                      <i className={`${role.icon} fs-1 role-icon-${role.color}`} />
-                    </div>
-                    <h5 className="role-title mb-3">{role.title}</h5>
-                    <p className="role-description small mb-0">{role.description}</p>
+            {aiCapabilities.map((ai, idx) => (
+              <div key={idx} className="col-md-6 col-lg-3">
+                <div 
+                  className="card h-100 p-4 border rounded-4 shadow-sm hover-lift"
+                  style={{ background: 'var(--card)', color: 'var(--text)', borderColor: 'var(--border)', minHeight: '220px' }}
+                >
+                  <div className="fs-2 mb-3 text-primary bg-primary bg-opacity-10 rounded-3 d-inline-flex p-2 align-items-center justify-content-center" style={{ width: '50px', height: '50px' }}>
+                    <i className={`bi ${ai.icon}`} />
                   </div>
+                  <h5 className="fw-bold mb-2" style={{ color: 'var(--text)' }}>{ai.title}</h5>
+                  <p className="small mb-0 text-muted">{ai.desc}</p>
                 </div>
               </div>
             ))}
@@ -288,277 +166,83 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section className="py-5 bg-light">
-        <div className="container py-4">
+      {/* FAQ Section */}
+      <section className="py-5 py-md-6 border-top" style={{ borderColor: 'var(--border)' }}>
+        <div className="container px-4" style={{ maxWidth: '800px' }}>
           <div className="text-center mb-5">
-            <h2 className="fw-bold mb-3">How It Works</h2>
+            <h2 className="fw-bold mb-3" style={{ color: 'var(--text)' }}>Frequently Asked Questions</h2>
+            <p className="text-muted">Everything you need to know about AI School OS.</p>
           </div>
-          <div className="row justify-content-center">
-            <div className="col-lg-10">
-              <div className="d-flex flex-column flex-md-row align-items-center justify-content-between text-center">
-                <div className="step-item mb-4 mb-md-0">
-                  <div className="step-icon bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2">
-                    <i className="bi bi-person-gear fs-4" />
-                  </div>
-                  <p className="mb-0 fw-medium">Main Admin</p>
-                </div>
-                <div className="d-none d-md-block mx-2">
-                  <i className="bi bi-arrow-right text-primary fs-3" />
-                </div>
-                <div className="step-item mb-4 mb-md-0">
-                  <div className="step-icon bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2">
-                    <i className="bi bi-building-add fs-4" />
-                  </div>
-                  <p className="mb-0 fw-medium">Create School</p>
-                </div>
-                <div className="d-none d-md-block mx-2">
-                  <i className="bi bi-arrow-right text-primary fs-3" />
-                </div>
-                <div className="step-item mb-4 mb-md-0">
-                  <div className="step-icon bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2">
-                    <i className="bi bi-building-gear fs-4" />
-                  </div>
-                  <p className="mb-0 fw-medium">School Admin</p>
-                </div>
-                <div className="d-none d-md-block mx-2">
-                  <i className="bi bi-arrow-right text-primary fs-3" />
-                </div>
-                <div className="step-item mb-4 mb-md-0">
-                  <div className="step-icon bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2">
-                    <i className="bi bi-person-workspace fs-4" />
-                  </div>
-                  <p className="mb-0 fw-medium">Teachers</p>
-                </div>
-                <div className="d-none d-md-block mx-2">
-                  <i className="bi bi-arrow-right text-primary fs-3" />
-                </div>
-                <div className="step-item mb-4 mb-md-0">
-                  <div className="step-icon bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2">
-                    <i className="bi bi-people fs-4" />
-                  </div>
-                  <p className="mb-0 fw-medium">Students</p>
-                </div>
-                <div className="d-none d-md-block mx-2">
-                  <i className="bi bi-arrow-right text-primary fs-3" />
-                </div>
-                <div className="step-item">
-                  <div className="step-icon bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-2">
-                    <i className="bi bi-robot fs-4" />
-                  </div>
-                  <p className="mb-0 fw-medium">AI Learning</p>
-                </div>
+          <div className="accordion d-flex flex-column gap-3" id="faqAccordion">
+            {faqItems.map((item, index) => (
+              <div key={index} className="card p-4 border rounded-4 shadow-sm" style={{ background: 'var(--card)', color: 'var(--text)', borderColor: 'var(--border)' }}>
+                <h5 className="fw-bold mb-2 text-primary">{item.q}</h5>
+                <p className="text-muted small mb-0">{item.a}</p>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* About Section - Premium AI Dashboard Preview */}
-      <section id="about" className="py-5 bg-white">
+      {/* Call To Action */}
+      <section className="py-5 bg-gradient-primary text-white text-center" style={{ background: 'linear-gradient(135deg, var(--primary) 0%, #3b82f6 100%)' }}>
         <div className="container py-4">
-          <div className="row align-items-center">
-            <div className="col-lg-6 mb-4 mb-lg-0">
-              <h2 className="fw-bold mb-3">About AI School Platform</h2>
-              <p className="text-muted mb-3">
-                Our AI-powered school management platform revolutionizes education by combining 
-                traditional administrative tools with cutting-edge artificial intelligence. 
-                We help educational institutions streamline their operations while providing 
-                personalized learning experiences for students.
-              </p>
-              <p className="text-muted mb-3">
-                Built with modern technology stack including React, Spring Boot, and AI models 
-                like RAG (Retrieval-Augmented Generation) and Ollama, our platform ensures 
-                reliability, scalability, and intelligent assistance at every step.
-              </p>
-              <div className="d-flex gap-3 mt-4">
-                <div className="text-center">
-                  <i className="bi bi-shield-check text-primary fs-2" />
-                  <p className="small mb-0 mt-2">Secure & Reliable</p>
-                </div>
-                <div className="text-center">
-                  <i className="bi bi-lightning-charge text-primary fs-2" />
-                  <p className="small mb-0 mt-2">Lightning Fast</p>
-                </div>
-                <div className="text-center">
-                  <i className="bi bi-gear text-primary fs-2" />
-                  <p className="small mb-0 mt-2">Highly Customizable</p>
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-6">
-              <div className="dashboard-preview shadow-lg">
-                {/* Dashboard Header */}
-                <div className="dashboard-header d-flex align-items-center justify-content-between p-3 border-bottom">
-                  <div className="d-flex align-items-center">
-                    <i className="bi bi-mortarboard-fill text-primary fs-4 me-2" />
-                    <span className="fw-bold">AI Dashboard</span>
-                  </div>
-                  <span className="ai-badge">AI Powered</span>
-                </div>
-                
-                {/* Dashboard Content */}
-                <div className="p-3">
-                  {/* Stats Row */}
-                  <div className="row g-2 mb-3">
-                    <div className="col-6">
-                      <div className="stat-mini stat-mini-blue">
-                        <div className="stat-value">1,248</div>
-                        <div className="stat-label">Students</div>
-                      </div>
-                    </div>
-                    <div className="col-6">
-                      <div className="stat-mini stat-mini-green">
-                        <div className="stat-value">86</div>
-                        <div className="stat-label">New Submissions</div>
-                      </div>
-                    </div>
-                    <div className="col-6">
-                      <div className="stat-mini stat-mini-purple">
-                        <div className="stat-value">94%</div>
-                        <div className="stat-label">Completion Rate</div>
-                      </div>
-                    </div>
-                    <div className="col-6">
-                      <div className="stat-mini stat-mini-orange">
-                        <div className="stat-value">AI</div>
-                        <div className="stat-label">Active Tutor</div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Chart Mockup */}
-                  <div className="chart-container mb-3">
-                    <div className="d-flex justify-content-between align-items-center mb-2 px-2">
-                      <small className="text-muted fw-medium">Performance Analytics</small>
-                      <small className="text-primary">This Week</small>
-                    </div>
-                    <div className="chart-bars d-flex align-items-end justify-content-between px-3">
-                      <div className="chart-bar" style={{ height: '30%' }} />
-                      <div className="chart-bar" style={{ height: '45%' }} />
-                      <div className="chart-bar" style={{ height: '60%' }} />
-                      <div className="chart-bar" style={{ height: '40%' }} />
-                      <div className="chart-bar" style={{ height: '75%' }} />
-                      <div className="chart-bar" style={{ height: '55%' }} />
-                      <div className="chart-bar" style={{ height: '48%' }} />
-                    </div>
-                    <div className="d-flex justify-content-between px-2 mt-1">
-                      <small className="text-muted">Mon</small>
-                      <small className="text-muted">Tue</small>
-                      <small className="text-muted">Wed</small>
-                      <small className="text-muted">Thu</small>
-                      <small className="text-muted">Fri</small>
-                      <small className="text-muted">Sat</small>
-                      <small className="text-muted">Sun</small>
-                    </div>
-                  </div>
-                  
-                  {/* Activity Feed */}
-                  <div className="activity-feed">
-                    <small className="text-muted fw-medium d-block mb-2">Recent Activity</small>
-                    <div className="activity-item">
-                      <span className="activity-dot bg-success" />
-                      <small>Assignment submitted by John D.</small>
-                    </div>
-                    <div className="activity-item">
-                      <span className="activity-dot bg-primary" />
-                      <small>AI tutor answered 42 queries</small>
-                    </div>
-                    <div className="activity-item">
-                      <span className="activity-dot bg-warning" />
-                      <small>Course grades updated</small>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <h2 className="fw-bold mb-3 text-white">Ready to Modernize Your Campus?</h2>
+          <p className="lead text-white-50 mb-4">Join leading educational institutions using AI School OS.</p>
+          <Link to="/login" className="btn btn-light btn-lg text-primary fw-semibold px-5 rounded-pill shadow">
+            Get Started Now
+          </Link>
         </div>
       </section>
 
-      {/* Contact Section */}
-      <section id="contact" className="py-5 bg-light">
-        <div className="container py-4">
-          <div className="text-center mb-5">
-            <h2 className="fw-bold mb-3">Contact Us</h2>
-            <p className="text-muted">Have questions? We're here to help!</p>
-          </div>
-          <div className="row g-4">
-            <div className="col-md-4">
-              <div className="card h-100 border-0 shadow-sm hover-lift contact-card">
-                <div className="card-body text-center p-4">
-                  <i className="bi bi-envelope text-primary fs-1 mb-3" />
-                  <h5 className="fw-bold mb-2">Email</h5>
-                  <p className="text-muted mb-0">support@aischoolplatform.com</p>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-4">
-              <div className="card h-100 border-0 shadow-sm hover-lift contact-card">
-                <div className="card-body text-center p-4">
-                  <i className="bi bi-telephone text-primary fs-1 mb-3" />
-                  <h5 className="fw-bold mb-2">Phone</h5>
-                  <p className="text-muted mb-0">+1 (555) 123-4567</p>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-4">
-              <div className="card h-100 border-0 shadow-sm hover-lift contact-card">
-                <div className="card-body text-center p-4">
-                  <i className="bi bi-geo-alt text-primary fs-1 mb-3" />
-                  <h5 className="fw-bold mb-2">Location</h5>
-                  <p className="text-muted mb-0">San Francisco, CA</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-dark text-white py-5">
-        <div className="container">
+      {/* Professional SaaS Footer */}
+      <footer className="py-5 border-top" style={{ borderColor: 'var(--border)', background: 'var(--card)', color: 'var(--text)' }}>
+        <div className="container px-4">
           <div className="row g-4 mb-4">
             <div className="col-lg-4">
-              <div className="d-flex align-items-center mb-3">
-                <i className="bi bi-mortarboard-fill text-primary fs-2 me-2" />
-                <span className="fs-4 fw-bold">AI School Platform</span>
+              <div className="d-flex align-items-center gap-2 mb-3">
+                <div className="brand-icon-wrapper">
+                  <i className="bi bi-cpu-fill text-white" />
+                </div>
+                <span className="fs-5 fw-bold" style={{ color: 'var(--text)' }}>AI School OS</span>
               </div>
-              <p className="text-white-50">
-                Modern AI-powered school management solution for educational institutions.
+              <p className="text-muted small mb-3">
+                The premier enterprise AI-powered platform for multi-campus school management, automated grading, and intelligent tutoring.
               </p>
+              <div className="d-flex gap-3 text-muted">
+                <a href="https://github.com" target="_blank" rel="noreferrer" className="text-muted fs-5"><i className="bi bi-github" /></a>
+                <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="text-muted fs-5"><i className="bi bi-linkedin" /></a>
+                <a href="https://twitter.com" target="_blank" rel="noreferrer" className="text-muted fs-5"><i className="bi bi-twitter" /></a>
+              </div>
             </div>
-            <div className="col-lg-2">
-              <h6 className="text-white mb-3">Product</h6>
-              <ul className="list-unstyled">
-                <li className="mb-2"><a href="#features" className="text-white-50 text-decoration-none footer-link" onClick={(e) => { e.preventDefault(); scrollToSection('features') }}>Features</a></li>
-                <li className="mb-2"><a href="#ai-section" className="text-white-50 text-decoration-none footer-link" onClick={(e) => { e.preventDefault(); scrollToSection('ai-section') }}>AI Assistant</a></li>
+            <div className="col-6 col-lg-2">
+              <h6 className="fw-bold mb-3" style={{ color: 'var(--text)' }}>Company</h6>
+              <ul className="list-unstyled d-flex flex-column gap-2 small text-muted">
+                <li><a href="#home" className="text-muted text-decoration-none" onClick={(e) => { e.preventDefault(); scrollToSection('home'); }}>About Us</a></li>
+                <li><a href="#features" className="text-muted text-decoration-none" onClick={(e) => { e.preventDefault(); scrollToSection('features'); }}>Features</a></li>
+                <li><a href="#ai-section" className="text-muted text-decoration-none" onClick={(e) => { e.preventDefault(); scrollToSection('ai-section'); }}>AI Architecture</a></li>
               </ul>
             </div>
-            <div className="col-lg-2">
-              <h6 className="text-white mb-3">Company</h6>
-              <ul className="list-unstyled">
-                <li className="mb-2"><a href="#about" className="text-white-50 text-decoration-none footer-link" onClick={(e) => { e.preventDefault(); scrollToSection('about') }}>About</a></li>
-                <li className="mb-2"><a href="#contact" className="text-white-50 text-decoration-none footer-link" onClick={(e) => { e.preventDefault(); scrollToSection('contact') }}>Contact</a></li>
+            <div className="col-6 col-lg-2">
+              <h6 className="fw-bold mb-3" style={{ color: 'var(--text)' }}>Resources</h6>
+              <ul className="list-unstyled d-flex flex-column gap-2 small text-muted">
+                <li><Link to="/knowledge" className="text-muted text-decoration-none">Documentation</Link></li>
+                <li><a href="#faqAccordion" className="text-muted text-decoration-none">API Reference</a></li>
+                <li><Link to="/login" className="text-muted text-decoration-none">System Status</Link></li>
               </ul>
             </div>
             <div className="col-lg-4">
-              <h6 className="text-white mb-3">Legal</h6>
-              <ul className="nav flex-column">
-                <li className="nav-item">
-                  <a className="nav-link text-white-50 px-0 py-1" href="#privacy">Privacy Policy</a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link text-white-50 px-0 py-1" href="#terms">Terms of Service</a>
-                </li>
+              <h6 className="fw-bold mb-3" style={{ color: 'var(--text)' }}>Support & Contact</h6>
+              <ul className="list-unstyled d-flex flex-column gap-2 small text-muted">
+                <li><i className="bi bi-envelope me-2" /> support@aischoolos.io</li>
+                <li><i className="bi bi-telephone me-2" /> +1 (800) 555-AI-OS</li>
+                <li><i className="bi bi-geo-alt me-2" /> Silicon Valley, CA, USA</li>
               </ul>
             </div>
           </div>
-          <hr className="my-4 opacity-25" />
-          <div className="d-flex justify-content-between align-items-center">
-            <small className="text-white-50">
-              &copy; {new Date().getFullYear()} AI School Platform. All rights reserved.
-            </small>
+          <div className="border-top pt-4 text-center text-muted small d-flex flex-column flex-md-row justify-content-between align-items-center" style={{ borderColor: 'var(--border)' }}>
+            <p className="mb-2 mb-md-0">&copy; {new Date().getFullYear()} AI School OS. All rights reserved. Enterprise SaaS Edition.</p>
+            <p className="mb-0">Built with React + Spring Boot + AI (Ollama & OpenAI RAG)</p>
           </div>
         </div>
       </footer>

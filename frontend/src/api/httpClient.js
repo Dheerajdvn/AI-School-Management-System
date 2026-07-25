@@ -31,6 +31,11 @@ httpClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type']
+      delete config.headers.common?.['Content-Type']
+      delete config.headers.post?.['Content-Type']
+    }
     return config
   },
   (error) => Promise.reject(error)

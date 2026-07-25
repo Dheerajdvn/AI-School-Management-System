@@ -41,7 +41,7 @@ public class DocumentController {
     private final DocumentService documentService;
     private final DocumentContentRepository documentContentRepository;
 
-    @PostMapping("/upload")
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER')")
     @Operation(summary = "Upload a document")
     public ApiResponse<DocumentResponse> upload(
@@ -50,7 +50,11 @@ public class DocumentController {
             @RequestParam(value = "documentType", required = false) String documentType,
             Authentication authentication) {
 
-        log.info("Uploading document: {}", file.getOriginalFilename());
+        log.info("Uploading document: filename={}, size={}, contentType={}, courseId={}, documentType={}",
+                file != null ? file.getOriginalFilename() : "null",
+                file != null ? file.getSize() : 0,
+                file != null ? file.getContentType() : "null",
+                courseId, documentType);
 
         UploadDocumentRequest request = UploadDocumentRequest.builder()
                 .file(file)
@@ -149,10 +153,11 @@ public class DocumentController {
     }
 
     private Long extractUserId(Authentication authentication) {
-        if (authentication != null && authentication.getCredentials() instanceof Long userId) {
-            return userId;
+        if (authentication == null) {
+            return null;
         }
-        return null;
+        Object credentials = authentication.getCredentials();
+        return credentials instanceof Long ? (Long) credentials : null;
     }
 
     private String getCurrentUserRole(Authentication authentication) {

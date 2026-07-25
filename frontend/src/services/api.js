@@ -15,6 +15,11 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type']
+      delete config.headers.common?.['Content-Type']
+      delete config.headers.post?.['Content-Type']
+    }
     return config
   },
   (error) => {
@@ -29,11 +34,23 @@ api.interceptors.request.use(
 export const RagApi = {
   chat: (message) => api.post('/ai/chat', { message }).then(r => r.data?.data || r.data),
   streamChat: (message) => api.post('/ai/chat/stream', { message }, { responseType: 'stream' }).then(r => r.data),
+  reindex: (id) => api.post(`/rag/reindex/${id}`).then(r => r.data?.data || r.data),
+  reindexAll: () => api.post('/rag/reindex-all').then(r => r.data?.data || r.data),
 }
 
 // AI API (for Topbar and AskAiPage health check)
 export const AiApi = {
   health: () => api.get('/ai/health').then(r => r.data?.data || r.data),
+}
+
+// AI Config API (for Settings page - per-user LLM provider configuration)
+export const AiConfigApi = {
+  getConfig: () => api.get('/ai/config').then(r => r.data?.data || r.data),
+  saveConfig: (data) => api.post('/ai/config', data).then(r => r.data?.data || r.data),
+  verifyConnection: (data) => api.post('/ai/config/verify', data).then(r => r.data?.data || r.data),
+  resetConfig: () => api.post('/ai/config/reset').then(r => r.data?.data || r.data),
+  getProviders: () => api.get('/ai/config/providers').then(r => r.data?.data || r.data),
+  getProviderInfo: () => api.get('/ai/config/providers/info').then(r => r.data?.data || r.data),
 }
 
 // Dashboard API endpoints
@@ -48,15 +65,32 @@ export const DashboardApi = {
 
 // Document API endpoints
 export const DocumentApi = {
-  list: (params) => api.get('/documents', { params }).then(r => r.data),
+  list: (params) => api.get('/documents', { params }).then(r => r.data?.data || r.data),
   get: (id) => api.get(`/documents/${id}`).then(r => r.data?.data || r.data),
   create: (data) => api.post('/documents', data).then(r => r.data?.data || r.data),
+  upload: (file, courseId, documentType, userId, onUploadProgress) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    if (courseId) formData.append('courseId', courseId)
+    if (documentType) formData.append('documentType', documentType)
+    return api.post('/documents/upload', formData, {
+      onUploadProgress: (progressEvent) => {
+        if (onUploadProgress && progressEvent.total) {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+          onUploadProgress(percentCompleted)
+        }
+      },
+    }).then(r => r.data?.data || r.data)
+  },
+  download: (id) => api.get(`/documents/${id}/download`, { responseType: 'blob' }).then(r => r.data),
+  getContent: (id) => api.get(`/documents/${id}/content`).then(r => r.data?.data || r.data),
+  remove: (id) => api.delete(`/documents/${id}`).then(r => r.data?.data || r.data),
   delete: (id) => api.delete(`/documents/${id}`).then(r => r.data?.data || r.data),
 }
 
 // Grade API endpoints
 export const GradeApi = {
-  list: (params) => api.get('/grades', { params }).then(r => r.data),
+  list: (params) => api.get('/grades', { params }).then(r => r.data?.data || r.data),
   get: (id) => api.get(`/grades/${id}`).then(r => r.data?.data || r.data),
   grade: (submissionId, data) => api.post(`/grades/${submissionId}`, data).then(r => r.data?.data || r.data),
   publish: (submissionId) => api.post(`/grades/${submissionId}/publish`).then(r => r.data?.data || r.data),
@@ -64,8 +98,8 @@ export const GradeApi = {
 
 // Student API endpoints
 export const StudentApi = {
-  list: (params) => api.get('/students', { params }).then(r => r.data),
-  search: (params) => api.get('/students/search', { params }).then(r => r.data),
+  list: (params) => api.get('/students', { params }).then(r => r.data?.data || r.data),
+  search: (params) => api.get('/students/search', { params }).then(r => r.data?.data || r.data),
   get: (id) => api.get(`/students/${id}`).then(r => r.data?.data || r.data),
   create: (data) => api.post('/students', data).then(r => r.data?.data || r.data),
   update: (id, data) => api.put(`/students/${id}`, data).then(r => r.data?.data || r.data),
@@ -75,24 +109,27 @@ export const StudentApi = {
 
 // Assignment API endpoints
 export const AssignmentApi = {
-  list: (params) => api.get('/assignments', { params }).then(r => r.data),
+  list: (params) => api.get('/assignments', { params }).then(r => r.data?.data || r.data),
+  search: (params) => api.get('/assignments/search', { params }).then(r => r.data?.data || r.data),
   get: (id) => api.get(`/assignments/${id}`).then(r => r.data?.data || r.data),
-  create: (data) => api.post('/assignments', data).then(r => r.data?.data || r.data),
+  create: (data, courseId) => api.post('/assignments', data, { params: courseId ? { courseId } : {} }).then(r => r.data?.data || r.data),
   update: (id, data) => api.put(`/assignments/${id}`, data).then(r => r.data?.data || r.data),
   delete: (id) => api.delete(`/assignments/${id}`).then(r => r.data?.data || r.data),
 }
 
 // Submission API endpoints
 export const SubmissionApi = {
-  list: (params) => api.get('/submissions', { params }).then(r => r.data),
+  list: (params) => api.get('/submissions', { params }).then(r => r.data?.data || r.data),
+  search: (params) => api.get('/submissions/search', { params }).then(r => r.data?.data || r.data),
+  getByAssignment: (assignmentId, params) => api.get(`/submissions/assignment/${assignmentId}`, { params }).then(r => r.data?.data || r.data),
   get: (id) => api.get(`/submissions/${id}`).then(r => r.data?.data || r.data),
   create: (data) => api.post('/submissions', data).then(r => r.data?.data || r.data),
 }
 
 // Course API endpoints
 export const CourseApi = {
-  list: (params) => api.get('/courses', { params }).then(r => r.data),
-  search: (params) => api.get('/courses/search', { params }).then(r => r.data),
+  list: (params) => api.get('/courses', { params }).then(r => r.data?.data || r.data),
+  search: (params) => api.get('/courses/search', { params }).then(r => r.data?.data || r.data),
   get: (id) => api.get(`/courses/${id}`).then(r => r.data?.data || r.data),
   create: (data) => api.post('/courses', data).then(r => r.data?.data || r.data),
   update: (id, data) => api.put(`/courses/${id}`, data).then(r => r.data?.data || r.data),
@@ -102,26 +139,26 @@ export const CourseApi = {
 
 // Enrollment API endpoints
 export const EnrollmentApi = {
-  list: (params) => api.get('/enrollments', { params }).then(r => r.data),
+  list: (params) => api.get('/enrollments', { params }).then(r => r.data?.data || r.data),
 }
 
 // School API endpoints
 export const SchoolApi = {
-  list: (params) => api.get('/schools', { params }).then(r => r.data),
+  list: (params) => api.get('/schools', { params }).then(r => r.data?.data || r.data),
   get: (id) => api.get(`/schools/${id}`).then(r => r.data?.data || r.data),
   create: (data) => api.post('/schools', data).then(r => r.data?.data || r.data),
   update: (id, data) => api.put(`/schools/${id}`, data).then(r => r.data?.data || r.data),
-  delete: (id) => api.delete(`/schools/${id}`).then(r => r.data),
+  delete: (id) => api.delete(`/schools/${id}`).then(r => r.data?.data || r.data),
   toggleStatus: (id) => api.post(`/schools/${id}/toggle-status`).then(r => r.data?.data || r.data),
 }
 
 // User API endpoints
 export const UserApi = {
-  list: (params) => api.get('/users', { params }).then(r => r.data),
+  list: (params) => api.get('/users', { params }).then(r => r.data?.data || r.data),
   get: (id) => api.get(`/users/${id}`).then(r => r.data?.data || r.data),
   create: (data) => api.post('/users', data).then(r => r.data?.data || r.data),
   update: (id, data) => api.put(`/users/${id}`, data).then(r => r.data?.data || r.data),
-  remove: (id) => api.delete(`/users/${id}`).then(r => r.data),
+  remove: (id) => api.delete(`/users/${id}`).then(r => r.data?.data || r.data),
   setEnabled: (id, enabled) => api.post(`/users/${id}/enable?enabled=${enabled}`).then(r => r.data?.data || r.data),
 }
 

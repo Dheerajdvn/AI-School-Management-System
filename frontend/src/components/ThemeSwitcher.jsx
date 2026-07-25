@@ -1,18 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
+import { useTheme } from '../context/ThemeContext'
 
 const ThemeSwitcher = () => {
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('theme') || 'light'
-  })
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-    localStorage.setItem('theme', theme)
-  }, [theme])
-
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light')
-  }
+  const { theme, toggleTheme } = useTheme()
 
   return (
     <div className="card">

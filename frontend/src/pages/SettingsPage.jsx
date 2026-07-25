@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import ThemeSwitcher from '../components/ThemeSwitcher'
 import NotificationSettings from '../components/NotificationSettings'
 import AccountSettings from '../components/AccountSettings'
+import AiSettings from '../components/AiSettings'
 
 const SettingsPage = () => {
   const [activeTab, setActiveTab] = useState('theme')
@@ -72,43 +73,7 @@ const SettingsPage = () => {
             )}
             {activeTab === 'notifications' && <NotificationSettings />}
             {activeTab === 'account' && <AccountSettings />}
-            {activeTab === 'ai' && (
-              <div className="card">
-                <div className="card-header">
-                  <h5 className="mb-0">
-                    <i className="bi bi-robot me-2" />
-                    AI Settings
-                  </h5>
-                </div>
-                <div className="card-body">
-                  <div className="mb-3">
-                    <label className="form-label">AI Model</label>
-                    <select className="form-select">
-                      <option>Default Model</option>
-                      <option>GPT-4</option>
-                      <option>Claude</option>
-                    </select>
-                  </div>
-                  
-                  <div className="mb-3">
-                    <label className="form-label">Response Length</label>
-                    <input type="range" className="form-range" min="1" max="10" defaultValue="5" />
-                  </div>
-                  
-                  <div className="mb-3">
-                    <label className="form-label">Creativity Level</label>
-                    <input type="range" className="form-range" min="0" max="100" defaultValue="50" />
-                  </div>
-                  
-                  <div className="form-check form-switch">
-                    <input className="form-check-input" type="checkbox" id="aiSuggestions" defaultChecked />
-                    <label className="form-check-label" htmlFor="aiSuggestions">
-                      Show AI suggestions automatically
-                    </label>
-                  </div>
-                </div>
-              </div>
-            )}
+            {activeTab === 'ai' && <AiSettings />}
           </div>
         </div>
       </div>

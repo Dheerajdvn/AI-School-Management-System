@@ -45,7 +45,7 @@ public class CourseController {
     private final JwtService jwtService;
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
     @Operation(summary = "Create a new course (ADMIN/TEACHER only)")
     public ResponseEntity<ApiResponse<CourseResponse>> create(
             @Valid @RequestBody CourseRequest request,
@@ -60,7 +60,7 @@ public class CourseController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
     @Operation(summary = "Update a course (ADMIN/TEACHER - own courses only)")
     public ApiResponse<CourseResponse> update(
             @PathVariable Long id,
@@ -75,7 +75,7 @@ public class CourseController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
     @Operation(summary = "Delete a course (ADMIN/TEACHER - own courses only)")
     public ApiResponse<Void> delete(
             @PathVariable Long id,
@@ -89,7 +89,7 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     @Operation(summary = "Get a course by ID")
     public ApiResponse<CourseResponse> getById(
             @PathVariable Long id,
@@ -100,7 +100,7 @@ public class CourseController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     @Operation(summary = "Get all courses")
     public ApiResponse<PagedResponse<CourseResponse>> getAll(
             @RequestParam(defaultValue = "0") int page,
@@ -118,7 +118,7 @@ public class CourseController {
     }
 
     @GetMapping("/search")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     @Operation(summary = "Search courses")
     public ApiResponse<PagedResponse<CourseResponse>> search(
             @RequestParam(required = false) String courseCode,
@@ -152,6 +152,11 @@ public class CourseController {
     }
 
     private String getCurrentUserRole(Authentication authentication) {
+        boolean hasAdmin = authentication.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN") || auth.getAuthority().equals("ROLE_SUPER_ADMIN"));
+        if (hasAdmin) {
+            return "ROLE_ADMIN";
+        }
         return authentication.getAuthorities().stream()
                 .findFirst()
                 .map(auth -> auth.getAuthority())

@@ -1,0 +1,23 @@
+.modal-content {
+  background-color: var(--modal-bg) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-card) !important;
+  box-shadow: var(--shadow-lg) !important;
+  animation: modalScaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-backdrop.show {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background-color: rgba(9, 9, 11, 0.6);
+}
+
+.modal-header, .modal-footer {
+  border-color: var(--border) !important;
+  padding: 1.25rem 1.5rem !important;
+}
+
+.modal-body {
+  padding: 1.5rem !important;
+}

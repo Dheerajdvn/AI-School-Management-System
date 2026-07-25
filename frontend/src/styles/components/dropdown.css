@@ -1,0 +1,25 @@
+.user-dropdown-popup {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 1rem;
+  right: 1rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  padding: 0.5rem;
+  z-index: 1050;
+  animation: fadeInScale 0.15s ease;
+}
+
+.user-dropdown-popup .dropdown-item {
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.875rem;
+  transition: background 0.15s;
+}
+
+.user-dropdown-popup .dropdown-item:hover {
+  background: var(--hover, rgba(79,70,229,0.08));
+  color: var(--primary);
+}

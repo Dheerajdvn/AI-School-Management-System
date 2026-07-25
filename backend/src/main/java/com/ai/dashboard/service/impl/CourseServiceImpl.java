@@ -70,7 +70,7 @@ public class CourseServiceImpl implements CourseService {
         validateCourseCodeUnique(request.getCourseCode(), id);
 
         // Only ADMIN can change teacher
-        if ("ROLE_ADMIN".equals(currentUserRole) && request.getTeacherId() != null) {
+        if (isAdmin(currentUserRole) && request.getTeacherId() != null) {
             User teacher = userRepository.findById(request.getTeacherId())
                     .orElseThrow(() -> new ResourceNotFoundException("Teacher not found with id " + request.getTeacherId()));
             existing.setTeacher(teacher);
@@ -139,7 +139,7 @@ public class CourseServiceImpl implements CourseService {
                         CourseSpecifications.hasStatus(status));
 
         // For non-admin users, restrict to own courses
-        if (!"ROLE_ADMIN".equals(currentUserRole)) {
+        if (!isAdmin(currentUserRole)) {
             spec = spec.and(CourseSpecifications.hasTeacherId(currentUserId));
         } else if (teacherId != null) {
             spec = spec.and(CourseSpecifications.hasTeacherId(teacherId));
@@ -156,8 +156,12 @@ public class CourseServiceImpl implements CourseService {
 
     // ------------------------------------------------------------------
 
+    private boolean isAdmin(String role) {
+        return "ROLE_ADMIN".equals(role) || "ROLE_SUPER_ADMIN".equals(role);
+    }
+
     private User getTeacher(Long teacherId, String currentUserRole, Long currentUserId) {
-        if ("ROLE_ADMIN".equals(currentUserRole) && teacherId != null) {
+        if (isAdmin(currentUserRole) && teacherId != null) {
             return userRepository.findById(teacherId)
                     .orElseThrow(() -> new ResourceNotFoundException("Teacher not found with id " + teacherId));
         }
@@ -176,7 +180,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     private void validateOwnership(Course course, Long currentUserId, String currentUserRole) {
-        if (!"ROLE_ADMIN".equals(currentUserRole)) {
+        if (!isAdmin(currentUserRole)) {
             if (!course.getTeacher().getId().equals(currentUserId)) {
                 throw new AccessDeniedException("You don't have permission to modify this course");
             }

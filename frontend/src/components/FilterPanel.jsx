@@ -44,7 +44,7 @@ export default function FilterPanel({
             <option value="">All Courses</option>
             {courses.map(course => (
               <option key={course.id} value={course.id}>
-                {course.code} - {course.name}
+                {course.courseCode || course.code || ''} - {course.title || course.name || ''}
               </option>
             ))}
           </select>

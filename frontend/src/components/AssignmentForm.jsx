@@ -70,7 +70,8 @@ const AssignmentForm = ({ show = true, assignment = null, courses = [], onClose,
       onSaved && onSaved()
     } catch (err) {
       console.error(err)
-      alert('Failed to save assignment')
+      const msg = err.response?.data?.message || err.message || 'Failed to save assignment'
+      alert(msg)
     } finally {
       setSaving(false)
     }

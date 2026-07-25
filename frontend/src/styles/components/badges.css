@@ -1,0 +1,35 @@
+.enterprise-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.badge-online {
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #059669;
+}
+
+[data-theme="dark"] .badge-online,
+body.dark-mode .badge-online {
+  color: #34d399;
+}
+
+.badge-model {
+  background: rgba(79, 70, 229, 0.08);
+  color: var(--primary);
+  border-color: rgba(79, 70, 229, 0.2);
+}
+
+[data-theme="dark"] .badge-model,
+body.dark-mode .badge-model {
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+  border-color: rgba(99, 102, 241, 0.3);
+}

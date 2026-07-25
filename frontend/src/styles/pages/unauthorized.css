@@ -1,0 +1,22 @@
+.unauthorized-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 1rem;
+}
+
+.unauthorized-container {
+  width: 100%;
+  max-width: 480px;
+}
+
+.unauthorized-card {
+  background: var(--card);
+  border-radius: 1rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  padding: 3rem 2.5rem;
+  text-align: center;
+  animation: slideUp 0.4s ease-out;
+}

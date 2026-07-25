@@ -29,6 +29,7 @@ public class DashboardServiceImpl implements DashboardService {
     private final AssignmentRepository assignmentRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final SubmissionRepository submissionRepository;
+    private final SchoolRepository schoolRepository;
 
     @Override
     @Transactional(readOnly = true)

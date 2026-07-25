@@ -35,6 +35,7 @@ export default function UserTable({ users = [], onEdit, onDelete, onView, onTogg
                   <td>{u.enabled ? <span className="badge bg-success">Enabled</span> : <span className="badge bg-secondary">Disabled</span>}</td>
                   <td className="text-end">
                     <div className="btn-group" role="group">
+                      <button className="btn btn-sm btn-outline-info" onClick={() => onView(u)}>View</button>
                       <button className="btn btn-sm btn-outline-primary" onClick={() => onEdit(u)}>Edit</button>
                       <button className="btn btn-sm btn-outline-danger" onClick={() => onDelete(u)}>Delete</button>
                       <button className="btn btn-sm btn-outline-secondary" onClick={() => onToggleEnabled(u)}>{u.enabled ? 'Disable' : 'Enable'}</button>

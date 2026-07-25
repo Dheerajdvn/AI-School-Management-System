@@ -172,10 +172,11 @@ public class AssignmentController {
     // ------------------------------------------------------------------
 
     private Long extractUserId(Authentication authentication) {
-        if (authentication.getDetails() instanceof Long) {
-            return (Long) authentication.getDetails();
+        if (authentication == null) {
+            return null;
         }
-        return null;
+        Object credentials = authentication.getCredentials();
+        return credentials instanceof Long ? (Long) credentials : null;
     }
 
     private String getCurrentUserRole(Authentication authentication) {

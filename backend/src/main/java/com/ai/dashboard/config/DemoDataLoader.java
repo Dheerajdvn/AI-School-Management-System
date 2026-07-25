@@ -32,6 +32,8 @@ public class DemoDataLoader {
     private final DocumentRepository documentRepository;
     private final ConversationSessionRepository conversationSessionRepository;
     private final ChatMessageRepository chatMessageRepository;
+    private final AssignmentRepository assignmentRepository;
+    private final SubmissionRepository submissionRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Bean
@@ -257,6 +259,39 @@ public class DemoDataLoader {
                 }
             }
             log.info("Created 200 chat messages");
+
+            // 8. Create Assignments & Submissions if empty
+            if (assignmentRepository.count() == 0 && !courses.isEmpty() && !teachers.isEmpty()) {
+                for (int i = 0; i < courses.size(); i++) {
+                    Course course = courses.get(i);
+                    User teacher = course.getTeacher() != null ? course.getTeacher() : teachers.get(0);
+                    Assignment assignment = Assignment.builder()
+                            .title("Assignment " + (i + 1) + " for " + course.getTitle())
+                            .description("Complete all exercises for " + course.getTitle())
+                            .instructions("Submit your work as a PDF or text file.")
+                            .dueDate(LocalDateTime.now().plusDays(7 + i))
+                            .maxMarks(100)
+                            .status(Assignment.Status.PUBLISHED)
+                            .teacher(teacher)
+                            .course(course)
+                            .build();
+                    Assignment savedAssignment = assignmentRepository.save(assignment);
+
+                    if (!studentUsers.isEmpty()) {
+                        User student = studentUsers.get(i % studentUsers.size());
+                        Submission submission = Submission.builder()
+                                .assignment(savedAssignment)
+                                .student(student)
+                                .submissionText("Here is my completed assignment submission.")
+                                .status(i % 2 == 0 ? Submission.Status.SUBMITTED : Submission.Status.GRADED)
+                                .obtainedMarks(i % 2 == 0 ? null : 85)
+                                .submittedAt(LocalDateTime.now().minusDays(1))
+                                .build();
+                        submissionRepository.save(submission);
+                    }
+                }
+                log.info("Created demo assignments and submissions");
+            }
 
             log.info("Demo data loaded successfully.");
         };

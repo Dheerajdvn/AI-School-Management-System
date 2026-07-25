@@ -8,9 +8,14 @@ const COLORS = {
   danger: 'linear-gradient(135deg,#ef4444,#dc2626)',
 }
 
-export default function StatCard({ icon, label, value, color = 'primary' }) {
+export default function StatCard({ icon, label, value, color = 'primary', onClick, active = false }) {
   return (
-    <div className="stat-card">
+    <div 
+      className={`stat-card ${active ? 'active' : ''} ${onClick ? 'clickable' : ''}`}
+      onClick={onClick}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+    >
       <div className="icon" style={{ background: COLORS[color] || COLORS.primary }}>
         <i className={`bi ${icon}`} />
       </div>

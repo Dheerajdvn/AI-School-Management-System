@@ -25,7 +25,8 @@ export default function KnowledgeLibrary() {
       const params = { ...filters }
       if (searchQuery) params.search = searchQuery
       const data = await knowledgeService.getDocuments(params)
-      setDocuments(data || [])
+      const list = data?.content || data?.data || (Array.isArray(data) ? data : [])
+      setDocuments(Array.isArray(list) ? list : [])
     } catch (err) {
       error('Failed to load documents: ' + (err.response?.data?.message || err.message))
     } finally {
@@ -59,14 +60,17 @@ export default function KnowledgeLibrary() {
   }
 
   const getStatusBadge = (status) => {
+    const st = String(status || 'Indexed')
     const styles = {
       Indexed: 'bg-success',
       indexed: 'bg-success',
+      COMPLETED: 'bg-success',
       Processing: 'bg-warning text-dark',
+      PROCESSING: 'bg-warning text-dark',
       Failed: 'bg-danger',
-      failed: 'bg-danger',
+      FAILED: 'bg-danger',
     }
-    return <span className={"badge " + (styles[status] || 'bg-secondary')}>{status}</span>
+    return <span className={"badge " + (styles[st] || 'bg-secondary')}>{st}</span>
   }
 
   return (
@@ -88,7 +92,7 @@ export default function KnowledgeLibrary() {
               </button>
             </div>
           </form>
-          <Link to="/knowledge/upload" className="btn btn-primary">
+          <Link to="/admin/documents" className="btn btn-primary">
             <i className="bi bi-upload me-1" />
             Upload
           </Link>
@@ -171,7 +175,7 @@ export default function KnowledgeLibrary() {
             <i className="bi bi-folder-x text-muted" style={{ fontSize: '3rem' }} />
             <h5 className="mt-3">No Documents Found</h5>
             <p className="text-muted">Upload your first document to get started.</p>
-            <Link to="/knowledge/upload" className="btn btn-primary">
+            <Link to="/admin/documents" className="btn btn-primary">
               <i className="bi bi-upload me-1" />
               Upload Documents
             </Link>
@@ -201,43 +205,49 @@ export default function KnowledgeLibrary() {
                   </tr>
                 </thead>
                 <tbody>
-                  {documents.map((doc) => (
-                    <tr key={doc.id}>
-                      <td className="fw-medium">{doc.name || doc.title}</td>
-                      <td><span className="badge bg-secondary">{doc.type}</span></td>
-                      <td>{doc.size}</td>
-                      <td>{doc.uploadedBy || doc.uploaded_by || 'N/A'}</td>
-                      <td>{doc.subject}</td>
-                      <td>{doc.collection}</td>
-                      <td>{getStatusBadge(doc.status)}</td>
-                      <td>{doc.chunks || 0}</td>
-                      <td>{doc.embeddings || doc.embeddingCount || 0}</td>
-                      <td>{doc.date || doc.createdAt || 'N/A'}</td>
-                      <td>
-                        <div className="btn-group btn-group-sm">
-                          <Link to={`/knowledge/document/${doc.id}`} className="btn btn-outline-primary">
-                            <i className="bi bi-eye" />
-                          </Link>
-                          <button className="btn btn-outline-success">
-                            <i className="bi bi-download" />
-                          </button>
-                          <button 
-                            className="btn btn-outline-warning"
-                            onClick={() => handleReindex(doc.id)}
-                            title="Reindex document"
-                          >
-                            <i className="bi bi-arrow-clockwise" />
-                          </button>
-                          <button 
-                            className="btn btn-outline-danger"
-                            onClick={() => handleDelete(doc.id)}
-                          >
-                            <i className="bi bi-trash" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  {documents.map((doc) => {
+                    const docName = doc.originalFilename || doc.filename || doc.name || doc.title || 'Untitled'
+                    const docType = doc.documentType || doc.type || 'OTHER'
+                    const docSize = doc.fileSize ? (doc.fileSize / 1024).toFixed(1) + ' KB' : doc.size || '—'
+                    const uploadedBy = doc.uploadedByName || doc.uploadedBy || doc.uploaded_by || 'Admin'
+                    const statusVal = doc.processingStatus || doc.status || 'Indexed'
+                    const dateVal = doc.uploadTime ? new Date(doc.uploadTime).toLocaleDateString() : doc.date || doc.createdAt || 'N/A'
+                    return (
+                      <tr key={doc.id}>
+                        <td className="fw-medium">{docName}</td>
+                        <td><span className="badge bg-secondary">{docType}</span></td>
+                        <td>{docSize}</td>
+                        <td>{uploadedBy}</td>
+                        <td>{doc.subject || 'General'}</td>
+                        <td>{doc.collection || 'General'}</td>
+                        <td>{getStatusBadge(statusVal)}</td>
+                        <td>{doc.chunks || 0}</td>
+                        <td>{doc.embeddings || doc.embeddingCount || 0}</td>
+                        <td>{dateVal}</td>
+                        <td>
+                          <div className="btn-group btn-group-sm">
+                            <Link to={`/knowledge/document/${doc.id}`} className="btn btn-outline-primary" title="View">
+                              <i className="bi bi-eye" />
+                            </Link>
+                            <button
+                              className="btn btn-outline-warning"
+                              onClick={() => handleReindex(doc.id)}
+                              title="Reindex document"
+                            >
+                              <i className="bi bi-arrow-clockwise" />
+                            </button>
+                            <button 
+                              className="btn btn-outline-danger"
+                              onClick={() => handleDelete(doc.id)}
+                              title="Delete"
+                            >
+                              <i className="bi bi-trash" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>

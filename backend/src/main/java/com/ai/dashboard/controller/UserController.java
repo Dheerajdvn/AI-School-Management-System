@@ -46,8 +46,8 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @Operation(summary = "Get user by id (ADMIN only)")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get user by id")
     public ApiResponse<UserDto> getUser(@PathVariable Long id) {
         return ApiResponse.success(userService.getUser(id));
     }
@@ -61,8 +61,8 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @Operation(summary = "Update a user (ADMIN only)")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Update a user")
     public ApiResponse<UserDto> updateUser(@PathVariable Long id, @Valid @RequestBody UpdateUserRequest request) {
         return ApiResponse.success("User updated", userService.updateUser(id, request));
     }

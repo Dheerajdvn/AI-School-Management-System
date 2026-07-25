@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { AssignmentApi, SubmissionApi } from '../services/api'
+import { AssignmentApi, SubmissionApi, DocumentApi } from '../services/api'
 import LoadingIndicator from './LoadingIndicator'
 
 const AssignmentDetails = ({ id }) => {
@@ -22,6 +22,30 @@ const AssignmentDetails = ({ id }) => {
     }).catch(() => {})
   }, [id])
 
+  const handleDownloadAttachment = async () => {
+    if (!assignment?.attachmentUrl) return
+    try {
+      const match = assignment.attachmentUrl.match(/\/documents\/(\d+)/)
+      if (match && match[1]) {
+        const docId = match[1]
+        const blob = await DocumentApi.download(docId)
+        const url = window.URL.createObjectURL(new Blob([blob]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', `assignment_attachment_${docId}.pdf`)
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+        window.URL.revokeObjectURL(url)
+      } else {
+        window.open(assignment.attachmentUrl, '_blank')
+      }
+    } catch (e) {
+      console.error('Failed to download attachment', e)
+      alert('Failed to download attachment. Please try again.')
+    }
+  }
+
   if (loading) return <LoadingIndicator />
   if (!assignment) return <div className="alert alert-warning">Assignment not found</div>
 
@@ -39,7 +63,11 @@ const AssignmentDetails = ({ id }) => {
         <div className="mb-2">Max Marks: {assignment.maxMarks}</div>
         <div className="mb-2">Submissions: {submissionsCount}</div>
         {assignment.attachmentUrl && (
-          <div><a href={assignment.attachmentUrl} target="_blank" rel="noreferrer">Download attachment</a></div>
+          <div>
+            <button type="button" className="btn btn-link p-0 text-decoration-underline" onClick={handleDownloadAttachment}>
+              Download attachment
+            </button>
+          </div>
         )}
       </div>
     </div>

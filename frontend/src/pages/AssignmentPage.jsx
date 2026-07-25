@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import AssignmentTable from '../components/AssignmentTable'
 import AssignmentForm from '../components/AssignmentForm'
 import AssignmentSearch from '../components/AssignmentSearch'
+import AssignmentDetails from '../components/AssignmentDetails'
 import { AssignmentApi, CourseApi } from '../services/api'
 import LoadingIndicator from '../components/LoadingIndicator'
 
@@ -13,6 +14,7 @@ const AssignmentPage = () => {
   const [loading, setLoading] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState(null)
+  const [viewingId, setViewingId] = useState(null)
   const [filters, setFilters] = useState({})
   const [courses, setCourses] = useState([])
 
@@ -84,6 +86,7 @@ const AssignmentPage = () => {
                          size={size}
                          total={total}
                          onRefresh={() => loadAssignments(0, size, filters)}
+                         onView={(a) => setViewingId(a.id)}
                          onEdit={(a) => { setEditing(a); setShowForm(true) }}
                          onDelete={() => loadAssignments(0, size, filters)} />
       )}
@@ -94,6 +97,25 @@ const AssignmentPage = () => {
                         courses={courses}
                         onClose={() => setShowForm(false)}
                         onSaved={onSaved} />
+      )}
+
+      {viewingId && (
+        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Assignment Details</h5>
+                <button type="button" className="btn-close" onClick={() => setViewingId(null)} />
+              </div>
+              <div className="modal-body">
+                <AssignmentDetails id={viewingId} />
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary btn-sm" onClick={() => setViewingId(null)}>Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

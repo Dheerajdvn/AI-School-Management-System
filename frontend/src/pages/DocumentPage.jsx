@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { DocumentApi, RagApi } from '../services/api'
+import { DocumentApi, RagApi, CourseApi } from '../services/api'
 import LoadingIndicator from '../components/LoadingIndicator'
 import { useAuth } from '../context/AuthContext'
 import UploadZone from '../components/UploadZone'
@@ -10,6 +10,7 @@ import SearchBar from '../components/SearchBar'
 import FilterPanel from '../components/FilterPanel'
 import Pagination from '../components/Pagination'
 import ErrorBanner from '../components/ErrorBanner'
+import useToast from '../hooks/useToast'
 
 /**
  * Document Management page for the AI Student Management System.
@@ -20,6 +21,7 @@ import ErrorBanner from '../components/ErrorBanner'
  */
 export default function DocumentPage() {
   const { user } = useAuth()
+  const { success: showSuccessToast, error: showErrorToast } = useToast()
   const [documents, setDocuments] = useState([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
@@ -52,7 +54,16 @@ export default function DocumentPage() {
     { value: 'OTHER', label: 'Other' },
   ]
 
-  const courses = [] // Would be populated from DashboardApi or CourseApi
+  const [courses, setCourses] = useState([])
+
+  useEffect(() => {
+    CourseApi.list({ page: 0, size: 100 })
+      .then(res => {
+        const data = res?.content || res?.data || res || []
+        setCourses(Array.isArray(data) ? data : [])
+      })
+      .catch(() => {})
+  }, [])
 
   // Fetch documents (uses backend pagination and sorting)
   const [sortBy, setSortBy] = useState('uploadTime')
@@ -79,11 +90,10 @@ export default function DocumentPage() {
     }
   }, [page, size, sortBy, direction, searchQuery, selectedType, selectedCourse])
 
-  // Fetch once on mount
+  // Fetch documents when page, filters, or sort change
   useEffect(() => {
     fetchDocuments()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [fetchDocuments])
 
   // Debounce search/filter/sort to avoid excessive requests
   useEffect(() => {
@@ -95,23 +105,33 @@ export default function DocumentPage() {
   }, [searchQuery, selectedType, selectedCourse, sortBy, direction])
 
   // Upload document
-  const handleUpload = async (file) => {
+  const handleUpload = async (file, documentType, courseId) => {
     setUploading(true)
     setUploadProgress(0)
     setError('')
     setSuccess('')
 
     try {
-      await DocumentApi.upload(file, selectedCourse, selectedType, user?.id, (percent) => {
+      await DocumentApi.upload(file, courseId || selectedCourse, documentType || selectedType, user?.id, (percent) => {
         setUploadProgress(percent)
       })
 
       setSuccess('Document uploaded successfully!')
+      if (typeof showSuccessToast === 'function') {
+        showSuccessToast('Document uploaded successfully!')
+      }
       // Refresh documents to include newly uploaded file
       setPage(0)
       fetchDocuments()
     } catch (e) {
-      setError(e.message || 'Upload failed')
+      const errorMessage = e.response?.data?.message || e.message || 'Upload failed'
+      setError(errorMessage)
+      if (typeof showErrorToast === 'function') {
+        showErrorToast(errorMessage)
+      }
+      if (import.meta.env.DEV) {
+        console.error('Upload error:', e)
+      }
     } finally {
       setUploading(false)
       setUploadProgress(0)
@@ -131,8 +151,26 @@ export default function DocumentPage() {
       link.remove()
 
       setSuccess('Download started')
+      if (typeof showSuccessToast === 'function') {
+        showSuccessToast('Download started')
+      }
     } catch (e) {
-      setError('Failed to download document: ' + (e.message || e))
+      let errMsg = 'Failed to download document'
+      if (e.response?.data instanceof Blob) {
+        try {
+          const text = await e.response.data.text()
+          const json = JSON.parse(text)
+          errMsg = json.message || errMsg
+        } catch (err) {}
+      } else if (e.response?.data?.message) {
+        errMsg = e.response.data.message
+      } else if (e.message) {
+        errMsg = e.message
+      }
+      setError(errMsg)
+      if (typeof showErrorToast === 'function') {
+        showErrorToast(errMsg)
+      }
     }
   }
 
@@ -154,7 +192,11 @@ export default function DocumentPage() {
       }
     } catch (e) {
       setPreviewContent('')
-      setError('Preview not available: ' + (e.message || e))
+      const errMsg = e.response?.data?.message || e.message || 'Preview not available'
+      setError(errMsg)
+      if (typeof showErrorToast === 'function') {
+        showErrorToast(errMsg)
+      }
     }
   }
 
@@ -234,7 +276,12 @@ export default function DocumentPage() {
           Upload New Document
         </div>
         
-        <UploadZone onUpload={handleUpload} loading={uploading} />
+        <UploadZone 
+          onUpload={handleUpload} 
+          loading={uploading} 
+          documentTypes={documentTypes}
+          courses={courses}
+        />
         
         {uploading && (
           <div className="mt-3">

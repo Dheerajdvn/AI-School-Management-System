@@ -5,14 +5,17 @@ import com.ai.dashboard.dto.AiQueryRequest;
 import com.ai.dashboard.dto.AiQueryResponse;
 import com.ai.dashboard.dto.ApiResponse;
 import com.ai.dashboard.dto.ChatMessage;
+import com.ai.dashboard.dto.UserAiConfigDto;
 import com.ai.dashboard.service.AiQueryService;
 import com.ai.dashboard.service.ChatService;
+import com.ai.dashboard.service.UserAiConfigService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -39,6 +42,7 @@ public class AiController {
     private final AiQueryService aiQueryService;
     private final ChatService chatService;
     private final OllamaProperties ollamaProperties;
+    private final UserAiConfigService configService;
 
     @PostMapping("/ask")
     @PreAuthorize("hasAnyAuthority('ROLE_TEACHER', 'ROLE_ADMIN', 'ROLE_PRINCIPAL', 'ROLE_SCHOOL_ADMIN')")
@@ -57,9 +61,37 @@ public class AiController {
     @GetMapping("/health")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Check AI service health (all authenticated users)")
-    public ApiResponse<Map<String, Object>> health() {
+    public ApiResponse<Map<String, Object>> health(Authentication authentication) {
+        String username = authentication != null ? authentication.getName() : "anonymous";
+        UserAiConfigDto userConfig = null;
+        try {
+            userConfig = configService.getUserConfig(username);
+        } catch (Exception e) {
+            // Fall back to default Ollama config
+        }
+
+        boolean llmAvailable;
+        String model;
+        String provider;
+
+        if (userConfig != null && userConfig.getProvider() != null) {
+            provider = userConfig.getProvider();
+            model = userConfig.getModel() != null ? userConfig.getModel() : "default";
+            // For Ollama, check local availability; for cloud providers, check connection status
+            if ("Ollama".equals(provider)) {
+                llmAvailable = aiQueryService.isLlmAvailable();
+            } else {
+                llmAvailable = userConfig.getIsConnected() != null && userConfig.getIsConnected();
+            }
+        } else {
+            provider = "Ollama";
+            model = ollamaProperties.getModel();
+            llmAvailable = aiQueryService.isLlmAvailable();
+        }
+
         return ApiResponse.success(Map.of(
-                "llmAvailable", aiQueryService.isLlmAvailable(),
-                "model", ollamaProperties.getModel()));
+                "llmAvailable", llmAvailable,
+                "provider", provider,
+                "model", model));
     }
 }

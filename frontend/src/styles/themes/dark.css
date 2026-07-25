@@ -1,0 +1,76 @@
+[data-theme="dark"], body.dark-mode {
+  background-color: var(--bg) !important;
+  color: var(--text) !important;
+  --primary: #6366F1;
+  --primary-hover: #818cf8;
+  --primary-rgb: 99, 102, 241;
+  --accent: #22d3ee;
+  --bg: #09090B;
+  --surface: #111827;
+  --card: #18181B;
+  --sidebar-bg: #0F172A;
+  --sidebar-text: #FAFAFA;
+  --text: #FAFAFA;
+  --muted: #E4E4E7;
+  --secondary-text: #E4E4E7;
+  --border: #27272A;
+  --hover: #1E293B;
+  --input-bg: #18181B;
+  --input-border: #27272A;
+  --table-hover: #1E293B;
+  --modal-bg: #18181B;
+  --shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
+}
+
+[data-theme="dark"] .main,
+body.dark-mode .main,
+[data-theme="dark"] .content,
+body.dark-mode .content,
+[data-theme="dark"] .dashboard-page,
+body.dark-mode .dashboard-page {
+  background-color: var(--bg) !important;
+  color: var(--text) !important;
+}
+
+[data-theme="dark"] .bg-white,
+body.dark-mode .bg-white,
+[data-theme="dark"] .card-header,
+body.dark-mode .card-header {
+  background-color: var(--card) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+[data-theme="dark"] .bg-light,
+body.dark-mode .bg-light {
+  background-color: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+[data-theme="dark"] .text-dark,
+body.dark-mode .text-dark {
+  color: var(--text) !important;
+}
+
+[data-theme="dark"] .text-muted,
+body.dark-mode .text-muted,
+[data-theme="dark"] p,
+body.dark-mode p {
+  color: var(--muted) !important;
+}
+
+[data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3, [data-theme="dark"] h4, [data-theme="dark"] h5, [data-theme="dark"] h6,
+body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4, body.dark-mode h5, body.dark-mode h6,
+[data-theme="dark"] .card-title,
+body.dark-mode .card-title {
+  color: var(--text) !important;
+}
+
+[data-theme="dark"] .modal-content,
+body.dark-mode .modal-content {
+  background-color: var(--modal-bg) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}

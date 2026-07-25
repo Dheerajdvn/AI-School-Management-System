@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 /**
- * Stores extracted text content from uploaded documents.
+ * Stores extracted text content from uploaded documents with full utf8mb4 support.
  */
 @Entity
 @Table(name = "document_contents")
@@ -26,7 +26,7 @@ public class DocumentContent {
     private Document document;
 
     @Lob
-    @Column(name = "extracted_text", columnDefinition = "LONGTEXT")
+    @Column(name = "extracted_text", columnDefinition = "LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
     private String extractedText;
 
     @Column(name = "extracted_at", nullable = false)

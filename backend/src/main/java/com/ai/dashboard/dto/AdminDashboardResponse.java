@@ -16,6 +16,10 @@ import java.util.List;
 @AllArgsConstructor
 public class AdminDashboardResponse {
 
+    // School statistics
+    private Long totalSchools;
+    private Long activeSchools;
+
     // User statistics
     private Long totalUsers;
     private Long students;

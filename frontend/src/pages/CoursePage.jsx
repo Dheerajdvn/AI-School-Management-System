@@ -27,19 +27,13 @@ export default function CoursePage() {
     setError(null)
     try {
       const res = await CourseApi.search({ title: q, status, page, size })
-      const data = res || {}
-      if (data.content) {
-        setCourses(data.content)
-        setTotal(data.totalElements || data.total || 0)
-      } else if (Array.isArray(data)) {
-        setCourses(data)
-        setTotal(data.length)
-      } else {
-        setCourses([])
-        setTotal(0)
-      }
+      const data = res?.data || res || {}
+      const items = data.content || data.items || (Array.isArray(data) ? data : [])
+      const count = data.totalElements || data.total || items.length
+      setCourses(items)
+      setTotal(count)
     } catch (e) {
-      setError(e.message)
+      setError(e.message || 'Failed to load courses')
     } finally {
       setLoading(false)
     }

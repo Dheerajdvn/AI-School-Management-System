@@ -2,7 +2,7 @@ import React from 'react'
 import DueDateBadge from './DueDateBadge'
 import { AssignmentApi } from '../services/api'
 
-const AssignmentTable = ({ assignments = [], onEdit, onDelete, onRefresh }) => {
+const AssignmentTable = ({ assignments = [], onView, onEdit, onDelete, onRefresh }) => {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this assignment?')) return
       try {
@@ -41,8 +41,17 @@ const AssignmentTable = ({ assignments = [], onEdit, onDelete, onRefresh }) => {
                 <td>{a.status}</td>
                 <td>
                   <div className="btn-group btn-group-sm" role="group">
-                    <button className="btn btn-outline-secondary" onClick={() => onEdit && onEdit(a)}>Edit</button>
-                    <button className="btn btn-outline-danger" onClick={() => handleDelete(a.id)}>Delete</button>
+                    {onView && (
+                      <button className="btn btn-outline-info" onClick={() => onView(a)}>
+                        <i className="bi bi-eye me-1" />View
+                      </button>
+                    )}
+                    <button className="btn btn-outline-secondary" onClick={() => onEdit && onEdit(a)}>
+                      <i className="bi bi-pencil me-1" />Edit
+                    </button>
+                    <button className="btn btn-outline-danger" onClick={() => handleDelete(a.id)}>
+                      <i className="bi bi-trash me-1" />Delete
+                    </button>
                   </div>
                 </td>
               </tr>
