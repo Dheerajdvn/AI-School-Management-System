@@ -33,3 +33,6 @@ qdrant_storage/
 
 # Build
 coverage/
+
+# Uploaded files
+backend/uploads/
