@@ -22,7 +22,7 @@ graph TB
     end
 
     subgraph External
-        N[(PostgreSQL)]
+        N[(MariaDB / MySQL)]
         O[(Redis)]
         P[(Qdrant)]
         Q[Ollama LLM]

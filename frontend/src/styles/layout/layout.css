@@ -8,8 +8,9 @@
   margin-left: var(--sidebar-w);
   display: flex;
   flex-direction: column;
+  background: var(--bg);
 }
 
 .content {
-  padding: 1.5rem;
+  padding: 0.85rem 1rem;
 }

@@ -6,7 +6,7 @@ import remarkGfm from 'remark-gfm'
  * ChatMessage component to display a single chat message.
  * Supports markdown rendering for assistant messages and copy functionality.
  */
-export default function ChatMessage({ role, content, sources, retrievedChunks, onDelete, onRetry }) {
+export default function ChatMessage({ role, content, sources, retrievedChunks, onDelete, onRetry, isStreaming }) {
   const [copied, setCopied] = useState(false)
 
   const copyToClipboard = async () => {
@@ -27,12 +27,12 @@ export default function ChatMessage({ role, content, sources, retrievedChunks, o
           <div className="text-muted small">
             {role === 'assistant' ? (
               <>
-                <i className="bi bi-robot me-1" />
+                <i className="bi bi-robot me-1 text-primary" />
                 Assistant
               </>
             ) : (
               <>
-                <i className="bi bi-person me-1" />
+                <i className="bi bi-person me-1 text-secondary" />
                 You
               </>
             )}
@@ -68,11 +68,16 @@ export default function ChatMessage({ role, content, sources, retrievedChunks, o
           </div>
         </div>
         
-        <div className="message-content">
+        <div className="message-content position-relative">
           {role === 'assistant' ? (
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {content || ''}
-            </ReactMarkdown>
+            <div>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {content || ''}
+              </ReactMarkdown>
+              {isStreaming && (
+                <span className="streaming-cursor ms-1 text-primary fw-bold animate-pulse">▌</span>
+              )}
+            </div>
           ) : (
             <div>{content}</div>
           )}

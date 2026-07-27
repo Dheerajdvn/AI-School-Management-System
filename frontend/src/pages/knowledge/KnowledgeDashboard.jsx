@@ -1,232 +1,242 @@
-import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { knowledgeService } from '../../services/knowledgeService'
-import useToast from '../../hooks/useToast'
+import React, { useEffect, useState } from 'react'
+import knowledgeService from '../../services/knowledgeService'
+import StatCard from '../../components/StatCard'
+import Chart from '../../components/Charts'
+import LoadingIndicator from '../../components/LoadingIndicator'
 
 export default function KnowledgeDashboard() {
-  const { success, error } = useToast()
-  const [stats, setStats] = useState({
-    totalDocuments: 0,
-    indexedDocuments: 0,
-    collections: 0,
-    aiSearches: 0,
-  })
-  const [recentUploads, setRecentUploads] = useState([])
+  const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [documentsByType, setDocumentsByType] = useState([])
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    fetchData()
+    let isMounted = true
+
+    const loadDashboardData = async () => {
+      setLoading(true)
+      setError(null)
+      try {
+        const res = await knowledgeService.getDashboard()
+        if (isMounted) {
+          setData(res || {})
+        }
+      } catch (e) {
+        if (isMounted) {
+          console.error('Failed to load knowledge dashboard:', e)
+          setError('Failed to load knowledge dashboard statistics. Please try again.')
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    loadDashboardData()
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
-  const fetchData = async () => {
-    setLoading(true)
-    try {
-      // Fetch documents
-      const res = await knowledgeService.getDocuments({ limit: 5, sortBy: 'date' })
-      const docs = res?.content || res?.data || (Array.isArray(res) ? res : [])
-      const docList = Array.isArray(docs) ? docs : []
-      setRecentUploads(docList)
-      
-      // Fetch collections
-      const collections = await knowledgeService.getCollections()
-      
-      // Calculate stats
-      const totalDocs = docList.length
-      const indexedDocs = docList.filter(d => d.status === 'Indexed' || d.status === 'indexed' || d.processingStatus === 'COMPLETED').length
-      
-      // Calculate documents by type
-      const typeCount = {}
-      docList.forEach(doc => {
-        const type = (doc.documentType || doc.type)?.toUpperCase() || 'UNKNOWN'
-        typeCount[type] = (typeCount[type] || 0) + 1
-      })
-      const typeArray = Object.entries(typeCount).map(([type, count]) => ({
-        type,
-        count,
-        percentage: totalDocs > 0 ? Math.round((count / totalDocs) * 100) : 0
-      }))
-      
-      setStats({
-        totalDocuments: totalDocs,
-        indexedDocuments: indexedDocs > 0 ? indexedDocs : totalDocs,
-        collections: collections?.length || 0,
-        aiSearches: 0,
-      })
-      setDocumentsByType(typeArray.length > 0 ? typeArray : [
-        { type: 'PDF', count: 0, percentage: 0 },
-        { type: 'DOCX', count: 0, percentage: 0 },
-        { type: 'TXT', count: 0, percentage: 0 },
-        { type: 'PPTX', count: 0, percentage: 0 },
-        { type: 'MD', count: 0, percentage: 0 },
-      ])
-    } catch (err) {
-      error('Failed to load dashboard data: ' + (err.response?.data?.message || err.message))
-    } finally {
-      setLoading(false)
+  if (loading) {
+    return <LoadingIndicator message="Loading AI Knowledge Dashboard..." />
+  }
+
+  const {
+    totalDocuments = 0,
+    totalCollections = 0,
+    indexedDocuments = 0,
+    pendingDocuments = 0,
+    failedDocuments = 0,
+    recentUploads = [],
+    uploadsPerDay = [],
+    documentsByCollection = [],
+    documentsByType = [],
+  } = data || {}
+
+  const getStatusBadgeClass = (status) => {
+    switch (status) {
+      case 'COMPLETED':
+        return 'bg-success'
+      case 'PENDING':
+      case 'PROCESSING':
+        return 'bg-warning text-dark'
+      case 'FAILED':
+        return 'bg-danger'
+      default:
+        return 'bg-secondary'
     }
   }
 
+  const formatFileSize = (bytes) => {
+    if (!bytes) return '0 B'
+    if (bytes < 1024) return bytes + ' B'
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+  }
+
   return (
-    <div className="container-fluid">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>AI Knowledge Center</h2>
-        <div className="text-muted">
-          <i className="bi bi-clock me-1" />
-          {new Date().toLocaleDateString()}
+    <div className="container-fluid p-0">
+      {/* Header */}
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <h3 className="fw-bold mb-0" style={{ fontSize: '18px' }}>AI Knowledge Dashboard</h3>
+          <p className="text-muted m-0" style={{ fontSize: '13px' }}>Real-time overview of AI knowledge base, collections, and vector ingestion</p>
         </div>
       </div>
 
-      {/* Statistics Cards */}
-      <div className="row g-3 mb-4">
-        <div className="col-md-3">
-          <div className="card border-0 shadow-sm">
-            <div className="card-body">
-              <div className="d-flex justify-content-between align-items-center">
-                <div>
-                  <p className="text-muted mb-1">Total Documents</p>
-                  <h3 className="mb-0">{stats.totalDocuments}</h3>
-                </div>
-                <div className="bg-primary bg-opacity-10 p-3 rounded">
-                  <i className="bi bi-file-earmark-text text-primary" style={{ fontSize: '1.5rem' }} />
-                </div>
-              </div>
-            </div>
+      {/* Error Alert */}
+      {error && (
+        <div className="alert alert-danger d-flex justify-content-between align-items-center mb-3 py-2" style={{ fontSize: '13px' }}>
+          <span><i className="bi bi-exclamation-triangle-fill me-2" />{error}</span>
+          <button className="btn btn-sm btn-outline-danger" onClick={() => window.location.reload()}>Retry</button>
+        </div>
+      )}
+
+      {/* Empty State Banner */}
+      {!error && totalDocuments === 0 && (
+        <div className="alert alert-info mb-3 py-2" style={{ fontSize: '13px' }}>
+          <i className="bi bi-info-circle-fill me-2" />
+          No documents found in knowledge base. Upload documents in the Knowledge Library to populate AI analytics.
+        </div>
+      )}
+
+      {/* Stat Cards Row */}
+      <div className="row g-2 mb-3">
+        <div className="col-6 col-md-4 col-xl-2">
+          <StatCard label="Total Documents" value={totalDocuments} icon="bi-file-earmark-text" color="primary" />
+        </div>
+        <div className="col-6 col-md-4 col-xl-2">
+          <StatCard label="Collections" value={totalCollections} icon="bi-folder" color="info" />
+        </div>
+        <div className="col-6 col-md-4 col-xl-2">
+          <StatCard label="Indexed" value={indexedDocuments} icon="bi-check-circle" color="success" />
+        </div>
+        <div className="col-6 col-md-4 col-xl-2">
+          <StatCard label="Pending" value={pendingDocuments} icon="bi-hourglass-split" color="warning" />
+        </div>
+        <div className="col-6 col-md-4 col-xl-2">
+          <StatCard label="Failed" value={failedDocuments} icon="bi-exclamation-triangle" color="danger" />
+        </div>
+        <div className="col-6 col-md-4 col-xl-2">
+          <StatCard label="Recent Uploads" value={recentUploads.length} icon="bi-clock-history" color="primary" />
+        </div>
+      </div>
+
+      {/* Charts Row */}
+      <div className="row g-3 mb-3">
+        {/* Uploads Trend */}
+        <div className="col-lg-8">
+          <div className="card h-100 p-3">
+            <h5 className="fw-bold mb-3" style={{ fontSize: '14px' }}>
+              <i className="bi bi-graph-up me-2 text-primary" />
+              Uploads Trend (Last 7 Days)
+            </h5>
+            {uploadsPerDay.length > 0 ? (
+              <Chart
+                type="line"
+                title="Uploads Count"
+                labels={uploadsPerDay.map(u => u.date || '')}
+                values={uploadsPerDay.map(u => u.count || 0)}
+              />
+            ) : (
+              <div className="text-muted py-5 text-center" style={{ fontSize: '13px' }}>No upload activity recorded in the last 7 days</div>
+            )}
           </div>
         </div>
-        <div className="col-md-3">
-          <div className="card border-0 shadow-sm">
-            <div className="card-body">
-              <div className="d-flex justify-content-between align-items-center">
-                <div>
-                  <p className="text-muted mb-1">Documents Indexed</p>
-                  <h3 className="mb-0">{stats.indexedDocuments}</h3>
-                </div>
-                <div className="bg-success bg-opacity-10 p-3 rounded">
-                  <i className="bi bi-check-circle text-success" style={{ fontSize: '1.5rem' }} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-3">
-          <div className="card border-0 shadow-sm">
-            <div className="card-body">
-              <div className="d-flex justify-content-between align-items-center">
-                <div>
-                  <p className="text-muted mb-1">Collections</p>
-                  <h3 className="mb-0">{stats.collections}</h3>
-                </div>
-                <div className="bg-info bg-opacity-10 p-3 rounded">
-                  <i className="bi bi-collection text-info" style={{ fontSize: '1.5rem' }} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-3">
-          <div className="card border-0 shadow-sm">
-            <div className="card-body">
-              <div className="d-flex justify-content-between align-items-center">
-                <div>
-                  <p className="text-muted mb-1">AI Searches Today</p>
-                  <h3 className="mb-0">{stats.aiSearches}</h3>
-                </div>
-                <div className="bg-warning bg-opacity-10 p-3 rounded">
-                  <i className="bi bi-search text-warning" style={{ fontSize: '1.5rem' }} />
-                </div>
-              </div>
-            </div>
+
+        {/* Document Types */}
+        <div className="col-lg-4">
+          <div className="card h-100 p-3">
+            <h5 className="fw-bold mb-3" style={{ fontSize: '14px' }}>
+              <i className="bi bi-pie-chart me-2 text-info" />
+              Documents by Type
+            </h5>
+            {documentsByType.length > 0 ? (
+              <Chart
+                type="pie"
+                title="File Types"
+                labels={documentsByType.map(t => t.name || t.type || 'Other')}
+                values={documentsByType.map(t => t.count || 0)}
+              />
+            ) : (
+              <div className="text-muted py-5 text-center" style={{ fontSize: '13px' }}>No document types categorized</div>
+            )}
           </div>
         </div>
       </div>
 
-      <div className="row">
-        {/* Recent Uploads */}
-        <div className="col-lg-6 mb-4">
-          <div className="card border-0 shadow-sm h-100">
-            <div className="card-header bg-white border-0 py-3">
-              <h5 className="mb-0">Recent Uploads</h5>
-            </div>
-            <div className="card-body">
+      {/* Row 2: Collections & Recent Uploads Table */}
+      <div className="row g-3">
+        {/* Documents by Collection */}
+        <div className="col-lg-6">
+          <div className="card h-100 p-3">
+            <h5 className="fw-bold mb-3" style={{ fontSize: '14px' }}>
+              <i className="bi bi-bar-chart me-2 text-success" />
+              Documents by Collection
+            </h5>
+            {documentsByCollection.length > 0 ? (
+              <Chart
+                type="bar"
+                title="Collection Breakdown"
+                labels={documentsByCollection.map(c => c.name || 'General')}
+                values={documentsByCollection.map(c => c.count || 0)}
+              />
+            ) : (
+              <div className="text-muted py-5 text-center" style={{ fontSize: '13px' }}>No collections found</div>
+            )}
+          </div>
+        </div>
+
+        {/* Recent Uploads Table */}
+        <div className="col-lg-6">
+          <div className="card h-100 p-3">
+            <h5 className="fw-bold mb-3" style={{ fontSize: '14px' }}>
+              <i className="bi bi-clock me-2 text-warning" />
+              Recent Uploads
+            </h5>
+            {recentUploads.length > 0 ? (
               <div className="table-responsive">
-                <table className="table table-sm">
-                  <thead>
+                <table className="table table-hover table-borderless align-middle mb-0" style={{ fontSize: '12px' }}>
+                  <thead className="table-dark text-muted">
                     <tr>
                       <th>Document</th>
                       <th>Type</th>
-                      <th>Uploaded</th>
+                      <th>Size</th>
+                      <th>Status</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {recentUploads.map((doc) => {
-                      const docName = doc.originalFilename || doc.filename || doc.name || doc.title || 'Untitled'
-                      const docType = doc.documentType || doc.type || 'OTHER'
-                      const dateVal = doc.uploadTime ? new Date(doc.uploadTime).toLocaleDateString() : doc.date || doc.createdAt || 'N/A'
-                      return (
-                        <tr key={doc.id}>
-                          <td className="fw-medium">{docName}</td>
-                          <td><span className="badge bg-secondary">{docType}</span></td>
-                          <td><small>{dateVal}</small></td>
-                        </tr>
-                      )
-                    })}
+                    {recentUploads.map((doc) => (
+                      <tr key={doc.id || doc.originalFilename}>
+                        <td>
+                          <div className="fw-semibold text-truncate" style={{ maxWidth: '180px' }} title={doc.originalFilename || doc.filename}>
+                            {doc.originalFilename || doc.filename || `Document #${doc.id}`}
+                          </div>
+                          {doc.courseCode && (
+                            <small className="text-muted">{doc.courseCode}</small>
+                          )}
+                        </td>
+                        <td>
+                          <span className="badge bg-dark border text-uppercase" style={{ fontSize: '10px' }}>
+                            {doc.documentType || 'File'}
+                          </span>
+                        </td>
+                        <td className="text-muted">{formatFileSize(doc.fileSize)}</td>
+                        <td>
+                          <span className={`badge ${getStatusBadgeClass(doc.processingStatus)}`} style={{ fontSize: '10px' }}>
+                            {doc.processingStatus || 'PENDING'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
-              <Link to="/knowledge/library" className="btn btn-outline-primary btn-sm mt-2">
-                View All Documents
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Documents by Type */}
-        <div className="col-lg-6 mb-4">
-          <div className="card border-0 shadow-sm h-100">
-            <div className="card-header bg-white border-0 py-3">
-              <h5 className="mb-0">Documents by Type</h5>
-            </div>
-            <div className="card-body">
-              {documentsByType.map((item) => (
-                <div key={item.type} className="mb-3">
-                  <div className="d-flex justify-content-between mb-1">
-                    <span>{item.type}</span>
-                    <span>{item.count}</span>
-                  </div>
-                  <div className="progress" style={{ height: '8px' }}>
-                    <div className="progress-bar" style={{ width: `${item.percentage}%` }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="row">
-        <div className="col-12">
-          <div className="card border-0 shadow-sm">
-            <div className="card-header bg-white border-0 py-3">
-              <h5 className="mb-0">Quick Actions</h5>
-            </div>
-            <div className="card-body">
-              <div className="d-flex gap-2 flex-wrap">
-                <Link to="/knowledge/upload" className="btn btn-primary">
-                  <i className="bi bi-upload me-1" />
-                  Upload Documents
-                </Link>
-                <Link to="/knowledge/search" className="btn btn-outline-primary">
-                  <i className="bi bi-search me-1" />
-                  AI Search
-                </Link>
-                <Link to="/knowledge/collections" className="btn btn-outline-primary">
-                  <i className="bi bi-collection me-1" />
-                  Manage Collections
-                </Link>
-              </div>
-            </div>
+            ) : (
+              <div className="text-muted py-5 text-center" style={{ fontSize: '13px' }}>No recent document uploads</div>
+            )}
           </div>
         </div>
       </div>

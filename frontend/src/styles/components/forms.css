@@ -1,8 +1,8 @@
 .form-label {
   color: var(--text) !important;
   font-weight: 500;
-  font-size: 0.9rem;
-  margin-bottom: 0.4rem;
+  font-size: 12px;
+  margin-bottom: 0.25rem;
 }
 
 .form-control, .form-select {
@@ -10,9 +10,10 @@
   border: 1px solid var(--input-border) !important;
   color: var(--text) !important;
   border-radius: var(--radius-input) !important;
-  padding: 0.65rem 1rem;
-  font-size: 0.95rem;
-  transition: all 0.2s ease;
+  padding: 0.35rem 0.65rem;
+  height: 34px;
+  font-size: 12px;
+  transition: all 0.15s ease;
 }
 
 .form-control::placeholder, .form-select::placeholder {
@@ -22,7 +23,32 @@
 
 .form-control:focus, .form-select:focus {
   border-color: var(--primary) !important;
-  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15) !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15) !important;
   background-color: var(--input-bg) !important;
   color: var(--text) !important;
+}
+
+textarea.form-control {
+  height: auto;
+  min-height: 70px;
+}
+
+.form-control-sm {
+  height: 30px;
+  padding: 0.2rem 0.5rem;
+  font-size: 11px;
+}
+
+.form-control-lg {
+  height: 38px;
+  padding: 0.4rem 0.85rem;
+  font-size: 13px;
+}
+
+.input-group-text {
+  background: var(--surface);
+  border-color: var(--input-border);
+  color: var(--muted);
+  font-size: 12px;
+  padding: 0.35rem 0.65rem;
 }

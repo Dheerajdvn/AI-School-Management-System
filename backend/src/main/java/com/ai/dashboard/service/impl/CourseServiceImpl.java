@@ -204,9 +204,9 @@ public class CourseServiceImpl implements CourseService {
                 .courseCode(course.getCourseCode())
                 .title(course.getTitle())
                 .description(course.getDescription())
-                .teacherId(course.getTeacher().getId())
-                .teacherName(course.getTeacher().getUsername())
-                .status(course.getStatus().name())
+                .teacherId(course.getTeacher() != null ? course.getTeacher().getId() : null)
+                .teacherName(course.getTeacher() != null ? course.getTeacher().getUsername() : "Unknown")
+                .status(course.getStatus() != null ? course.getStatus().name() : "ACTIVE")
                 .createdAt(course.getCreatedAt())
                 .updatedAt(course.getUpdatedAt())
                 .build();

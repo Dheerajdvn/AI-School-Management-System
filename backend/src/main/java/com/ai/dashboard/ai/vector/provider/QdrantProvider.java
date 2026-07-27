@@ -69,8 +69,12 @@ public class QdrantProvider implements VectorStoreProvider {
             log.info("Qdrant collection '{}' ready (elapsed={}ms, response={})", collection, elapsed, truncate(response));
         } catch (Exception e) {
             long elapsed = Duration.between(start, Instant.now()).toMillis();
-            log.warn("Qdrant collection creation attempt failed after {}ms: {}", elapsed, e.getMessage());
-            // Collection may already exist — that's fine
+            String msg = e.getMessage() != null ? e.getMessage() : "";
+            if (msg.contains("409") || msg.contains("Conflict") || msg.contains("already exists")) {
+                log.info("Qdrant collection '{}' already exists (elapsed={}ms)", collection, elapsed);
+            } else {
+                log.warn("Qdrant collection creation attempt failed after {}ms: {}", elapsed, msg);
+            }
         }
     }
 

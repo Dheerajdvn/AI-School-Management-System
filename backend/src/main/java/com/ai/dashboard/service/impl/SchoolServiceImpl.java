@@ -36,6 +36,7 @@ public class SchoolServiceImpl implements SchoolService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final com.ai.dashboard.service.AuditLogService auditLogService;
 
     @Override
     @Transactional(readOnly = true)
@@ -111,6 +112,7 @@ public class SchoolServiceImpl implements SchoolService {
                 .build();
 
         School savedSchool = schoolRepository.save(school);
+        auditLogService.log("system", "CREATE", "School", "Created school: " + savedSchool.getSchoolName(), "127.0.0.1");
         log.info("Created school: {}", savedSchool.getSchoolName());
 
         // Create School Admin user
@@ -163,6 +165,7 @@ public class SchoolServiceImpl implements SchoolService {
         if (request.getLogoUrl() != null) school.setLogoUrl(request.getLogoUrl());
 
         School updated = schoolRepository.save(school);
+        auditLogService.log("system", "UPDATE", "School", "Updated school: " + updated.getId(), "127.0.0.1");
         log.info("Updated school: {}", updated.getId());
         return SchoolDto.fromEntity(updated);
     }
@@ -176,6 +179,7 @@ public class SchoolServiceImpl implements SchoolService {
         school.setDeleted(true);
         school.setStatus("INACTIVE");
         schoolRepository.save(school);
+        auditLogService.log("system", "DELETE", "School", "Deleted school: " + id, "127.0.0.1");
         log.info("Soft deleted school: {}", id);
     }
 
@@ -188,6 +192,7 @@ public class SchoolServiceImpl implements SchoolService {
         String newStatus = "ACTIVE".equalsIgnoreCase(school.getStatus()) ? "INACTIVE" : "ACTIVE";
         school.setStatus(newStatus);
         School saved = schoolRepository.save(school);
+        auditLogService.log("system", "UPDATE", "School", "Toggled status for school " + id + " to " + newStatus, "127.0.0.1");
         log.info("Toggled status for school {} to {}", id, newStatus);
         return SchoolDto.fromEntity(saved);
     }

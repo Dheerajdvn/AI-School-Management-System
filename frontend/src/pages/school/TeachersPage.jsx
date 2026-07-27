@@ -15,7 +15,11 @@ export default function TeachersPage() {
   const [deleteConfirm, setDeleteConfirm] = useState(null)
   const [resetPwdTarget, setResetPwdTarget] = useState(null)
 
+  const [showAssignModal, setShowAssignModal] = useState(false)
+  const [assignForm, setAssignForm] = useState({ teacherId: '', selectedSubjects: [] })
+
   const departments = ['Science', 'Commerce', 'Arts', 'Mathematics', 'Computer Science']
+  const allSubjectsList = ['Physics', 'Chemistry', 'Algebra', 'Geometry', 'Programming', 'Data Structures', 'English Literature', 'History', 'Biology', 'Business Studies', 'Economics']
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -97,12 +101,52 @@ export default function TeachersPage() {
     setTeachers(prev => prev.map(t => t.id === id ? { ...t, status: t.status === 'Active' ? 'Inactive' : 'Active' } : t))
   }
 
+  const openAssignModal = () => {
+    if (teachers.length === 0) {
+      alert('Please add at least one teacher first.')
+      return
+    }
+    setAssignForm({
+      teacherId: String(teachers[0].id),
+      selectedSubjects: teachers[0].subjects ? teachers[0].subjects.split(', ').map(s => s.trim()) : []
+    })
+    setShowAssignModal(true)
+  }
+
+  const handleAssignTeacherChange = (teacherId) => {
+    const selectedTeacher = teachers.find(t => String(t.id) === teacherId)
+    setAssignForm({
+      teacherId,
+      selectedSubjects: selectedTeacher && selectedTeacher.subjects ? selectedTeacher.subjects.split(', ').map(s => s.trim()) : []
+    })
+  }
+
+  const handleSubjectCheckboxChange = (subject, checked) => {
+    setAssignForm(prev => {
+      const updated = checked
+        ? [...prev.selectedSubjects, subject]
+        : prev.selectedSubjects.filter(s => s !== subject)
+      return { ...prev, selectedSubjects: updated }
+    })
+  }
+
+  const handleSaveAssignment = () => {
+    const tId = Number(assignForm.teacherId)
+    setTeachers(prev => prev.map(t => {
+      if (t.id === tId) {
+        return { ...t, subjects: assignForm.selectedSubjects.join(', ') }
+      }
+      return t
+    }))
+    setShowAssignModal(false)
+  }
+
   return (
     <div className="tp-page">
       <div className="page-header-custom">
         <h4><i className="bi bi-person-badge me-2" />Teachers</h4>
         <div className="d-flex gap-2">
-          <button className="btn btn-outline-success btn-sm" onClick={() => {}}><i className="bi bi-people me-1" />Assign Subjects</button>
+          <button className="btn btn-outline-success btn-sm" onClick={openAssignModal}><i className="bi bi-people me-1" />Assign Subjects</button>
           <button className="btn btn-primary btn-sm" onClick={openAdd}><i className="bi bi-plus-lg me-1" />Add Teacher</button>
         </div>
       </div>
@@ -247,6 +291,62 @@ export default function TeachersPage() {
             <div className="modal-footer-custom justify-content-center">
               <button className="btn btn-secondary" onClick={() => setResetPwdTarget(null)}>Cancel</button>
               <button className="btn btn-warning" onClick={() => { alert('Password reset to default123'); setResetPwdTarget(null); }}>Reset Password</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Assign Subjects Modal */}
+      {showAssignModal && (
+        <div className="modal-overlay" onClick={() => setShowAssignModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '480px' }}>
+            <div className="modal-header-custom">
+              <h5>Assign Subjects to Teacher</h5>
+              <button className="btn-close btn-close-white" onClick={() => setShowAssignModal(false)} />
+            </div>
+            <div className="modal-body">
+              <div className="mb-3">
+                <label className="form-label">Select Teacher</label>
+                <select
+                  className="form-select"
+                  value={assignForm.teacherId}
+                  onChange={e => handleAssignTeacherChange(e.target.value)}
+                >
+                  {teachers.map(t => (
+                    <option key={t.id} value={t.id}>{t.name} ({t.department})</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="mb-2">
+                <label className="form-label">Assign Subjects</label>
+              </div>
+              <div className="row g-2 px-1">
+                {allSubjectsList.map(sub => {
+                  const isChecked = assignForm.selectedSubjects.includes(sub)
+                  return (
+                    <div key={sub} className="col-6">
+                      <div className="form-check p-2.5 rounded-3 border d-flex align-items-center" style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.1)' }}>
+                        <input
+                          className="form-check-input ms-0 me-2"
+                          type="checkbox"
+                          id={`assign-sub-${sub}`}
+                          checked={isChecked}
+                          onChange={e => handleSubjectCheckboxChange(sub, e.target.checked)}
+                          style={{ cursor: 'pointer' }}
+                        />
+                        <label className="form-check-label text-white small cursor-pointer" htmlFor={`assign-sub-${sub}`}>
+                          {sub}
+                        </label>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+            <div className="modal-footer-custom">
+              <button className="btn btn-secondary" onClick={() => setShowAssignModal(false)}>Cancel</button>
+              <button className="btn btn-primary" onClick={handleSaveAssignment}>Save Assignments</button>
             </div>
           </div>
         </div>

@@ -18,4 +18,8 @@ public class RagSource {
     private int chunkId;
 
     private double score;
+
+    private String reference;
+
+    private Integer pageNumber;
 }

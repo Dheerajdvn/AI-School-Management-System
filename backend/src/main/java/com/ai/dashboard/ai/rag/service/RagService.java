@@ -1,7 +1,9 @@
 package com.ai.dashboard.ai.rag.service;
 
+import com.ai.dashboard.ai.rag.dto.RagChatRequest;
 import com.ai.dashboard.ai.rag.dto.RagChatResponse;
 import com.ai.dashboard.ai.rag.dto.RagChatStreamResponse;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
  * Service interface for Retrieval-Augmented Generation.
@@ -33,6 +35,15 @@ public interface RagService {
      * @return stream of RAG response chunks
      */
     java.util.stream.Stream<RagChatStreamResponse> answerQuestionStream(String question, Long courseId);
+
+    /**
+     * Answer a question with progressive token-by-token SSE streaming.
+     *
+     * @param request the RAG chat request containing question, courseId, and sessionId
+     * @param emitter the SSE emitter for token push
+     * @param userId the authenticated user ID
+     */
+    void answerQuestionStreamSse(RagChatRequest request, SseEmitter emitter, Long userId);
 
     /**
      * Answer a question within a conversation context.

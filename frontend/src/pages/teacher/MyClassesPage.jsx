@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 
 export default function MyClassesPage() {
   const [loading, setLoading] = useState(true)
   const [classes, setClasses] = useState([])
   const [search, setSearch] = useState('')
-  const [selected, setSelected] = useState(null)
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -20,46 +20,90 @@ export default function MyClassesPage() {
     return () => clearTimeout(timer)
   }, [])
 
-  const filtered = classes.filter(c => c.name.toLowerCase().includes(search.toLowerCase()) || c.subject.toLowerCase().includes(search.toLowerCase()))
+  const filtered = classes.filter(c => 
+    c.name.toLowerCase().includes(search.toLowerCase()) || 
+    c.subject.toLowerCase().includes(search.toLowerCase())
+  )
 
   if (loading) {
     return (
-      <div className="mcp-page">
-        <div className="row g-3">{[...Array(4)].map((_, i) => <div key={i} className="col-12"><div className="skeleton-row" /></div>)}</div>
-        <style>{mcpStyles}</style>
+      <div className="mcp-page py-4">
+        <div className="row g-3">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="col-12 col-md-4">
+              <div className="skeleton-row animate-pulse" style={{ height: '180px', background: 'var(--surface)', borderRadius: '16px' }} />
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="mcp-page">
-      <div className="page-header-custom">
-        <h4><i className="bi bi-layers me-2" />My Classes</h4>
+    <div className="mcp-page py-4">
+      <div className="page-header-custom d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+        <div>
+          <h4 className="fw-bold mb-1" style={{ color: 'var(--text)' }}>
+            <i className="bi bi-layers-fill text-primary me-2" />My Assigned Classes
+          </h4>
+          <p className="text-muted small mb-0 font-medium">Review class schedules, roster statistics, classroom targets, and quick management links.</p>
+        </div>
       </div>
-      <div className="search-bar mb-3">
+
+      <div className="search-bar mb-4">
         <i className="bi bi-search search-icon" />
-        <input type="text" className="form-control" placeholder="Search classes..." value={search} onChange={e => setSearch(e.target.value)} />
+        <input 
+          type="text" 
+          className="form-control style-search-input" 
+          placeholder="Filter classes by name or subject..." 
+          value={search} 
+          onChange={e => setSearch(e.target.value)} 
+        />
       </div>
 
       {filtered.length === 0 ? (
-        <div className="empty-state"><i className="bi bi-layers" /><h6>{search ? 'No matching classes' : 'No classes assigned'}</h6></div>
+        <div className="empty-state text-center py-5 rounded-4 border" style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}>
+          <i className="bi bi-calendar-x text-muted display-4 mb-2 d-block" />
+          <h6 className="fw-bold text-white mb-1" style={{ color: 'var(--text)' }}>
+            {search ? 'No matching classes found' : 'No classes assigned'}
+          </h6>
+          <p className="text-muted small mb-0">Try checking back with school admin registrations.</p>
+        </div>
       ) : (
         <div className="row g-3">
           {filtered.map(cls => (
             <div className="col-md-6 col-lg-4" key={cls.id}>
-              <div className="class-card" onClick={() => setSelected(cls)}>
-                <div className="class-header">
-                  <div className="class-icon"><i className="bi bi-book" /></div>
-                  <div className="class-title"><h5>{cls.name}</h5><span>{cls.subject}</span></div>
+              <div className="class-card shadow-sm h-100">
+                <div className="class-header d-flex align-items-center gap-3 mb-3">
+                  <div className="class-icon shadow-xs">
+                    <i className="bi bi-book-half" />
+                  </div>
+                  <div>
+                    <h5 className="fw-bold text-white mb-0" style={{ color: 'var(--text)' }}>{cls.name}</h5>
+                    <span className="text-muted small font-medium">{cls.subject}</span>
+                  </div>
                 </div>
-                <div className="class-body">
-                  <div className="class-stat"><i className="bi bi-people" /><span>{cls.students} Students</span></div>
-                  <div className="class-stat"><i className="bi bi-clock" /><span>{cls.schedule}</span></div>
-                  <div className="class-stat"><i className="bi bi-door-open" /><span>{cls.room}</span></div>
+                <div className="class-body d-flex flex-column gap-2 mb-3.5">
+                  <div className="class-stat small text-muted font-medium">
+                    <i className="bi bi-people-fill text-primary me-2" />
+                    <span>{cls.students} Students</span>
+                  </div>
+                  <div className="class-stat small text-muted font-medium">
+                    <i className="bi bi-clock-fill text-success me-2" />
+                    <span>{cls.schedule}</span>
+                  </div>
+                  <div className="class-stat small text-muted font-medium">
+                    <i className="bi bi-geo-alt-fill text-danger me-2" />
+                    <span>{cls.room}</span>
+                  </div>
                 </div>
-                <div className="class-footer">
-                  <a href={`/teacher/attendance?class=${cls.id}`} className="btn btn-sm btn-outline-primary">Attendance</a>
-                  <a href={`/teacher/assignments?class=${cls.id}`} className="btn btn-sm btn-outline-success">Assignments</a>
+                <div className="class-footer d-flex gap-2 pt-3 border-top" style={{ borderColor: 'var(--border)' }}>
+                  <Link to={`/teacher/attendance?class=${cls.name}`} className="btn btn-sm btn-outline-primary rounded-pill px-3.5 flex-grow-1 font-semibold">
+                    Attendance
+                  </Link>
+                  <Link to={`/teacher/assignments?class=${cls.name}`} className="btn btn-sm btn-outline-success rounded-pill px-3.5 flex-grow-1 font-semibold">
+                    Assignments
+                  </Link>
                 </div>
               </div>
             </div>
@@ -73,24 +117,11 @@ export default function MyClassesPage() {
 }
 
 const mcpStyles = `
-.mcp-page .page-header-custom { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
-.mcp-page .page-header-custom h4 { margin: 0; font-weight: 700; }
 .mcp-page .search-bar { position: relative; }
-.mcp-page .search-bar .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); opacity: 0.5; z-index: 1; }
-.mcp-page .search-bar .form-control { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding-left: 36px; color: inherit; }
-.mcp-page .search-bar .form-control:focus { background: rgba(255,255,255,0.1); border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
-.mcp-page .class-card { background: rgba(255,255,255,0.06); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 1.25rem; transition: all 0.3s; cursor: pointer; display: flex; flex-direction: column; height: 100%; }
-.mcp-page .class-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); border-color: rgba(59,130,246,0.3); }
-.mcp-page .class-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
-.mcp-page .class-icon { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, rgba(59,130,246,0.3), rgba(59,130,246,0.1)); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #60a5fa; flex-shrink: 0; }
-.mcp-page .class-title h5 { margin: 0; font-weight: 600; }
-.mcp-page .class-title span { font-size: 0.8rem; opacity: 0.7; }
-.mcp-page .class-body { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; flex: 1; }
-.mcp-page .class-stat { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; opacity: 0.8; }
-.mcp-page .class-stat i { width: 20px; text-align: center; }
-.mcp-page .class-footer { display: flex; gap: 0.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.08); }
-.mcp-page .skeleton-row { height: 140px; border-radius: 16px; background: rgba(255,255,255,0.06); animation: pulse 1.5s infinite; }
-.mcp-page .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem; background: rgba(255,255,255,0.06); border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); }
-.mcp-page .empty-state i { font-size: 3rem; opacity: 0.3; margin-bottom: 0.5rem; }
-@keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.7; } }
+.mcp-page .search-bar .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); opacity: 0.55; z-index: 1; color: var(--text); }
+.mcp-page .style-search-input { background: var(--surface) !important; border: 1px solid var(--border) !important; border-radius: 12px; padding: 0.55rem 0.55rem 0.55rem 42px; color: var(--text) !important; font-size: 13.5px; }
+.mcp-page .style-search-input:focus { border-color: var(--primary) !important; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important; }
+.mcp-page .class-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; }
+.mcp-page .class-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
+.mcp-page .class-icon { width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(99, 102, 241, 0.03)); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: #6366f1; flex-shrink: 0; border: 1px solid rgba(99, 102, 241, 0.18); }
 `

@@ -30,6 +30,11 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
+import com.ai.dashboard.document.service.DocumentProcessingService;
+import com.ai.dashboard.document.repository.DocumentContentRepository;
+import com.ai.dashboard.ai.rag.repository.DocumentChunkRepository;
+import com.ai.dashboard.ai.vector.provider.VectorStoreProvider;
+
 /**
  * Implementation of DocumentService with local file storage.
  */
@@ -39,7 +44,9 @@ import java.util.UUID;
 @Transactional
 public class DocumentServiceImpl implements DocumentService {
 
-    private static final Set<String> ALLOWED_EXTENSIONS = Set.of("pdf", "docx", "txt", "md");
+    private static final Set<String> ALLOWED_EXTENSIONS = Set.of(
+            "pdf", "docx", "doc", "txt", "md", "pptx", "ppt", "xlsx", "xls", "csv", "jpg", "jpeg", "png", "epub", "rtf"
+    );
     private static final long MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
     private final DocumentRepository documentRepository;
@@ -47,6 +54,10 @@ public class DocumentServiceImpl implements DocumentService {
     private final EnrollmentRepository enrollmentRepository;
     private final ParserService parserService;
     private final UserRepository userRepository;
+    private final DocumentProcessingService documentProcessingService;
+    private final DocumentContentRepository documentContentRepository;
+    private final DocumentChunkRepository documentChunkRepository;
+    private final VectorStoreProvider vectorStoreProvider;
 
     private final Path storagePath = Paths.get("uploads/documents").toAbsolutePath().normalize();
 
@@ -102,24 +113,19 @@ public class DocumentServiceImpl implements DocumentService {
                     .build();
 
             Document saved = documentRepository.save(document);
-            log.info("Step: Save Document entity completed: {}", saved.getId());
+            documentRepository.flush();
+            log.info("Upload started: documentId={}", saved.getId());
 
-            // Attempt text extraction; never fail the upload on parse errors.
+            // Trigger background processing asynchronously
             try {
-                log.info("Step: Save content / Create chunks / Generate embeddings / Save vectors started");
-                saved.setProcessingStatus(Document.ProcessingStatus.PROCESSING);
-                documentRepository.save(saved);
-                parserService.extractText(saved);
-                log.info("Step: Save content / Create chunks / Generate embeddings / Save vectors completed");
+                documentProcessingService.processDocumentAsync(saved.getId());
+                log.info("Async background processing triggered for documentId={}", saved.getId());
             } catch (Exception e) {
-                log.error("Text extraction failed for document {}: {}", saved.getId(), e.getMessage(), e);
-                saved.setProcessingStatus(Document.ProcessingStatus.FAILED);
-                documentRepository.save(saved);
+                log.error("Failed to trigger async processing for documentId={}: {}", saved.getId(), e.getMessage(), e);
             }
 
-            log.info("Step: Commit transaction started");
             DocumentResponse response = toResponse(saved);
-            log.info("Step: Commit transaction completed");
+            log.info("Upload completed & HTTP response returning immediately with status=PENDING for documentId={}", saved.getId());
             return response;
         } catch (IOException e) {
             log.error("Failed to store file", e);
@@ -135,11 +141,11 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public Page<DocumentResponse> getAll(Pageable pageable, String q, String documentType, Long courseId) {
         // Validate documentType parameter if present
-        if (documentType != null) {
+        if (documentType != null && !documentType.isBlank()) {
             try {
                 Document.DocumentType.valueOf(documentType);
             } catch (IllegalArgumentException e) {
-                throw new com.ai.dashboard.exception.BadRequestException("Invalid documentType: " + documentType);
+                documentType = null; // Ignore invalid documentType filter instead of throwing 400
             }
         }
 
@@ -199,14 +205,40 @@ public class DocumentServiceImpl implements DocumentService {
             throw new AccessDeniedException("You can only delete your own documents");
         }
 
+        // 1. Delete Qdrant vectors
+        try {
+            vectorStoreProvider.delete(id);
+            log.info("Deleted Qdrant vectors for documentId={}", id);
+        } catch (Exception e) {
+            log.warn("Failed to delete vectors from vector store for documentId={}: {}", id, e.getMessage());
+        }
+
+        // 2. Delete document chunks from db
+        try {
+            documentChunkRepository.deleteByDocumentId(id);
+            log.info("Deleted database chunks for documentId={}", id);
+        } catch (Exception e) {
+            log.warn("Failed to delete chunks for documentId={}: {}", id, e.getMessage());
+        }
+
+        // 3. Delete document contents from db
+        try {
+            documentContentRepository.deleteByDocumentId(id);
+            log.info("Deleted document content for documentId={}", id);
+        } catch (Exception e) {
+            log.warn("Failed to delete document content for documentId={}: {}", id, e.getMessage());
+        }
+
+        // 4. Delete physical file
         try {
             Files.deleteIfExists(Paths.get(document.getStoragePath()));
         } catch (IOException e) {
             log.warn("Failed to delete file from storage: {}", document.getStoragePath());
         }
 
+        // 5. Delete document entity from db
         documentRepository.delete(document);
-        log.info("Document deleted: {}", id);
+        log.info("Document deleted successfully: {}", id);
     }
 
     // ------------------------------------------------------------------

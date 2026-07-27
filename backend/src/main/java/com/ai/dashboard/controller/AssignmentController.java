@@ -46,16 +46,21 @@ public class AssignmentController {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER')")
     @Operation(summary = "Create a new assignment (ADMIN/TEACHER - own courses only)")
     public ResponseEntity<ApiResponse<AssignmentResponse>> create(
-            @RequestParam Long courseId,
+            @RequestParam(required = false) Long courseId,
             @Valid @RequestBody AssignmentRequest request,
             Authentication authentication) {
+
+        Long targetCourseId = courseId != null ? courseId : request.getCourseId();
+        if (targetCourseId == null) {
+            throw new IllegalArgumentException("Course ID is required");
+        }
 
         Long currentUserId = extractUserId(authentication);
         String currentUserRole = getCurrentUserRole(authentication);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Assignment created",
-                        assignmentService.createAssignment(request, courseId, currentUserId, currentUserRole)));
+                        assignmentService.createAssignment(request, targetCourseId, currentUserId, currentUserRole)));
     }
 
     @PutMapping("/{id}")

@@ -36,4 +36,8 @@ public class AssignmentRequest {
 
     @Size(max = 500, message = "Attachment URL must not exceed 500 characters")
     private String attachmentUrl;
+
+    private Long courseId;
+
+    private String status;
 }

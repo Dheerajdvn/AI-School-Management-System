@@ -52,6 +52,7 @@ public class AuthenticationController {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final com.ai.dashboard.service.AuditLogService auditLogService;
 
     @PostMapping("/register")
     @Operation(summary = "Register a new user")
@@ -81,6 +82,7 @@ public class AuthenticationController {
                 .build();
 
         userRepository.save(user);
+        auditLogService.log(user.getUsername(), "CREATE", "User", "Registered new user: " + user.getUsername(), "127.0.0.1");
         log.info("User registered successfully: {}", user.getUsername());
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -98,6 +100,7 @@ public class AuthenticationController {
         User user = userRepository.findByUsername(request.getUsername()).orElse(null);
         String token = jwtService.generateToken(userDetails, user != null ? user.getId() : null);
 
+        auditLogService.log(request.getUsername(), "LOGIN", "Auth", "User logged in successfully", "127.0.0.1");
         log.info("User logged in successfully: {}", request.getUsername());
 
         return ResponseEntity.ok(ApiResponse.success("Login successful", buildLoginResponse(userDetails, user != null ? user.getId() : null, token)));

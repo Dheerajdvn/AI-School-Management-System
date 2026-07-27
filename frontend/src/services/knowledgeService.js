@@ -2,6 +2,12 @@ import api from './api'
 
 // Knowledge Center Service
 export const knowledgeService = {
+  // Get knowledge dashboard statistics
+  getDashboard: async () => {
+    const response = await api.get('/knowledge/dashboard')
+    return response.data?.data || response.data
+  },
+
   // Upload document
   uploadDocument: async (formData) => {
     const response = await api.post('/knowledge/documents', formData, {

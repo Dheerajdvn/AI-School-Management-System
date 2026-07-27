@@ -1,4 +1,4 @@
-:root {
+:root, [data-theme="light"], body.light-mode {
   --primary: #4F46E5;
   --primary-hover: #4338ca;
   --primary-rgb: 79, 70, 229;
@@ -10,7 +10,9 @@
   --sidebar-text: #0F172A;
   --text: #0F172A;
   --muted: #64748B;
+  --secondary-text: #64748B;
   --border: #E2E8F0;
+  --hover: #F1F5F9;
   --input-bg: #FFFFFF;
   --input-border: #CBD5E1;
   --table-hover: #F1F5F9;
@@ -307,14 +309,17 @@ body.dark-mode .sidebar-nav-link.active {
   position: absolute;
   bottom: calc(100% + 8px);
   left: 1rem;
-  right: 1rem;
+  width: max-content;
+  min-width: calc(100% - 2rem);
+  max-width: 280px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 12px;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.05);
   padding: 0.5rem;
   z-index: 1050;
   animation: fadeInScale 0.15s ease;
+  outline: none !important;
 }
 
 @keyframes fadeInScale {
@@ -326,12 +331,20 @@ body.dark-mode .sidebar-nav-link.active {
   border-radius: 8px;
   color: var(--text);
   font-size: 0.875rem;
-  transition: background 0.15s;
+  transition: background 0.15s, color 0.15s;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  outline: none !important;
+  white-space: nowrap;
 }
 
-.user-dropdown-popup .dropdown-item:hover {
-  background: var(--hover, rgba(79,70,229,0.08));
-  color: var(--primary);
+.user-dropdown-popup .dropdown-item:hover,
+.user-dropdown-popup .dropdown-item:focus {
+  background: var(--hover);
+  color: var(--primary) !important;
+  outline: none !important;
 }
 
 .main {
@@ -465,12 +478,15 @@ body.dark-mode .badge-model {
 }
 
 .user-topbar-btn {
-  border-color: var(--border);
-  transition: all 0.15s;
+  background-color: var(--surface) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  transition: all 0.15s ease;
 }
 
 .user-topbar-btn:hover {
-  border-color: var(--primary);
+  background-color: var(--hover) !important;
+  border-color: var(--primary) !important;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 

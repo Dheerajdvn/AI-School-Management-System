@@ -29,7 +29,7 @@ public class ParserServiceImpl implements ParserService {
     private final DocumentContentRepository documentContentRepository;
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void extractText(Document document) {
         if (document == null || document.getId() == null) {
             log.error("ParserServiceImpl.extractText: Document or Document ID must not be null");
@@ -37,7 +37,7 @@ public class ParserServiceImpl implements ParserService {
         }
 
         Document managedDocument = documentRepository.findById(document.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + document.getId()));
+                .orElse(document);
 
         Long documentId = managedDocument.getId();
         Long courseId = managedDocument.getCourse() != null ? managedDocument.getCourse().getId() : null;

@@ -1,3 +1,5 @@
+/* Dark Theme Specific Adaptive Styles */
+
 [data-theme="dark"], body.dark-mode {
   background-color: var(--bg) !important;
   color: var(--text) !important;
@@ -5,22 +7,22 @@
   --primary-hover: #818cf8;
   --primary-rgb: 99, 102, 241;
   --accent: #22d3ee;
-  --bg: #09090B;
-  --surface: #111827;
-  --card: #18181B;
-  --sidebar-bg: #0F172A;
-  --sidebar-text: #FAFAFA;
-  --text: #FAFAFA;
-  --muted: #E4E4E7;
-  --secondary-text: #E4E4E7;
-  --border: #27272A;
-  --hover: #1E293B;
-  --input-bg: #18181B;
-  --input-border: #27272A;
-  --table-hover: #1E293B;
-  --modal-bg: #18181B;
-  --shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
+  --bg: #0E0F11;
+  --surface: #17181B;
+  --card: #17181B;
+  --sidebar-bg: #131417;
+  --sidebar-text: #F3F4F6;
+  --text: #F3F4F6;
+  --muted: #9CA3AF;
+  --secondary-text: #9CA3AF;
+  --border: #2A2D31;
+  --hover: #1D1F23;
+  --input-bg: #17181B;
+  --input-border: #2A2D31;
+  --table-hover: #1D1F23;
+  --modal-bg: #17181B;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 [data-theme="dark"] .main,
@@ -50,7 +52,11 @@ body.dark-mode .bg-light {
 }
 
 [data-theme="dark"] .text-dark,
-body.dark-mode .text-dark {
+body.dark-mode .text-dark,
+[data-theme="dark"] .text-body,
+body.dark-mode .text-body,
+[data-theme="dark"] .text-body-secondary,
+body.dark-mode .text-body-secondary {
   color: var(--text) !important;
 }
 
@@ -73,4 +79,70 @@ body.dark-mode .modal-content {
   background-color: var(--modal-bg) !important;
   color: var(--text) !important;
   border-color: var(--border) !important;
+}
+
+/* Topbar user profile button dark mode override */
+[data-theme="dark"] .user-topbar-btn,
+body.dark-mode .user-topbar-btn {
+  background-color: #17181B !important;
+  color: #F3F4F6 !important;
+  border-color: #2A2D31 !important;
+}
+
+[data-theme="dark"] .user-topbar-btn span,
+body.dark-mode .user-topbar-btn span,
+[data-theme="dark"] .user-topbar-btn i,
+body.dark-mode .user-topbar-btn i {
+  color: #F3F4F6 !important;
+}
+
+/* Adaptive Inputs, Selects, Pre, and Input Groups in Dark Mode */
+[data-theme="dark"] .form-control,
+body.dark-mode .form-control,
+[data-theme="dark"] .form-select,
+body.dark-mode .form-select,
+[data-theme="dark"] textarea,
+body.dark-mode textarea,
+[data-theme="dark"] select,
+body.dark-mode select {
+  background-color: var(--input-bg) !important;
+  color: #F3F4F6 !important;
+  border-color: var(--input-border) !important;
+}
+
+[data-theme="dark"] .form-control:focus,
+body.dark-mode .form-control:focus,
+[data-theme="dark"] .form-select:focus,
+body.dark-mode .form-select:focus {
+  background-color: var(--input-bg) !important;
+  color: #FFFFFF !important;
+  border-color: var(--primary) !important;
+}
+
+[data-theme="dark"] .form-control[readonly],
+body.dark-mode .form-control[readonly],
+[data-theme="dark"] .form-control:disabled,
+body.dark-mode .form-control:disabled {
+  background-color: #121316 !important;
+  color: #9CA3AF !important;
+  opacity: 0.8;
+}
+
+[data-theme="dark"] .input-group-text,
+body.dark-mode .input-group-text {
+  background-color: #121316 !important;
+  color: #9CA3AF !important;
+  border-color: var(--input-border) !important;
+}
+
+[data-theme="dark"] option,
+body.dark-mode option {
+  background-color: #17181B !important;
+  color: #F3F4F6 !important;
+}
+
+[data-theme="dark"] pre,
+body.dark-mode pre {
+  color: #E5E7EB !important;
+  background-color: #0E0F11 !important;
 }

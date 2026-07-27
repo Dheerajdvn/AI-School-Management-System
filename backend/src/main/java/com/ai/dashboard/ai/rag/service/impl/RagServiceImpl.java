@@ -34,6 +34,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.*;
 
+import com.ai.dashboard.ai.rag.dto.RagChatRequest;
+import com.ai.dashboard.ai.dto.ChatRequest;
+import com.ai.dashboard.ai.rag.service.ConversationService;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
 /**
  * Implementation of RAG pipeline: chunking, embedding, vector search, and answer generation.
  */
@@ -52,6 +57,7 @@ public class RagServiceImpl implements RagService {
     private final EmbeddingService embeddingService;
     private final VectorStoreService vectorStoreService;
     private final com.ai.dashboard.ai.service.AIService aiService;
+    private final ConversationService conversationService;
 
     @PostConstruct
     public void init() {
@@ -81,6 +87,145 @@ public class RagServiceImpl implements RagService {
                 .responseTimeMs(response.getResponseTime())
                 .confidenceScore(response.getConfidenceScore())
                 .build());
+    }
+
+    @Override
+    public void answerQuestionStreamSse(RagChatRequest request, SseEmitter emitter, Long userId) {
+        long startTime = System.currentTimeMillis();
+        String question = request.getQuestion();
+        Long courseId = request.getCourseId();
+        String sessionId = request.getSessionId();
+
+        log.info("RAG SSE streaming started: questionLength={}, courseId={}, userId={}, sessionId={}",
+                question.length(), courseId, userId, sessionId);
+
+        try {
+            // 1. Session resolution & User message persistence
+            if (sessionId == null || sessionId.isBlank()) {
+                String title = question.length() > 30 ? question.substring(0, 30) + "..." : question;
+                sessionId = conversationService.createSession(userId != null ? userId : 1L, title);
+            }
+            conversationService.addMessage(sessionId, ChatMessage.Role.USER, question, null);
+
+            // 2. Vector search & deduplication
+            List<Float> questionEmbedding = embeddingService.generateEmbedding(question);
+            List<SearchResult> searchResults = vectorStoreService.searchSimilar(questionEmbedding, TOP_K, courseId);
+            log.info("Vector search completed: retrieved {} matching chunks", searchResults.size());
+
+            // Deduplicate chunks
+            List<SearchResult> deduplicated = new ArrayList<>();
+            Set<String> seen = new HashSet<>();
+            for (SearchResult r : searchResults) {
+                String key = r.getDocumentId() + "_" + r.getChunkId();
+                if (seen.add(key)) {
+                    deduplicated.add(r);
+                }
+            }
+
+            // Fallback check if searchResults are empty or relevance score is low (< 0.20)
+            if (deduplicated.isEmpty() || searchResults.get(0).getScore() < 0.20) {
+                String fallbackText = "I couldn't find relevant information in the uploaded documents.";
+                log.info("RAG fallback triggered (no relevant document context found)");
+
+                emitter.send(SseEmitter.event().name("sources").data(Collections.emptyList()));
+                emitter.send(SseEmitter.event().name("token").data(fallbackText));
+                emitter.send(SseEmitter.event().name("done").data(Map.of(
+                        "sessionId", sessionId,
+                        "sources", Collections.emptyList(),
+                        "answer", fallbackText
+                )));
+                emitter.complete();
+
+                conversationService.addMessage(sessionId, ChatMessage.Role.ASSISTANT, fallbackText, "No context found");
+                return;
+            }
+
+            // 3. Batch retrieve chunk text
+            List<Long> docIds = deduplicated.stream().map(SearchResult::getDocumentId).distinct().toList();
+            List<DocumentChunk> allChunks = docIds.isEmpty() ? Collections.emptyList() : documentChunkRepository.findByDocumentIdIn(docIds);
+
+            Map<String, String> chunkTextMap = allChunks.stream()
+                    .collect(Collectors.toMap(
+                            c -> c.getDocumentId() + "_" + c.getChunkIndex(),
+                            DocumentChunk::getContent,
+                            (existing, replacement) -> existing
+                    ));
+
+            List<String> retrievedChunks = new ArrayList<>();
+            List<RagSource> sources = new ArrayList<>();
+            for (SearchResult r : deduplicated) {
+                String chunkText = chunkTextMap.getOrDefault(r.getDocumentId() + "_" + r.getChunkId(), "[Chunk content unavailable]");
+                retrievedChunks.add(chunkText);
+                String ref = (r.getFilename() != null ? r.getFilename() : "Document #" + r.getDocumentId()) + " (Chunk " + r.getChunkId() + ")";
+                sources.add(RagSource.builder()
+                        .documentId(r.getDocumentId())
+                        .filename(r.getFilename() != null ? r.getFilename() : "Document #" + r.getDocumentId())
+                        .chunkId(r.getChunkId())
+                        .score(r.getScore())
+                        .reference(ref)
+                        .build());
+            }
+
+            // Send sources metadata event via SSE
+            emitter.send(SseEmitter.event().name("sources").data(sources));
+
+            // 4. Construct Prompt
+            List<ChatMessage> history = conversationService.getSessionHistory(sessionId);
+            String historyText = history.stream()
+                    .limit(6)
+                    .map(m -> m.getRole() + ": " + m.getContent())
+                    .collect(Collectors.joining("\n"));
+
+            String contextText = buildContext(retrievedChunks);
+            String prompt = "You are an AI learning assistant.\n\n" +
+                    "Conversation History:\n" + historyText + "\n\n" +
+                    "Context:\n" + contextText + "\n\n" +
+                    "Question: " + question + "\n\n" +
+                    "Answer strictly using the provided context. If not found, say you couldn't find relevant information.\nAnswer:";
+
+            log.info("Prompt constructed for SSE stream (size={} chars)", prompt.length());
+
+            // 5. Stream Tokens
+            StringBuilder fullAnswer = new StringBuilder();
+            ChatRequest chatReq = new ChatRequest();
+            chatReq.setMessage(prompt);
+            chatReq.setConversationId(sessionId);
+
+            Stream<String> tokenStream = aiService.streamChat(chatReq);
+            tokenStream.forEach(token -> {
+                try {
+                    fullAnswer.append(token);
+                    emitter.send(SseEmitter.event().name("token").data(token));
+                } catch (Exception ex) {
+                    log.warn("Failed to push SSE token: {}", ex.getMessage());
+                }
+            });
+
+            long latency = System.currentTimeMillis() - startTime;
+            log.info("RAG SSE streaming finished for sessionId={}, totalChars={}, latency={}ms",
+                    sessionId, fullAnswer.length(), latency);
+
+            String finalAnswer = fullAnswer.length() > 0 ? fullAnswer.toString() : "I couldn't find relevant information in the uploaded documents.";
+
+            emitter.send(SseEmitter.event().name("done").data(Map.of(
+                    "sessionId", sessionId,
+                    "sources", sources,
+                    "latencyMs", latency
+            )));
+            emitter.complete();
+
+            conversationService.addMessage(sessionId, ChatMessage.Role.ASSISTANT, finalAnswer, contextText);
+
+        } catch (Exception e) {
+            long elapsed = System.currentTimeMillis() - startTime;
+            log.error("RAG SSE streaming failed after {}ms: {}", elapsed, e.getMessage(), e);
+            try {
+                emitter.send(SseEmitter.event().name("error").data("RAG SSE Pipeline Error: " + e.getMessage()));
+                emitter.completeWithError(e);
+            } catch (Exception inner) {
+                // ignore
+            }
+        }
     }
 
     @Override

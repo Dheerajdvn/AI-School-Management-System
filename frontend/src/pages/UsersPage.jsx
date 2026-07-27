@@ -69,7 +69,8 @@ export default function UsersPage() {
       setShowDelete(false)
       fetchUsers()
     } catch (e) {
-      setError(e.message)
+      setShowDelete(false)
+      setError(e.response?.data?.message || e.message)
     }
   }
 
@@ -99,17 +100,17 @@ export default function UsersPage() {
 
   return (
     <div>
-      <div className="page-header d-flex justify-content-between align-items-center mb-3">
+      <div className="d-flex justify-content-between align-items-center mb-2">
         <div>
-          <h1>Users</h1>
-          <p className="text-muted">Manage application users, roles and access</p>
+          <h3 className="fw-bold mb-0" style={{ fontSize: '16px' }}>Users</h3>
+          <p className="text-muted m-0" style={{ fontSize: '12px' }}>Manage application users, roles and access</p>
         </div>
         <div>
           <button className="btn btn-primary" onClick={onAdd}>Add User</button>
         </div>
       </div>
 
-      <div className="card mb-3 p-3">
+      <div className="card p-2 mb-2">
         <div className="row g-2">
           <div className="col-md-6">
             <UserSearch value={q} onChange={(v) => { setPage(0); setQ(v) }} />
@@ -117,18 +118,18 @@ export default function UsersPage() {
           <div className="col-md-3">
             <UserFilter value={role} onChange={(v) => { setPage(0); setRole(v) }} />
           </div>
-          <div className="col-md-3 text-end">
-            <small className="text-muted">{total} users</small>
+          <div className="col-md-3 text-end d-flex align-items-center justify-content-end">
+            <small className="text-muted" style={{ fontSize: '12px' }}>{total} users</small>
           </div>
         </div>
       </div>
 
       <div className="card">
-        <div className="card-body">
+        <div className="card-body p-0">
           {loading ? (
             <LoadingIndicator />
           ) : error ? (
-            <div className="alert alert-danger">{error}</div>
+            <div className="alert alert-danger m-2 py-2" style={{ fontSize: '12px' }}>{error}</div>
           ) : (
             <UserTable
               users={users}

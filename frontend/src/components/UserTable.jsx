@@ -10,6 +10,7 @@ export default function UserTable({ users = [], onEdit, onDelete, onView, onTogg
         <table className="table table-hover">
           <thead>
             <tr>
+              <th>Name</th>
               <th>Username</th>
               <th>Email</th>
               <th>Roles</th>
@@ -21,14 +22,17 @@ export default function UserTable({ users = [], onEdit, onDelete, onView, onTogg
           <tbody>
             {users.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center text-muted py-4">No users found</td>
+                <td colSpan={7} className="text-center text-muted py-4">No users found</td>
               </tr>
             ) : (
               users.map((u) => (
                 <tr key={u.id}>
-                  <td>
-                    <a href="#" onClick={(e) => { e.preventDefault(); onView(u) }}>{u.username}</a>
+                  <td className="fw-medium">
+                    <a href="#" onClick={(e) => { e.preventDefault(); onView(u) }}>
+                      {u.firstName || u.lastName ? `${u.firstName || ''} ${u.lastName || ''}`.trim() : '—'}
+                    </a>
                   </td>
+                  <td>{u.username}</td>
                   <td>{u.email}</td>
                   <td>{(u.roles || []).join(', ')}</td>
                   <td>{formatDate(u.createdAt)}</td>

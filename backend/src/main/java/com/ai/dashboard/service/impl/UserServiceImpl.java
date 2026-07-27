@@ -8,6 +8,13 @@ import com.ai.dashboard.entity.User;
 import com.ai.dashboard.repository.RoleRepository;
 import com.ai.dashboard.repository.UserRepository;
 import com.ai.dashboard.repository.UserSpecifications;
+import com.ai.dashboard.repository.CourseRepository;
+import com.ai.dashboard.repository.AssignmentRepository;
+import com.ai.dashboard.repository.EnrollmentRepository;
+import com.ai.dashboard.repository.SubmissionRepository;
+import com.ai.dashboard.repository.UserAiConfigRepository;
+import com.ai.dashboard.document.repository.DocumentRepository;
+import com.ai.dashboard.exception.ConflictException;
 import com.ai.dashboard.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,12 +35,22 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final DocumentRepository documentRepository;
+    private final CourseRepository courseRepository;
+    private final AssignmentRepository assignmentRepository;
+    private final EnrollmentRepository enrollmentRepository;
+    private final SubmissionRepository submissionRepository;
+    private final UserAiConfigRepository userAiConfigRepository;
 
     private UserDto toDto(User u) {
         return UserDto.builder()
                 .id(u.getId())
                 .username(u.getUsername())
+                .firstName(u.getFirstName())
+                .lastName(u.getLastName())
                 .email(u.getEmail())
+                .phone(u.getPhone())
+                .profilePictureUrl(u.getProfilePictureUrl())
                 .enabled(u.isEnabled())
                 .createdAt(u.getCreatedAt())
                 .updatedAt(u.getUpdatedAt())
@@ -67,13 +84,19 @@ public class UserServiceImpl implements UserService {
         }
         User u = new User();
         u.setUsername(request.getUsername());
+        u.setFirstName(request.getFirstName());
+        u.setLastName(request.getLastName());
         u.setEmail(request.getEmail());
+        u.setPhone(request.getPhone());
         u.setPassword(passwordEncoder.encode(request.getPassword()));
         u.setEnabled(true);
         Set<Role> roles = new HashSet<>();
-        if (request.getRoles() != null) {
-            request.getRoles().forEach(rn -> roleRepository.findByName(rn).ifPresent(roles::add));
-        }
+        Set<String> targetRoles = (request.getRoles() != null && !request.getRoles().isEmpty()) ? request.getRoles() : Set.of("ROLE_SCHOOL_ADMIN");
+        targetRoles.forEach(rn -> {
+            Role role = roleRepository.findByName(rn)
+                    .orElseGet(() -> roleRepository.save(Role.builder().name(rn).build()));
+            roles.add(role);
+        });
         u.setRoles(roles);
         u = userRepository.save(u);
         return toDto(u);
@@ -90,13 +113,21 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Email already exists");
         }
         u.setUsername(request.getUsername());
+        u.setFirstName(request.getFirstName());
+        u.setLastName(request.getLastName());
+        u.setProfilePictureUrl(request.getProfilePictureUrl());
         u.setEmail(request.getEmail());
+        u.setPhone(request.getPhone());
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
             u.setPassword(passwordEncoder.encode(request.getPassword()));
         }
-        if (request.getRoles() != null) {
+        if (request.getRoles() != null && !request.getRoles().isEmpty()) {
             Set<Role> roles = new HashSet<>();
-            request.getRoles().forEach(rn -> roleRepository.findByName(rn).ifPresent(roles::add));
+            request.getRoles().forEach(rn -> {
+                Role role = roleRepository.findByName(rn)
+                        .orElseGet(() -> roleRepository.save(Role.builder().name(rn).build()));
+                roles.add(role);
+            });
             u.setRoles(roles);
         }
         if (request.getEnabled() != null) {
@@ -109,6 +140,32 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void deleteUser(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found: " + id));
+
+        long docCount = documentRepository.countByUploadedById(id);
+        if (docCount > 0) {
+            throw new ConflictException("Cannot delete user because they still own " + docCount + " documents.");
+        }
+        long courseCount = courseRepository.countByTeacherId(id);
+        if (courseCount > 0) {
+            throw new ConflictException("Cannot delete user because they still teach " + courseCount + " courses.");
+        }
+        long assignmentCount = assignmentRepository.countByTeacherId(id);
+        if (assignmentCount > 0) {
+            throw new ConflictException("Cannot delete user because they still manage " + assignmentCount + " assignments.");
+        }
+        long enrollmentCount = enrollmentRepository.countByStudentId(id);
+        if (enrollmentCount > 0) {
+            throw new ConflictException("Cannot delete user because they have " + enrollmentCount + " enrollments.");
+        }
+        long submissionCount = submissionRepository.countByStudentId(id);
+        if (submissionCount > 0) {
+            throw new ConflictException("Cannot delete user because they have " + submissionCount + " submissions.");
+        }
+        if (userAiConfigRepository.findByUserId(id).isPresent()) {
+            throw new ConflictException("Cannot delete user because they have AI configurations.");
+        }
+
         userRepository.deleteById(id);
     }
 

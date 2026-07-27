@@ -158,7 +158,7 @@ class AssignmentServiceImplTest {
         Assignment assignment = buildAssignment(1L, course, teacher, Assignment.Status.PUBLISHED);
         when(assignmentRepository.findById(1L)).thenReturn(Optional.of(assignment));
         AssignmentResponse response = assignmentService.getAssignment(1L, 1L, "ROLE_TEACHER");
-        assertEquals("Title1", response.getTitle());
+        assertEquals("Assignment1", response.getTitle());
     }
 
     @Test

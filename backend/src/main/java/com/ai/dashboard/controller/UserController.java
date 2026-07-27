@@ -3,23 +3,34 @@ package com.ai.dashboard.controller;
 import com.ai.dashboard.dto.*;
 import com.ai.dashboard.service.UserService;
 import com.ai.dashboard.entity.Role;
+import com.ai.dashboard.entity.User;
 import com.ai.dashboard.repository.RoleRepository;
+import com.ai.dashboard.repository.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
 @Validated
@@ -29,6 +40,7 @@ public class UserController {
 
     private final UserService userService;
     private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
 
     @GetMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -100,10 +112,58 @@ public class UserController {
     public ApiResponse<UserDto> setRoles(@PathVariable Long id, @RequestBody Set<String> roleNames) {
         // Validate roles exist
         roleNames.forEach(rn -> roleRepository.findByName(rn).orElseThrow(() -> new IllegalArgumentException("Role not found: " + rn)));
+        UserDto existing = userService.getUser(id);
         UpdateUserRequest req = new UpdateUserRequest();
-        req.setUsername(userService.getUser(id).getUsername());
-        req.setEmail(userService.getUser(id).getEmail());
+        req.setUsername(existing.getUsername());
+        req.setFirstName(existing.getFirstName());
+        req.setLastName(existing.getLastName());
+        req.setEmail(existing.getEmail());
         req.setRoles(roleNames);
         return ApiResponse.success("Roles updated", userService.updateUser(id, req));
+    }
+
+    @PostMapping(value = "/{id}/picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Upload profile picture")
+    public ApiResponse<UserDto> uploadProfilePicture(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file) {
+        User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found: " + id));
+        try {
+            Path storagePath = Paths.get("uploads/profiles").toAbsolutePath().normalize();
+            Files.createDirectories(storagePath);
+            String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            Path targetPath = storagePath.resolve(filename);
+            Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+            
+            String fileUrl = "/api/uploads/profiles/" + filename;
+            UpdateUserRequest req = new UpdateUserRequest();
+            req.setUsername(user.getUsername());
+            req.setFirstName(user.getFirstName());
+            req.setLastName(user.getLastName());
+            req.setEmail(user.getEmail());
+            req.setProfilePictureUrl(fileUrl);
+            UserDto updated = userService.updateUser(id, req);
+            return ApiResponse.success("Profile picture uploaded", updated);
+        } catch (Exception e) {
+            log.error("Failed to upload profile picture", e);
+            throw new RuntimeException("Failed to upload profile picture: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}/picture")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Remove profile picture")
+    public ApiResponse<UserDto> removeProfilePicture(@PathVariable Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found: " + id));
+        UpdateUserRequest req = new UpdateUserRequest();
+        req.setUsername(user.getUsername());
+        req.setFirstName(user.getFirstName());
+        req.setLastName(user.getLastName());
+        req.setEmail(user.getEmail());
+        req.setPhone(user.getPhone());
+        req.setProfilePictureUrl(null);
+        UserDto updated = userService.updateUser(id, req);
+        return ApiResponse.success("Profile picture removed", updated);
     }
 }

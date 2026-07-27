@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
 const EditProfileDialog = ({ show, user, onClose, onSave }) => {
-  const [payload, setPayload] = useState({ username: '', email: '', phone: '' })
+  const [payload, setPayload] = useState({ username: '', firstName: '', lastName: '', email: '', phone: '' })
   const [errors, setErrors] = useState({})
   const [saving, setSaving] = useState(false)
 
@@ -9,6 +9,8 @@ const EditProfileDialog = ({ show, user, onClose, onSave }) => {
     if (user) {
       setPayload({
         username: user.username || '',
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
         email: user.email || '',
         phone: user.phone || ''
       })
@@ -17,11 +19,14 @@ const EditProfileDialog = ({ show, user, onClose, onSave }) => {
 
   const validate = (data) => {
     const errs = {}
-    if (!data.username || data.username.trim().length < 3) {
-      errs.username = 'Username is required (min 3 characters)'
+    if (!data.username || data.username.trim().length < 3 || /\s/.test(data.username)) {
+      errs.username = 'Username is required (min 3 characters, no spaces)'
     }
     if (!data.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)) {
       errs.email = 'Valid email is required'
+    }
+    if (data.phone && !/^\d+$/.test(data.phone)) {
+      errs.phone = 'Phone number must contain only numbers'
     }
     return errs
   }
@@ -58,12 +63,33 @@ const EditProfileDialog = ({ show, user, onClose, onSave }) => {
               </div>
               <div className="modal-body">
                 {errors.form && <div className="alert alert-danger">{errors.form}</div>}
-                <div className="mb-3">
+                <div className="row g-3">
+                  <div className="col-md-6">
+                    <label className="form-label">First Name</label>
+                    <input 
+                      className="form-control" 
+                      value={payload.firstName} 
+                      onChange={e => handleChange('firstName', e.target.value)} 
+                      placeholder="First name"
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Last Name</label>
+                    <input 
+                      className="form-control" 
+                      value={payload.lastName} 
+                      onChange={e => handleChange('lastName', e.target.value)} 
+                      placeholder="Last name"
+                    />
+                  </div>
+                </div>
+                <div className="mb-3 mt-3">
                   <label className="form-label">Username</label>
                   <input 
                     className={`form-control ${errors.username ? 'is-invalid' : ''}`} 
                     value={payload.username} 
                     onChange={e => handleChange('username', e.target.value)} 
+                    placeholder="Username (no spaces)"
                   />
                   {errors.username && <div className="invalid-feedback">{errors.username}</div>}
                 </div>
@@ -80,11 +106,12 @@ const EditProfileDialog = ({ show, user, onClose, onSave }) => {
                 <div className="mb-3">
                   <label className="form-label">Phone</label>
                   <input 
-                    className="form-control" 
+                    className={`form-control ${errors.phone ? 'is-invalid' : ''}`} 
                     value={payload.phone} 
                     onChange={e => handleChange('phone', e.target.value)} 
-                    placeholder="Enter phone number"
+                    placeholder="Enter phone number (numbers only)"
                   />
+                  {errors.phone && <div className="invalid-feedback">{errors.phone}</div>}
                 </div>
               </div>
               <div className="modal-footer">

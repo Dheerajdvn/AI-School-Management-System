@@ -2,7 +2,7 @@
   border-radius: var(--radius-card);
   border: 1px solid var(--border);
   background: var(--card);
-  box-shadow: var(--shadow);
+  box-shadow: none;
   overflow: hidden;
 }
 
@@ -10,6 +10,7 @@
   color: var(--text) !important;
   margin-bottom: 0 !important;
   vertical-align: middle;
+  font-size: 12px;
 }
 
 .table thead th {
@@ -17,17 +18,18 @@
   color: var(--muted) !important;
   font-weight: 600;
   text-transform: uppercase;
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   letter-spacing: 0.05em;
   border-bottom: 1px solid var(--border) !important;
-  padding: 1rem !important;
+  padding: 0.5rem 0.65rem !important;
 }
 
 .table tbody td {
-  padding: 1rem !important;
+  padding: 0.5rem 0.65rem !important;
   border-bottom: 1px solid var(--border) !important;
   background: transparent !important;
   color: var(--text) !important;
+  font-size: 12px;
 }
 
 .table tbody tr {
@@ -36,4 +38,8 @@
 
 .table tbody tr:hover {
   background-color: var(--table-hover) !important;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none !important;
 }

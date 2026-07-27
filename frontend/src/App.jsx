@@ -18,6 +18,9 @@ const ChatPage = lazy(() => import('./pages/ChatPage'))
 const AskAiPage = lazy(() => import('./pages/AskAiPage'))
 const DocumentPage = lazy(() => import('./pages/DocumentPage'))
 const AssignmentPage = lazy(() => import('./pages/AssignmentPage'))
+const CreateAssignmentPage = lazy(() => import('./pages/CreateAssignmentPage'))
+const EditAssignmentPage = lazy(() => import('./pages/EditAssignmentPage'))
+const AssignmentDetailsPage = lazy(() => import('./pages/AssignmentDetailsPage'))
 const SubmissionPage = lazy(() => import('./pages/SubmissionPage'))
 const ProfilePage = lazy(() => import('./pages/ProfilePage'))
 const SettingsPage = lazy(() => import('./pages/SettingsPage'))
@@ -26,6 +29,9 @@ const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'))
 const NotificationPage = lazy(() => import('./pages/NotificationPage'))
 const UsersPage = lazy(() => import('./pages/UsersPage'))
 const CoursePage = lazy(() => import('./pages/CoursePage'))
+const CourseDetailsPage = lazy(() => import('./pages/CourseDetailsPage'))
+const CreateCoursePage = lazy(() => import('./pages/CreateCoursePage'))
+const EditCoursePage = lazy(() => import('./pages/EditCoursePage'))
 const AdminStudentsPage = lazy(() => import('./pages/StudentsPage'))
 const LoginPage = lazy(() => import('./pages/LoginPage'))
 const UnauthorizedPage = lazy(() => import('./pages/UnauthorizedPage'))
@@ -38,6 +44,9 @@ const SchoolDetailsPage = lazy(() => import('./pages/SchoolDetailsPage'))
 const CreateSchoolPage = lazy(() => import('./pages/CreateSchoolPage'))
 const EditSchoolPage = lazy(() => import('./pages/EditSchoolPage'))
 const SchoolAdminsPage = lazy(() => import('./pages/SchoolAdminsPage'))
+const EditSchoolAdminPage = lazy(() => import('./pages/EditSchoolAdminPage'))
+const CreateSchoolAdminPage = lazy(() => import('./pages/CreateSchoolAdminPage'))
+const SchoolAdminDetailsPage = lazy(() => import('./pages/SchoolAdminDetailsPage'))
 const SubscriptionsPage = lazy(() => import('./pages/SubscriptionsPage'))
 const AdminAnalyticsPage = lazy(() => import('./pages/AdminAnalyticsPage'))
 const AuditLogsPage = lazy(() => import('./pages/AuditLogsPage'))
@@ -135,6 +144,7 @@ function RoleBasedTopbar({ onMenu }) {
     '/admin/analytics': 'AI Analytics',
     '/admin/documents': 'Document Management',
     '/admin/assignments': 'Assignments',
+    '/admin/assignments/new': 'Create Assignment',
     '/admin/submissions': 'Submissions',
     '/admin/schools': 'Schools',
     '/admin/schools/new': 'Create School',
@@ -400,6 +410,48 @@ function AppRoutes() {
           }
         />
         <Route
+          path="/admin/school-admins/new"
+          element={
+            <ProtectedRoute>
+              <RoleProtectedRoute requiredRoles={ROLE_ADMIN}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <CreateSchoolAdminPage />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/school-admins/:id"
+          element={
+            <ProtectedRoute>
+              <RoleProtectedRoute requiredRoles={ROLE_ADMIN}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <SchoolAdminDetailsPage />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/school-admins/:id/edit"
+          element={
+            <ProtectedRoute>
+              <RoleProtectedRoute requiredRoles={ROLE_ADMIN}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <EditSchoolAdminPage />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/admin/subscriptions"
           element={
             <ProtectedRoute>
@@ -457,6 +509,20 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/admin/documents/upload"
+          element={
+            <ProtectedRoute>
+              <RoleProtectedRoute requiredRoles={ROLE_ADMIN}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <UploadDocuments />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
 
         {/* Admin users route */}
         <Route
@@ -505,6 +571,48 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/admin/courses/new"
+          element={
+            <ProtectedRoute>
+              <RoleProtectedRoute requiredRoles={ROLE_ADMIN}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <CreateCoursePage />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/courses/:id"
+          element={
+            <ProtectedRoute>
+              <RoleProtectedRoute requiredRoles={ROLE_ADMIN}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <CourseDetailsPage />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/courses/:id/edit"
+          element={
+            <ProtectedRoute>
+              <RoleProtectedRoute requiredRoles={ROLE_ADMIN}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <EditCoursePage />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/documents"
@@ -540,6 +648,48 @@ function AppRoutes() {
                 <ProtectedLayout>
                   <Suspense fallback={<LoadingIndicator message="Loading..." />}>
                     <AssignmentPage />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/assignments/new"
+          element={
+            <ProtectedRoute>
+              <RoleProtectedRoute requiredRoles={ROLE_ADMIN}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <CreateAssignmentPage />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/assignments/:id"
+          element={
+            <ProtectedRoute>
+              <RoleProtectedRoute requiredRoles={ROLE_ADMIN}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <AssignmentDetailsPage />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/assignments/:id/edit"
+          element={
+            <ProtectedRoute>
+              <RoleProtectedRoute requiredRoles={ROLE_ADMIN}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <EditAssignmentPage />
                   </Suspense>
                 </ProtectedLayout>
               </RoleProtectedRoute>
@@ -757,6 +907,48 @@ function AppRoutes() {
                 <ProtectedLayout>
                   <Suspense fallback={<LoadingIndicator message="Loading..." />}>
                     <TeacherAssignmentsPage />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/assignments/new"
+          element={
+            <ProtectedRoute>
+              <RoleProtectedRoute requiredRoles={ROLE_TEACHER}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <CreateAssignmentPage />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/assignments/:id"
+          element={
+            <ProtectedRoute>
+              <RoleProtectedRoute requiredRoles={ROLE_TEACHER}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <AssignmentDetailsPage />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/assignments/:id/edit"
+          element={
+            <ProtectedRoute>
+              <RoleProtectedRoute requiredRoles={ROLE_TEACHER}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <EditAssignmentPage />
                   </Suspense>
                 </ProtectedLayout>
               </RoleProtectedRoute>

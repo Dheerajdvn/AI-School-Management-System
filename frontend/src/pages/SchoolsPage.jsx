@@ -4,10 +4,6 @@ import LoadingIndicator from '../components/LoadingIndicator'
 import Pagination from '../components/Pagination'
 import { SchoolApi } from '../services/api'
 
-/**
- * Schools Page - List and manage schools from backend database
- * Role: ROLE_SUPER_ADMIN / ROLE_ADMIN
- */
 export default function SchoolsPage() {
   const [schools, setSchools] = useState([])
   const [page, setPage] = useState(0)
@@ -76,11 +72,11 @@ export default function SchoolsPage() {
   }
 
   return (
-    <div className="container-fluid">
-      <div className="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <div className="d-flex justify-content-between align-items-center mb-2">
         <div>
-          <h1>Schools</h1>
-          <p className="text-muted">Manage live schools on the platform</p>
+          <h3 className="fw-bold mb-0" style={{ fontSize: '16px' }}>Schools</h3>
+          <p className="text-muted m-0" style={{ fontSize: '12px' }}>Manage live schools on the platform</p>
         </div>
         <Link to="/admin/schools/new" className="btn btn-primary">
           <i className="bi bi-plus-lg me-1"></i>
@@ -88,7 +84,7 @@ export default function SchoolsPage() {
         </Link>
       </div>
 
-      <form className="row g-2 mb-3" onSubmit={handleSearch}>
+      <form className="row g-2 mb-2" onSubmit={handleSearch}>
         <div className="col-md-5">
           <input
             type="text"
@@ -117,9 +113,9 @@ export default function SchoolsPage() {
       {loading ? (
         <LoadingIndicator message="Loading schools..." />
       ) : error ? (
-        <div className="alert alert-danger">{error}</div>
+        <div className="alert alert-danger py-2" style={{ fontSize: '12px' }}>{error}</div>
       ) : schools.length === 0 ? (
-        <div className="alert alert-info">No schools found in database</div>
+        <div className="alert alert-info py-2" style={{ fontSize: '12px' }}>No schools found in database</div>
       ) : (
         <>
           <div className="table-responsive">
@@ -132,7 +128,7 @@ export default function SchoolsPage() {
                   <th>City</th>
                   <th>Status</th>
                   <th>Subscription</th>
-                  <th>AI Enabled</th>
+                  <th>AI</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -140,55 +136,57 @@ export default function SchoolsPage() {
                 {schools.map((school) => (
                   <tr key={school.id}>
                     <td>
-                      <div className="rounded bg-light d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
+                      <div className="rounded bg-light d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px' }}>
                         {school.logoUrl ? (
                           <img src={school.logoUrl} alt="Logo" className="rounded" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
-                          <i className="bi bi-building text-primary"></i>
+                          <i className="bi bi-building text-primary" style={{ fontSize: '12px' }}></i>
                         )}
                       </div>
                     </td>
-                    <td>{school.schoolName}</td>
+                    <td className="fw-medium">{school.schoolName}</td>
                     <td>{school.schoolCode}</td>
                     <td>{school.city || '—'}</td>
                     <td>
-                      <span className={`badge ${school.status === 'ACTIVE' ? 'bg-success' : 'bg-secondary'}`}>
+                      <span className={`badge ${school.status === 'ACTIVE' ? 'bg-success' : 'bg-secondary'}`} style={{ fontSize: '10px' }}>
                         {school.status}
                       </span>
                     </td>
                     <td>
-                      <span className={`badge ${school.subscriptionPlan === 'PREMIUM' ? 'bg-primary' : 'bg-secondary'}`}>
+                      <span className={`badge ${school.subscriptionPlan === 'PREMIUM' ? 'bg-primary' : 'bg-secondary'}`} style={{ fontSize: '10px' }}>
                         {school.subscriptionPlan || 'BASIC'}
                       </span>
                     </td>
                     <td>
                       {school.aiEnabled ? (
-                        <span className="badge bg-success">Yes</span>
+                        <span className="badge bg-success" style={{ fontSize: '10px' }}>Yes</span>
                       ) : (
-                        <span className="badge bg-secondary">No</span>
+                        <span className="badge bg-secondary" style={{ fontSize: '10px' }}>No</span>
                       )}
                     </td>
                     <td>
-                      <Link to={`/admin/schools/${school.id}`} className="btn btn-sm btn-outline-primary me-1" title="View Details">
-                        <i className="bi bi-eye"></i>
-                      </Link>
-                      <Link to={`/admin/schools/${school.id}/edit`} className="btn btn-sm btn-outline-secondary me-1" title="Edit School">
-                        <i className="bi bi-pencil"></i>
-                      </Link>
-                      <button
-                        className="btn btn-sm btn-outline-danger me-1"
-                        onClick={() => handleDelete(school.id)}
-                        title="Delete School"
-                      >
-                        <i className="bi bi-trash"></i>
-                      </button>
-                      <button
-                        className={`btn btn-sm ${school.status === 'ACTIVE' ? 'btn-outline-warning' : 'btn-outline-success'}`}
-                        onClick={() => handleToggleStatus(school.id)}
-                        title={school.status === 'ACTIVE' ? 'Deactivate' : 'Activate'}
-                      >
-                        {school.status === 'ACTIVE' ? <i className="bi bi-pause"></i> : <i className="bi bi-play"></i>}
-                      </button>
+                      <div className="d-flex gap-1">
+                        <Link to={`/admin/schools/${school.id}`} className="btn btn-sm btn-outline-primary" title="View Details">
+                          <i className="bi bi-eye"></i>
+                        </Link>
+                        <Link to={`/admin/schools/${school.id}/edit`} className="btn btn-sm btn-outline-secondary" title="Edit School">
+                          <i className="bi bi-pencil"></i>
+                        </Link>
+                        <button
+                          className="btn btn-sm btn-outline-danger"
+                          onClick={() => handleDelete(school.id)}
+                          title="Delete School"
+                        >
+                          <i className="bi bi-trash"></i>
+                        </button>
+                        <button
+                          className={`btn btn-sm ${school.status === 'ACTIVE' ? 'btn-outline-warning' : 'btn-outline-success'}`}
+                          onClick={() => handleToggleStatus(school.id)}
+                          title={school.status === 'ACTIVE' ? 'Deactivate' : 'Activate'}
+                        >
+                          {school.status === 'ACTIVE' ? <i className="bi bi-pause"></i> : <i className="bi bi-play"></i>}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

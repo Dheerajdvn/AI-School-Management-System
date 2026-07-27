@@ -1,15 +1,22 @@
 import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import LoadingIndicator from '../../components/LoadingIndicator'
 
 /**
  * School Admin Dashboard - Overview of the school's data and metrics
  * Role: ROLE_SCHOOL_ADMIN
+ * Redesigned with premium OpenAI/Stripe aesthetics, dynamic greeting, SPA routing, custom reactive charts, and full theme adaptability.
  */
 export default function SchoolDashboard() {
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState(null)
+  const [currentDate, setCurrentDate] = useState('')
 
   useEffect(() => {
+    // Format current date
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
+    setCurrentDate(new Date().toLocaleDateString('en-US', options))
+
     const timer = setTimeout(() => {
       setStats({
         totalStudents: 1250,
@@ -38,32 +45,51 @@ export default function SchoolDashboard() {
         assignmentData: [15, 18, 22, 20, 25, 28, 30, 26, 32, 35, 38, 42],
       })
       setLoading(false)
-    }, 800)
+    }, 600)
     return () => clearTimeout(timer)
   }, [])
 
   if (loading) {
     return (
-      <div className="dashboard-skeleton">
-        <div className="row g-3">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="col-md-3 col-sm-6">
-              <div className="skeleton-card">
-                <div className="skeleton-line skeleton-title" />
-                <div className="skeleton-line skeleton-value" />
-                <div className="skeleton-line skeleton-subtitle" />
+      <div className="school-dashboard py-4">
+        <div className="dashboard-skeleton">
+          <div className="skeleton-header mb-4" style={{ height: '40px', width: '300px', background: 'var(--surface)', borderRadius: '8px' }} />
+          <div className="row g-3">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="col-md-3 col-sm-6">
+                <div className="skeleton-card">
+                  <div className="skeleton-line skeleton-title" />
+                  <div className="skeleton-line skeleton-value" />
+                  <div className="skeleton-line skeleton-subtitle" />
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+        <style>{dashboardStyles}</style>
       </div>
     )
   }
 
   return (
-    <div className="school-dashboard">
-      {/* Stats Cards */}
-      <div className="row g-3 mb-4">
+    <div className="school-dashboard py-4">
+      {/* Header with Greeting & Date */}
+      <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+        <div>
+          <h4 className="fw-bold mb-1" style={{ color: 'var(--text)' }}>
+            <span>Welcome back, Admin 👋</span>
+          </h4>
+          <p className="text-muted small mb-0">{currentDate}</p>
+        </div>
+        <div className="d-flex align-items-center gap-2">
+          <span className="badge rounded-pill bg-success bg-opacity-15 text-success border border-success border-opacity-35 px-3 py-1.5 fw-semibold small d-flex align-items-center gap-1.5">
+            <span className="pulse-indicator bg-success" /> System Status: Optimal
+          </span>
+        </div>
+      </div>
+
+      {/* Stats Cards Grid */}
+      <div className="row g-3 mb-4.5">
         <div className="col-md-3 col-sm-6">
           <div className="stat-card gradient-card blue">
             <div className="stat-icon">
@@ -96,7 +122,7 @@ export default function SchoolDashboard() {
             <div className="stat-content">
               <span className="stat-label">Total Classes</span>
               <span className="stat-value">{stats.totalClasses}</span>
-              <span className="stat-change up">{stats.totalSubjects} Subjects</span>
+              <span className="stat-change up" style={{ color: '#fbbf24' }}>{stats.totalSubjects} Subjects</span>
             </div>
           </div>
         </div>
@@ -162,20 +188,22 @@ export default function SchoolDashboard() {
         </div>
       </div>
 
-      {/* Charts Row */}
-      <div className="row g-3 mb-4">
-        <div className="col-md-4">
+      {/* Custom Bar Charts Section */}
+      <div className="row g-4 mb-4.5">
+        <div className="col-lg-4 col-md-6">
           <div className="chart-card">
             <div className="card-header-custom">
-              <h5><i className="bi bi-graph-up me-2" />Student Growth</h5>
-              <span className="badge bg-primary">Monthly</span>
+              <h6 className="mb-0"><i className="bi bi-graph-up text-primary me-2" />Student Growth</h6>
+              <span className="badge rounded-pill px-2.5 py-1" style={{ backgroundColor: 'rgba(99, 102, 241, 0.12)', color: '#6366f1', border: '1px solid rgba(99, 102, 241, 0.2)' }}>Monthly</span>
             </div>
             <div className="chart-body">
               <div className="chart-container">
                 {stats.studentGrowth.map((val, i) => (
                   <div key={i} className="chart-bar-wrapper">
-                    <div className="chart-bar blue" style={{ height: `${(val / 520) * 100}%` }}>
-                      <span className="chart-tooltip">{val}</span>
+                    <div className="chart-bar-track">
+                      <div className="chart-bar blue" style={{ height: `${(val / 520) * 100}%` }}>
+                        <span className="chart-tooltip">{val} Students</span>
+                      </div>
                     </div>
                     <span className="chart-label">{['J','F','M','A','M','J','J','A','S','O','N','D'][i]}</span>
                   </div>
@@ -184,18 +212,20 @@ export default function SchoolDashboard() {
             </div>
           </div>
         </div>
-        <div className="col-md-4">
+        <div className="col-lg-4 col-md-6">
           <div className="chart-card">
             <div className="card-header-custom">
-              <h5><i className="bi bi-calendar-check me-2" />Attendance</h5>
-              <span className="badge bg-success">This Year</span>
+              <h6 className="mb-0"><i className="bi bi-calendar-check text-success me-2" />Attendance</h6>
+              <span className="badge rounded-pill px-2.5 py-1" style={{ backgroundColor: 'rgba(16, 185, 129, 0.12)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.2)' }}>This Year</span>
             </div>
             <div className="chart-body">
               <div className="chart-container">
                 {stats.attendanceData.map((val, i) => (
                   <div key={i} className="chart-bar-wrapper">
-                    <div className="chart-bar green" style={{ height: `${val}%` }}>
-                      <span className="chart-tooltip">{val}%</span>
+                    <div className="chart-bar-track">
+                      <div className="chart-bar green" style={{ height: `${val}%` }}>
+                        <span className="chart-tooltip">{val}% Attendance</span>
+                      </div>
                     </div>
                     <span className="chart-label">{['J','F','M','A','M','J','J','A','S','O','N','D'][i]}</span>
                   </div>
@@ -204,18 +234,20 @@ export default function SchoolDashboard() {
             </div>
           </div>
         </div>
-        <div className="col-md-4">
+        <div className="col-lg-4 col-md-12">
           <div className="chart-card">
             <div className="card-header-custom">
-              <h5><i className="bi bi-card-text me-2" />Assignments</h5>
-              <span className="badge bg-warning text-dark">Monthly</span>
+              <h6 className="mb-0"><i className="bi bi-card-text text-warning me-2" />Assignments</h6>
+              <span className="badge rounded-pill px-2.5 py-1" style={{ backgroundColor: 'rgba(245, 158, 11, 0.12)', color: '#d97706', border: '1px solid rgba(245, 158, 11, 0.2)' }}>Monthly</span>
             </div>
             <div className="chart-body">
               <div className="chart-container">
                 {stats.assignmentData.map((val, i) => (
                   <div key={i} className="chart-bar-wrapper">
-                    <div className="chart-bar orange" style={{ height: `${(val / 42) * 100}%` }}>
-                      <span className="chart-tooltip">{val}</span>
+                    <div className="chart-bar-track">
+                      <div className="chart-bar orange" style={{ height: `${(val / 42) * 100}%` }}>
+                        <span className="chart-tooltip">{val} Tasks</span>
+                      </div>
                     </div>
                     <span className="chart-label">{['J','F','M','A','M','J','J','A','S','O','N','D'][i]}</span>
                   </div>
@@ -226,23 +258,23 @@ export default function SchoolDashboard() {
         </div>
       </div>
 
-      {/* Activity and Events Row */}
-      <div className="row g-3 mb-4">
+      {/* Activity and Events split row */}
+      <div className="row g-4 mb-4.5">
         <div className="col-md-6">
           <div className="glass-card">
             <div className="card-header-custom">
-              <h5><i className="bi bi-activity me-2" />Recent Activity</h5>
+              <h6 className="mb-0"><i className="bi bi-activity text-primary me-2" />Recent Activities</h6>
             </div>
             <div className="card-body p-0">
               <div className="activity-list">
                 {stats.recentActivity.map((item) => (
-                  <div key={item.id} className="activity-item">
-                    <div className={`activity-icon ${item.type}`}>
-                      <i className={`bi bi-${item.type === 'student' ? 'person-plus' : item.type === 'teacher' ? 'person-badge' : item.type === 'timetable' ? 'calendar-week' : item.type === 'announcement' ? 'megaphone' : 'book'}`} />
+                  <div key={item.id} className="activity-item d-flex align-items-center">
+                    <div className={`activity-icon ${item.type} shadow-sm`}>
+                      <i className={`bi bi-${item.type === 'student' ? 'person-plus-fill' : item.type === 'teacher' ? 'person-badge-fill' : item.type === 'timetable' ? 'calendar-week-fill' : item.type === 'announcement' ? 'megaphone-fill' : 'book-fill'}`} />
                     </div>
-                    <div className="activity-content">
-                      <p className="activity-text">{item.action}</p>
-                      <span className="activity-time">{item.time}</span>
+                    <div className="activity-content ms-3">
+                      <p className="activity-text fw-medium mb-0" style={{ color: 'var(--text)' }}>{item.action}</p>
+                      <span className="activity-time text-muted small">{item.time}</span>
                     </div>
                   </div>
                 ))}
@@ -253,19 +285,27 @@ export default function SchoolDashboard() {
         <div className="col-md-6">
           <div className="glass-card">
             <div className="card-header-custom">
-              <h5><i className="bi bi-calendar-event me-2" />Upcoming Events</h5>
+              <h6 className="mb-0"><i className="bi bi-calendar-event text-success me-2" />Upcoming Events</h6>
             </div>
             <div className="card-body p-0">
               <div className="event-list">
                 {stats.upcomingEvents.map((event) => (
-                  <div key={event.id} className="event-item">
-                    <div className={`event-date-badge ${event.type}`}>
-                      <span className="event-day">{new Date(event.date).getDate()}</span>
-                      <span className="event-month">{['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][new Date(event.date).getMonth()]}</span>
+                  <div key={event.id} className="event-item d-flex align-items-center">
+                    <div className={`event-date-badge ${event.type} d-flex flex-column align-items-center justify-content-center`}>
+                      <span className="event-day fw-bold" style={{ color: 'var(--text)' }}>{new Date(event.date).getDate()}</span>
+                      <span className="event-month text-uppercase text-muted" style={{ fontSize: '9px' }}>{['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][new Date(event.date).getMonth()]}</span>
                     </div>
-                    <div className="event-content">
-                      <h6>{event.title}</h6>
-                      <span className="event-type">{event.type.charAt(0).toUpperCase() + event.type.slice(1)}</span>
+                    <div className="event-content ms-3">
+                      <h6 className="fw-semibold mb-1" style={{ color: 'var(--text)' }}>{event.title}</h6>
+                      <span className="event-type badge text-uppercase rounded-pill" style={{ 
+                        fontSize: '9px',
+                        letterSpacing: '0.05em',
+                        backgroundColor: event.type === 'meeting' ? 'rgba(59, 130, 246, 0.12)' : event.type === 'exam' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(16, 185, 129, 0.12)',
+                        color: event.type === 'meeting' ? '#60a5fa' : event.type === 'exam' ? '#f87171' : '#34d399',
+                        padding: '4px 8px'
+                      }}>
+                        {event.type}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -275,295 +315,315 @@ export default function SchoolDashboard() {
         </div>
       </div>
 
-      {/* Quick Actions */}
+      {/* Quick Actions (Router Link Enforced) */}
       <div className="glass-card">
         <div className="card-header-custom">
-          <h5><i className="bi bi-lightning-charge-fill me-2" />Quick Actions</h5>
+          <h6 className="mb-0"><i className="bi bi-lightning-charge-fill text-warning me-2" />Quick Actions</h6>
         </div>
-        <div className="card-body">
+        <div className="card-body p-4">
           <div className="row g-3">
             <div className="col-md-3 col-6">
-              <a href="/school/students" className="quick-action-card">
+              <Link to="/school/students" className="quick-action-card d-block">
                 <div className="qa-icon blue"><i className="bi bi-person-plus-fill" /></div>
-                <span>Add Student</span>
-              </a>
+                <span className="font-medium d-block mt-2" style={{ color: 'var(--text)' }}>Add Student</span>
+              </Link>
             </div>
             <div className="col-md-3 col-6">
-              <a href="/school/teachers" className="quick-action-card">
-                <div className="qa-icon green"><i className="bi bi-person-badge" /></div>
-                <span>Add Teacher</span>
-              </a>
+              <Link to="/school/teachers" className="quick-action-card d-block">
+                <div className="qa-icon green"><i className="bi bi-person-badge-fill" /></div>
+                <span className="font-medium d-block mt-2" style={{ color: 'var(--text)' }}>Add Teacher</span>
+              </Link>
             </div>
             <div className="col-md-3 col-6">
-              <a href="/school/announcements" className="quick-action-card">
+              <Link to="/school/announcements" className="quick-action-card d-block">
                 <div className="qa-icon orange"><i className="bi bi-megaphone-fill" /></div>
-                <span>New Announcement</span>
-              </a>
+                <span className="font-medium d-block mt-2" style={{ color: 'var(--text)' }}>New Announcement</span>
+              </Link>
             </div>
             <div className="col-md-3 col-6">
-              <a href="/school/timetable" className="quick-action-card">
+              <Link to="/school/timetable" className="quick-action-card d-block">
                 <div className="qa-icon purple"><i className="bi bi-calendar-week-fill" /></div>
-                <span>Manage Timetable</span>
-              </a>
+                <span className="font-medium d-block mt-2" style={{ color: 'var(--text)' }}>Manage Timetable</span>
+              </Link>
             </div>
           </div>
         </div>
       </div>
 
-      <style>{`
-        .school-dashboard .stat-card {
-          display: flex;
-          align-items: center;
-          padding: 1.25rem;
-          border-radius: 16px;
-          background: rgba(255,255,255,0.08);
-          backdrop-filter: blur(12px);
-          border: 1px solid rgba(255,255,255,0.1);
-          transition: all 0.3s ease;
-          gap: 1rem;
-        }
-        .school-dashboard .stat-card:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-        }
-        .school-dashboard .stat-card.gradient-card.blue { background: linear-gradient(135deg, rgba(59,130,246,0.3), rgba(59,130,246,0.1)); border-color: rgba(59,130,246,0.3); }
-        .school-dashboard .stat-card.gradient-card.green { background: linear-gradient(135deg, rgba(16,185,129,0.3), rgba(16,185,129,0.1)); border-color: rgba(16,185,129,0.3); }
-        .school-dashboard .stat-card.gradient-card.orange { background: linear-gradient(135deg, rgba(245,158,11,0.3), rgba(245,158,11,0.1)); border-color: rgba(245,158,11,0.3); }
-        .school-dashboard .stat-card.gradient-card.purple { background: linear-gradient(135deg, rgba(139,92,246,0.3), rgba(139,92,246,0.1)); border-color: rgba(139,92,246,0.3); }
-        .school-dashboard .stat-card.gradient-card.red { background: linear-gradient(135deg, rgba(239,68,68,0.3), rgba(239,68,68,0.1)); border-color: rgba(239,68,68,0.3); }
-        .school-dashboard .stat-card.gradient-card.cyan { background: linear-gradient(135deg, rgba(6,182,212,0.3), rgba(6,182,212,0.1)); border-color: rgba(6,182,212,0.3); }
-        .school-dashboard .stat-card.gradient-card.teal { background: linear-gradient(135deg, rgba(13,148,136,0.3), rgba(13,148,136,0.1)); border-color: rgba(13,148,136,0.3); }
-        .school-dashboard .stat-card.gradient-card.pink { background: linear-gradient(135deg, rgba(236,72,153,0.3), rgba(236,72,153,0.1)); border-color: rgba(236,72,153,0.3); }
-        .school-dashboard .stat-icon {
-          width: 48px;
-          height: 48px;
-          border-radius: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.4rem;
-          background: rgba(255,255,255,0.15);
-          flex-shrink: 0;
-        }
-        .school-dashboard .stat-content {
-          display: flex;
-          flex-direction: column;
-        }
-        .school-dashboard .stat-label {
-          font-size: 0.8rem;
-          opacity: 0.7;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
-        .school-dashboard .stat-value {
-          font-size: 1.6rem;
-          font-weight: 700;
-          line-height: 1.2;
-        }
-        .school-dashboard .stat-change {
-          font-size: 0.75rem;
-          opacity: 0.8;
-        }
-        .school-dashboard .stat-change.up { color: #10b981; }
-        .school-dashboard .chart-card, .glass-card {
-          background: rgba(255,255,255,0.06);
-          backdrop-filter: blur(12px);
-          border-radius: 16px;
-          border: 1px solid rgba(255,255,255,0.1);
-          overflow: hidden;
-        }
-        .school-dashboard .card-header-custom {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 1rem 1.25rem;
-          border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
-        .school-dashboard .card-header-custom h5 {
-          margin: 0;
-          font-size: 0.95rem;
-          font-weight: 600;
-        }
-        .school-dashboard .chart-body { padding: 1.25rem; }
-        .school-dashboard .chart-container {
-          display: flex;
-          align-items: flex-end;
-          gap: 4px;
-          height: 160px;
-        }
-        .school-dashboard .chart-bar-wrapper {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          height: 100%;
-          justify-content: flex-end;
-        }
-        .school-dashboard .chart-bar {
-          width: 100%;
-          max-width: 28px;
-          border-radius: 4px 4px 0 0;
-          position: relative;
-          transition: height 0.5s ease;
-          min-height: 4px;
-        }
-        .school-dashboard .chart-bar.blue { background: linear-gradient(to top, #3b82f6, #60a5fa); }
-        .school-dashboard .chart-bar.green { background: linear-gradient(to top, #10b981, #34d399); }
-        .school-dashboard .chart-bar.orange { background: linear-gradient(to top, #f59e0b, #fbbf24); }
-        .school-dashboard .chart-tooltip {
-          position: absolute;
-          top: -22px;
-          left: 50%;
-          transform: translateX(-50%);
-          font-size: 0.65rem;
-          background: rgba(0,0,0,0.8);
-          padding: 2px 6px;
-          border-radius: 4px;
-          opacity: 0;
-          transition: opacity 0.2s;
-          white-space: nowrap;
-        }
-        .school-dashboard .chart-bar:hover .chart-tooltip { opacity: 1; }
-        .school-dashboard .chart-label {
-          font-size: 0.6rem;
-          margin-top: 4px;
-          opacity: 0.6;
-        }
-        .school-dashboard .activity-list, .event-list { padding: 0; }
-        .school-dashboard .activity-item {
-          display: flex;
-          align-items: flex-start;
-          gap: 0.75rem;
-          padding: 0.8rem 1.25rem;
-          border-bottom: 1px solid rgba(255,255,255,0.05);
-          transition: background 0.2s;
-        }
-        .school-dashboard .activity-item:last-child { border-bottom: none; }
-        .school-dashboard .activity-item:hover { background: rgba(255,255,255,0.04); }
-        .school-dashboard .activity-icon {
-          width: 32px;
-          height: 32px;
-          border-radius: 8px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 0.9rem;
-          flex-shrink: 0;
-        }
-        .school-dashboard .activity-icon.student { background: rgba(59,130,246,0.2); color: #60a5fa; }
-        .school-dashboard .activity-icon.teacher { background: rgba(16,185,129,0.2); color: #34d399; }
-        .school-dashboard .activity-icon.timetable { background: rgba(245,158,11,0.2); color: #fbbf24; }
-        .school-dashboard .activity-icon.announcement { background: rgba(139,92,246,0.2); color: #a78bfa; }
-        .school-dashboard .activity-icon.subject { background: rgba(6,182,212,0.2); color: #22d3ee; }
-        .school-dashboard .activity-content { flex: 1; min-width: 0; }
-        .school-dashboard .activity-text {
-          margin: 0;
-          font-size: 0.85rem;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-        .school-dashboard .activity-time {
-          font-size: 0.72rem;
-          opacity: 0.5;
-        }
-        .school-dashboard .event-item {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          padding: 0.8rem 1.25rem;
-          border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .school-dashboard .event-item:last-child { border-bottom: none; }
-        .school-dashboard .event-date-badge {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          width: 50px;
-          padding: 6px 0;
-          border-radius: 10px;
-          flex-shrink: 0;
-        }
-        .school-dashboard .event-date-badge.meeting { background: rgba(59,130,246,0.2); }
-        .school-dashboard .event-date-badge.event { background: rgba(16,185,129,0.2); }
-        .school-dashboard .event-date-badge.exam { background: rgba(239,68,68,0.2); }
-        .school-dashboard .event-day {
-          font-size: 1.2rem;
-          font-weight: 700;
-          line-height: 1;
-        }
-        .school-dashboard .event-month {
-          font-size: 0.6rem;
-          text-transform: uppercase;
-          opacity: 0.7;
-        }
-        .school-dashboard .event-content h6 {
-          margin: 0;
-          font-size: 0.9rem;
-          font-weight: 600;
-        }
-        .school-dashboard .event-type {
-          font-size: 0.72rem;
-          opacity: 0.6;
-        }
-        .school-dashboard .quick-action-card {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 1.25rem;
-          border-radius: 12px;
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.08);
-          text-decoration: none;
-          color: inherit;
-          transition: all 0.3s;
-          cursor: pointer;
-        }
-        .school-dashboard .quick-action-card:hover {
-          background: rgba(255,255,255,0.1);
-          transform: translateY(-2px);
-          text-decoration: none;
-          color: inherit;
-        }
-        .school-dashboard .quick-action-card span {
-          font-size: 0.8rem;
-          font-weight: 500;
-        }
-        .school-dashboard .qa-icon {
-          width: 44px;
-          height: 44px;
-          border-radius: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.2rem;
-        }
-        .school-dashboard .qa-icon.blue { background: rgba(59,130,246,0.2); color: #60a5fa; }
-        .school-dashboard .qa-icon.green { background: rgba(16,185,129,0.2); color: #34d399; }
-        .school-dashboard .qa-icon.orange { background: rgba(245,158,11,0.2); color: #fbbf24; }
-        .school-dashboard .qa-icon.purple { background: rgba(139,92,246,0.2); color: #a78bfa; }
-        .school-dashboard .skeleton-card {
-          padding: 1.25rem;
-          border-radius: 16px;
-          background: rgba(255,255,255,0.05);
-          border: 1px solid rgba(255,255,255,0.08);
-        }
-        .school-dashboard .skeleton-line {
-          height: 12px;
-          border-radius: 6px;
-          background: rgba(255,255,255,0.08);
-          margin-bottom: 8px;
-          animation: pulse 1.5s infinite;
-        }
-        .school-dashboard .skeleton-title { width: 60%; }
-        .school-dashboard .skeleton-value { width: 40%; height: 24px; }
-        .school-dashboard .skeleton-subtitle { width: 80%; }
-        @keyframes pulse {
-          0%, 100% { opacity: 0.4; }
-          50% { opacity: 0.8; }
-        }
-      `}</style>
+      <style>{dashboardStyles}</style>
     </div>
   )
 }
+
+const dashboardStyles = `
+.school-dashboard .stat-card {
+  display: flex;
+  align-items: center;
+  padding: 1.25rem;
+  border-radius: 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: 1rem;
+}
+.school-dashboard .stat-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(99, 102, 241, 0.25);
+  box-shadow: var(--shadow-lg);
+}
+.school-dashboard .stat-card.gradient-card.blue { background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(59,130,246,0.01)); border-color: rgba(59,130,246,0.15); }
+.school-dashboard .stat-card.gradient-card.green { background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.01)); border-color: rgba(16,185,129,0.15); }
+.school-dashboard .stat-card.gradient-card.orange { background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(245,158,11,0.01)); border-color: rgba(245,158,11,0.15); }
+.school-dashboard .stat-card.gradient-card.purple { background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(139,92,246,0.01)); border-color: rgba(139,92,246,0.15); }
+.school-dashboard .stat-card.gradient-card.red { background: linear-gradient(135deg, rgba(239,68,68,0.1), rgba(239,68,68,0.01)); border-color: rgba(239,68,68,0.15); }
+.school-dashboard .stat-card.gradient-card.cyan { background: linear-gradient(135deg, rgba(6,182,212,0.1), rgba(6,182,212,0.01)); border-color: rgba(6,182,212,0.15); }
+.school-dashboard .stat-card.gradient-card.teal { background: linear-gradient(135deg, rgba(13,148,136,0.1), rgba(13,148,136,0.01)); border-color: rgba(13,148,136,0.15); }
+.school-dashboard .stat-card.gradient-card.pink { background: linear-gradient(135deg, rgba(236,72,153,0.1), rgba(236,72,153,0.01)); border-color: rgba(236,72,153,0.15); }
+
+.school-dashboard .stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  flex-shrink: 0;
+}
+.school-dashboard .stat-content {
+  display: flex;
+  flex-direction: column;
+}
+.school-dashboard .stat-label {
+  font-size: 0.72rem;
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 2px;
+  color: var(--text);
+}
+.school-dashboard .stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.25;
+}
+.school-dashboard .stat-change {
+  font-size: 0.72rem;
+  opacity: 0.7;
+  color: var(--muted);
+}
+.school-dashboard .stat-change.up { color: #10b981; }
+
+.school-dashboard .chart-card, .school-dashboard .glass-card {
+  background: var(--card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.school-dashboard .card-header-custom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+}
+.school-dashboard .card-header-custom h6 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: var(--text);
+}
+.school-dashboard .chart-body { padding: 1.5rem 1.25rem 1.25rem 1.25rem; }
+.school-dashboard .chart-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 160px;
+}
+.school-dashboard .chart-bar-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+.school-dashboard .chart-bar-track {
+  width: 100%;
+  height: calc(100% - 20px);
+  background-color: var(--surface);
+  border-radius: 6px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: visible;
+  border: 1px solid var(--border);
+}
+.school-dashboard .chart-bar {
+  width: 100%;
+  max-width: 18px;
+  border-radius: 6px;
+  position: relative;
+  transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  min-height: 4px;
+}
+.school-dashboard .chart-bar.blue { background: linear-gradient(to top, #4f46e5, #818cf8); box-shadow: 0 0 12px rgba(79, 70, 229, 0.2); }
+.school-dashboard .chart-bar.green { background: linear-gradient(to top, #059669, #34d399); box-shadow: 0 0 12px rgba(5, 150, 105, 0.2); }
+.school-dashboard .chart-bar.orange { background: linear-gradient(to top, #d97706, #fbbf24); box-shadow: 0 0 12px rgba(217, 119, 6, 0.2); }
+
+.school-dashboard .chart-tooltip {
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.68rem;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 3px 8px;
+  border-radius: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  white-space: nowrap;
+  z-index: 10;
+  box-shadow: var(--shadow);
+}
+.school-dashboard .chart-bar:hover {
+  transform: scaleY(1.03);
+}
+.school-dashboard .chart-bar:hover .chart-tooltip { 
+  opacity: 1; 
+  transform: translateX(-50%) translateY(-2px);
+}
+.school-dashboard .chart-label {
+  font-size: 0.65rem;
+  margin-top: 6px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.school-dashboard .activity-item {
+  padding: 1rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+}
+.school-dashboard .activity-item:last-child { border-bottom: none; }
+.school-dashboard .activity-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+.school-dashboard .activity-icon.student { background: rgba(59,130,246,0.12); color: #60a5fa; }
+.school-dashboard .activity-icon.teacher { background: rgba(16,185,129,0.12); color: #34d399; }
+.school-dashboard .activity-icon.timetable { background: rgba(245,158,11,0.12); color: #fbbf24; }
+.school-dashboard .activity-icon.announcement { background: rgba(139,92,246,0.12); color: #a78bfa; }
+.school-dashboard .activity-icon.subject { background: rgba(6,182,212,0.12); color: #22d3ee; }
+
+.school-dashboard .event-item {
+  padding: 1rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+}
+.school-dashboard .event-item:last-child { border-bottom: none; }
+.school-dashboard .event-date-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+.school-dashboard .event-date-badge.meeting { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.15); }
+.school-dashboard .event-date-badge.event { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.15); }
+.school-dashboard .event-date-badge.exam { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.15); }
+.school-dashboard .event-day {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+.school-dashboard .event-month {
+  font-size: 0.58rem;
+  letter-spacing: 0.5px;
+}
+
+.school-dashboard .quick-action-card {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  text-decoration: none !important;
+  transition: all 0.25s ease;
+}
+.school-dashboard .quick-action-card:hover {
+  background: var(--hover);
+  border-color: var(--primary);
+  transform: translateY(-3px);
+}
+.school-dashboard .quick-action-card span {
+  font-size: 0.85rem;
+}
+.school-dashboard .qa-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  margin: 0 auto;
+  border: 1px solid var(--border);
+}
+.school-dashboard .qa-icon.blue { background: rgba(59,130,246,0.12); color: #60a5fa; }
+.school-dashboard .qa-icon.green { background: rgba(16,185,129,0.12); color: #34d399; }
+.school-dashboard .qa-icon.orange { background: rgba(245,158,11,0.12); color: #fbbf24; }
+.school-dashboard .qa-icon.purple { background: rgba(139,92,246,0.12); color: #a78bfa; }
+
+.school-dashboard .skeleton-card {
+  padding: 1.25rem;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.school-dashboard .skeleton-line {
+  height: 12px;
+  border-radius: 6px;
+  background: var(--border);
+  margin-bottom: 8px;
+  animation: pulse 1.5s infinite;
+}
+.school-dashboard .skeleton-title { width: 60%; }
+.school-dashboard .skeleton-value { width: 40%; height: 24px; }
+.school-dashboard .skeleton-subtitle { width: 80%; }
+
+.pulse-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+}
+.pulse-indicator::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: 50%;
+  background: inherit;
+  animation: ripple 1.6s infinite ease-out;
+}
+@keyframes ripple {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+`

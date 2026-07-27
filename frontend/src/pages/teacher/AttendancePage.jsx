@@ -1,34 +1,45 @@
 import React, { useState, useEffect } from 'react'
+import useToast from '../../hooks/useToast'
 
 export default function AttendancePage() {
+  const { success: showSuccess, error: showError } = useToast()
   const [loading, setLoading] = useState(true)
   const [students, setStudents] = useState([])
   const [selectedClass, setSelectedClass] = useState('Class 10-A')
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
   const [search, setSearch] = useState('')
   const [saving, setSaving] = useState(false)
-  const [success, setSuccess] = useState(false)
 
   const classes = ['Class 10-A', 'Class 10-B', 'Class 11-A', 'Class 11-B', 'Class 12-A']
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setStudents([
-        { id: 1, name: 'Rahul Sharma', roll: 'R-1001', status: 'present' },
-        { id: 2, name: 'Priya Patel', roll: 'R-1002', status: 'present' },
-        { id: 3, name: 'Amit Kumar', roll: 'R-1003', status: 'absent' },
-        { id: 4, name: 'Sneha Singh', roll: 'R-1004', status: 'late' },
-        { id: 5, name: 'Vikram Joshi', roll: 'R-1005', status: 'present' },
-        { id: 6, name: 'Anita Desai', roll: 'R-1006', status: 'leave' },
-        { id: 7, name: 'Karan Mehta', roll: 'R-1007', status: 'present' },
-        { id: 8, name: 'Deepika Rao', roll: 'R-1008', status: 'present' },
-      ])
-      setLoading(false)
-    }, 600)
-    return () => clearTimeout(timer)
-  }, [selectedClass])
+  const defaultStudents = [
+    { id: 1, name: 'Rahul Sharma', roll: 'R-1001', status: 'present' },
+    { id: 2, name: 'Priya Patel', roll: 'R-1002', status: 'present' },
+    { id: 3, name: 'Amit Kumar', roll: 'R-1003', status: 'absent' },
+    { id: 4, name: 'Sneha Singh', roll: 'R-1004', status: 'late' },
+    { id: 5, name: 'Vikram Joshi', roll: 'R-1005', status: 'present' },
+    { id: 6, name: 'Anita Desai', roll: 'R-1006', status: 'leave' },
+    { id: 7, name: 'Karan Mehta', roll: 'R-1007', status: 'present' },
+    { id: 8, name: 'Deepika Rao', roll: 'R-1008', status: 'present' },
+  ]
 
-  const filtered = students.filter(s => s.name.toLowerCase().includes(search.toLowerCase()) || s.roll.toLowerCase().includes(search.toLowerCase()))
+  // Load from LocalStorage when class or date changes
+  useEffect(() => {
+    setLoading(true)
+    try {
+      const key = `attendance_data_${selectedClass}_${date}`
+      const stored = localStorage.getItem(key)
+      if (stored) {
+        setStudents(JSON.parse(stored))
+      } else {
+        // Fall back to default
+        setStudents(defaultStudents)
+      }
+    } catch (e) {
+      setStudents(defaultStudents)
+    }
+    setLoading(false)
+  }, [selectedClass, date])
 
   const setStatus = (id, status) => {
     setStudents(prev => prev.map(s => s.id === id ? { ...s, status } : s))
@@ -36,88 +47,198 @@ export default function AttendancePage() {
 
   const bulkSet = (status) => {
     setStudents(prev => prev.map(s => ({ ...s, status })))
+    showSuccess(`All students marked as ${status.toUpperCase()}!`)
   }
 
   const handleSave = () => {
     setSaving(true)
     setTimeout(() => {
-      setSaving(false)
-      setSuccess(true)
-      setTimeout(() => setSuccess(false), 3000)
-    }, 800)
+      try {
+        const key = `attendance_data_${selectedClass}_${date}`
+        localStorage.setItem(key, JSON.stringify(students))
+        showSuccess(`Attendance registry for ${selectedClass} on ${date} saved successfully!`)
+      } catch (e) {
+        showError('Failed to save attendance registry')
+      } finally {
+        setSaving(false)
+      }
+    }, 650)
   }
 
-  const counts = { present: students.filter(s => s.status === 'present').length, absent: students.filter(s => s.status === 'absent').length, late: students.filter(s => s.status === 'late').length, leave: students.filter(s => s.status === 'leave').length }
+  const counts = {
+    present: students.filter(s => s.status === 'present').length,
+    absent: students.filter(s => s.status === 'absent').length,
+    late: students.filter(s => s.status === 'late').length,
+    leave: students.filter(s => s.status === 'leave').length
+  }
+
+  const filtered = students.filter(s => 
+    s.name.toLowerCase().includes(search.toLowerCase()) || 
+    s.roll.toLowerCase().includes(search.toLowerCase())
+  )
 
   if (loading) {
     return (
-      <div className="atp-page">
-        <div className="row g-3">{[...Array(6)].map((_, i) => <div key={i} className="col-12"><div className="skeleton-row" /></div>)}</div>
-        <style>{atpStyles}</style>
+      <div className="atp-page py-4">
+        <div className="row g-3">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="col-12">
+              <div className="skeleton-row animate-pulse" style={{ height: '56px', background: 'var(--surface)', borderRadius: '12px' }} />
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="atp-page">
-      {success && (
-        <div className="alert alert-success alert-dismissible fade show" role="alert">
-          <i className="bi bi-check-circle-fill me-2" />Attendance saved successfully.
-          <button type="button" className="btn-close" onClick={() => setSuccess(false)} />
+    <div className="atp-page py-4">
+      <div className="page-header-custom d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+        <div>
+          <h4 className="fw-bold mb-1" style={{ color: 'var(--text)' }}>
+            <i className="bi bi-calendar-check-fill text-primary me-2" />Attendance Register
+          </h4>
+          <p className="text-muted small mb-0 font-medium">Record student attendance status daily, run bulk markers, and view metrics graphs.</p>
         </div>
-      )}
-
-      <div className="page-header-custom">
-        <h4><i className="bi bi-calendar-check me-2" />Attendance</h4>
-        <div className="d-flex gap-2">
-          <input type="date" className="form-control" value={date} onChange={e => setDate(e.target.value)} style={{ width: 'auto' }} />
-          <select className="form-select" style={{ width: 'auto' }} value={selectedClass} onChange={e => setSelectedClass(e.target.value)}>
-            {classes.map(c => <option key={c}>{c}</option>)}
+        <div className="d-flex flex-wrap gap-2">
+          <input 
+            type="date" 
+            className="form-control bg-dark border-secondary text-white rounded-3 py-1.5" 
+            value={date} 
+            onChange={e => setDate(e.target.value)} 
+            style={{ width: 'auto' }} 
+          />
+          <select 
+            className="form-select bg-dark border-secondary text-white rounded-3 py-1.5" 
+            style={{ width: 'auto', minWidth: '150px' }} 
+            value={selectedClass} 
+            onChange={e => setSelectedClass(e.target.value)}
+          >
+            {classes.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
-          <button className="btn btn-primary btn-sm" onClick={handleSave} disabled={saving}>
-            {saving ? <><span className="spinner-border spinner-border-sm me-1" />Saving...</> : <><i className="bi bi-check-lg me-1" />Save Attendance</>}
+          <button className="btn btn-primary rounded-3 px-3.5 fw-semibold d-flex align-items-center gap-2" onClick={handleSave} disabled={saving}>
+            {saving ? <span className="spinner-border spinner-border-sm" /> : <i className="bi bi-cloud-arrow-up-fill" />}
+            <span>Save Registry</span>
           </button>
         </div>
       </div>
 
-      <div className="row g-3 mb-3">
-        <div className="col-md-3 col-sm-6"><div className="count-card present"><i className="bi bi-check-circle" /><span>Present: <strong>{counts.present}</strong></span></div></div>
-        <div className="col-md-3 col-sm-6"><div className="count-card absent"><i className="bi bi-x-circle" /><span>Absent: <strong>{counts.absent}</strong></span></div></div>
-        <div className="col-md-3 col-sm-6"><div className="count-card late"><i className="bi bi-clock" /><span>Late: <strong>{counts.late}</strong></span></div></div>
-        <div className="col-md-3 col-sm-6"><div className="count-card leave"><i className="bi bi-calendar-x" /><span>Leave: <strong>{counts.leave}</strong></span></div></div>
+      {/* Counts summary widgets */}
+      <div className="row g-3 mb-4">
+        <div className="col-md-3 col-sm-6">
+          <div className="count-card present shadow-sm">
+            <i className="bi bi-check-circle-fill" />
+            <div>
+              <span className="count-label text-muted d-block uppercase tracking-wider">Present</span>
+              <strong className="count-value text-white" style={{ color: 'var(--text)' }}>{counts.present}</strong>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-3 col-sm-6">
+          <div className="count-card absent shadow-sm">
+            <i className="bi bi-x-circle-fill" />
+            <div>
+              <span className="count-label text-muted d-block uppercase tracking-wider">Absent</span>
+              <strong className="count-value text-white" style={{ color: 'var(--text)' }}>{counts.absent}</strong>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-3 col-sm-6">
+          <div className="count-card late shadow-sm">
+            <i className="bi bi-clock-fill" />
+            <div>
+              <span className="count-label text-muted d-block uppercase tracking-wider">Late</span>
+              <strong className="count-value text-white" style={{ color: 'var(--text)' }}>{counts.late}</strong>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-3 col-sm-6">
+          <div className="count-card leave shadow-sm">
+            <i className="bi bi-calendar-x-fill" />
+            <div>
+              <span className="count-label text-muted d-block uppercase tracking-wider">On Leave</span>
+              <strong className="count-value text-white" style={{ color: 'var(--text)' }}>{counts.leave}</strong>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="bulk-actions mb-3">
-        <span className="bulk-label">Bulk Actions:</span>
-        <button className="btn btn-sm btn-outline-success me-1" onClick={() => bulkSet('present')}>All Present</button>
-        <button className="btn btn-sm btn-outline-danger me-1" onClick={() => bulkSet('absent')}>All Absent</button>
-        <button className="btn btn-sm btn-outline-warning me-1" onClick={() => bulkSet('late')}>All Late</button>
+      <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3.5">
+        {/* Bulk Action Controls */}
+        <div className="bulk-actions d-flex align-items-center gap-2">
+          <span className="bulk-label text-muted small fw-semibold uppercase tracking-wider me-1">Bulk Actions:</span>
+          <button className="btn btn-sm btn-outline-success rounded-pill px-3" onClick={() => bulkSet('present')}>
+            Mark All Present
+          </button>
+          <button className="btn btn-sm btn-outline-danger rounded-pill px-3" onClick={() => bulkSet('absent')}>
+            Mark All Absent
+          </button>
+          <button className="btn btn-sm btn-outline-warning rounded-pill px-3" onClick={() => bulkSet('late')}>
+            Mark All Late
+          </button>
+        </div>
+
+        {/* Search Filter */}
+        <div className="search-bar" style={{ minWidth: '260px' }}>
+          <i className="bi bi-search search-icon" />
+          <input 
+            type="text" 
+            className="form-control style-search-input" 
+            placeholder="Search student names..." 
+            value={search} 
+            onChange={e => setSearch(e.target.value)} 
+          />
+        </div>
       </div>
 
-      <div className="search-bar mb-3">
-        <i className="bi bi-search search-icon" />
-        <input type="text" className="form-control" placeholder="Search students..." value={search} onChange={e => setSearch(e.target.value)} />
-      </div>
-
-      <div className="table-responsive">
-        <table className="table atp-table">
-          <thead><tr><th>Roll</th><th>Name</th><th>Status</th></tr></thead>
+      {/* Roster list */}
+      <div className="table-responsive shadow-sm">
+        <table className="table atp-table align-middle mb-0" style={{ color: 'inherit' }}>
+          <thead>
+            <tr className="border-bottom border-secondary border-opacity-10">
+              <th className="px-4 py-3 text-muted text-uppercase" style={{ fontSize: '11px' }}>Roll</th>
+              <th className="py-3 text-muted text-uppercase" style={{ fontSize: '11px' }}>Student Name</th>
+              <th className="px-4 py-3 text-muted text-uppercase text-end" style={{ fontSize: '11px' }}>Status Trigger</th>
+            </tr>
+          </thead>
           <tbody>
-            {filtered.map(s => (
-              <tr key={s.id}>
-                <td><code>{s.roll}</code></td>
-                <td><strong>{s.name}</strong></td>
-                <td>
-                  <div className="btn-group">
-                    {['present', 'absent', 'late', 'leave'].map(status => (
-                      <button key={status} className={`btn btn-sm ${s.status === status ? 'btn-' + (status === 'present' ? 'success' : status === 'absent' ? 'danger' : status === 'late' ? 'warning' : 'info') : 'btn-outline-secondary'}`} onClick={() => setStatus(s.id, status)}>
-                        {status.charAt(0).toUpperCase() + status.slice(1)}
-                      </button>
-                    ))}
-                  </div>
-                </td>
+            {filtered.length === 0 ? (
+              <tr>
+                <td colSpan="3" className="text-center py-5 text-muted small">No students found matching your search.</td>
               </tr>
-            ))}
+            ) : (
+              filtered.map(s => (
+                <tr key={s.id} className="border-bottom border-secondary border-opacity-10">
+                  <td className="px-4"><code>{s.roll}</code></td>
+                  <td><strong className="text-white" style={{ color: 'var(--text)' }}>{s.name}</strong></td>
+                  <td className="px-4 text-end">
+                    <div className="btn-group rounded-3 overflow-hidden p-0.5 border" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--surface)' }}>
+                      {[
+                        { key: 'present', label: 'Present', color: 'success' },
+                        { key: 'absent', label: 'Absent', color: 'danger' },
+                        { key: 'late', label: 'Late', color: 'warning' },
+                        { key: 'leave', label: 'Leave', color: 'info' }
+                      ].map(option => {
+                        const isSelected = s.status === option.key
+                        return (
+                          <button 
+                            key={option.key} 
+                            className={`btn btn-sm px-3.5 py-1.5 border-0 font-medium transition ${isSelected ? 'btn-' + option.color : 'text-muted'}`}
+                            onClick={() => setStatus(s.id, option.key)}
+                            style={{
+                              fontSize: '11.5px',
+                              borderRadius: '6px'
+                            }}
+                          >
+                            {option.label}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -128,28 +249,19 @@ export default function AttendancePage() {
 }
 
 const atpStyles = `
-.atp-page .page-header-custom { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
-.atp-page .page-header-custom h4 { margin: 0; font-weight: 700; }
-.atp-page .d-flex.gap-2 { gap: 0.5rem; }
 .atp-page .search-bar { position: relative; }
-.atp-page .search-bar .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); opacity: 0.5; z-index: 1; }
-.atp-page .search-bar .form-control { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding-left: 36px; color: inherit; }
-.atp-page .search-bar .form-control:focus { background: rgba(255,255,255,0.1); border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
-.atp-page .count-card { display: flex; align-items: center; gap: 0.75rem; padding: 1rem; border-radius: 12px; background: rgba(255,255,255,0.06); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
-.atp-page .count-card i { font-size: 1.5rem; }
-.atp-page .count-card.present i { color: #34d399; }
-.atp-page .count-card.absent i { color: #f87171; }
+.atp-page .search-bar .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); opacity: 0.55; z-index: 1; color: var(--text); }
+.atp-page .style-search-input { background: var(--surface) !important; border: 1px solid var(--border) !important; border-radius: 12px; padding: 0.55rem 0.55rem 0.55rem 42px; color: var(--text) !important; font-size: 13.5px; }
+.atp-page .style-search-input:focus { border-color: var(--primary) !important; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important; }
+.atp-page .count-card { display: flex; align-items: center; gap: 1rem; padding: 1.15rem; border-radius: 16px; background: var(--card); border: 1px solid var(--border); }
+.atp-page .count-card i { font-size: 1.6rem; }
+.atp-page .count-card.present i { color: #10b981; }
+.atp-page .count-card.absent i { color: #ef4444; }
 .atp-page .count-card.late i { color: #fbbf24; }
-.atp-page .count-card.leave i { color: #60a5fa; }
-.atp-page .count-card span { font-size: 0.9rem; }
-.atp-page .bulk-actions { display: flex; align-items: center; gap: 0.5rem; }
-.atp-page .bulk-label { font-size: 0.85rem; opacity: 0.7; }
-.atp-page .table-responsive { background: rgba(255,255,255,0.06); backdrop-filter: blur(12px); border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; }
-.atp-page .atp-table { margin: 0; color: inherit; }
-.atp-page .atp-table thead th { background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; padding: 0.75rem 1rem; }
-.atp-page .atp-table td { padding: 0.75rem 1rem; vertical-align: middle; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.atp-page .atp-table tr:last-child td { border-bottom: none; }
-.atp-page .atp-table .btn-group { display: flex; gap: 0.25rem; }
-.atp-page .skeleton-row { height: 56px; border-radius: 12px; background: rgba(255,255,255,0.06); animation: pulse 1.5s infinite; }
-@keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.7; } }
+.atp-page .count-card.leave i { color: #3b82f6; }
+.atp-page .count-label { font-size: 10px; font-weight: 600; letter-spacing: 0.05em; }
+.atp-page .count-value { font-size: 1.6rem; font-weight: 700; line-height: 1.2; }
+.atp-page .table-responsive { background: var(--card); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
+.atp-page .atp-table thead th { background: rgba(255,255,255,0.02) !important; border-bottom: 1px solid var(--border) !important; font-size: 11px; padding: 0.85rem 1rem; }
+.atp-page .atp-table td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border) !important; }
 `

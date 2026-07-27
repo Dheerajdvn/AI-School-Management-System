@@ -18,4 +18,6 @@ public class RagChatRequest {
     private String question;
 
     private Long courseId;
+
+    private String sessionId;
 }

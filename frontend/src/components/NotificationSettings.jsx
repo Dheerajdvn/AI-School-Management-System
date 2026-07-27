@@ -19,15 +19,15 @@ const NotificationSettings = () => {
   }
 
   return (
-    <div className="card">
-      <div className="card-header">
-        <h5 className="mb-0">
-          <i className="bi bi-bell me-2" />
+    <div className="card border-0 shadow-sm" style={{ background: 'var(--card)', color: 'var(--text)', borderColor: 'var(--border)' }}>
+      <div className="card-header border-bottom py-3" style={{ background: 'var(--card)', color: 'var(--text)', borderColor: 'var(--border)' }}>
+        <h5 className="mb-0 fw-bold" style={{ color: 'var(--text)' }}>
+          <i className="bi bi-bell me-2 text-primary" />
           Notification Preferences
         </h5>
       </div>
-      <div className="card-body">
-        <div className="mb-3">
+      <div className="card-body p-4">
+        <div className="mb-4">
           <div className="form-check form-switch">
             <input 
               className="form-check-input" 
@@ -36,14 +36,14 @@ const NotificationSettings = () => {
               checked={settings.emailNotifications}
               onChange={() => handleChange('emailNotifications')}
             />
-            <label className="form-check-label" htmlFor="emailNotifications">
+            <label className="form-check-label fw-semibold" htmlFor="emailNotifications" style={{ color: 'var(--text)' }}>
               Email Notifications
             </label>
           </div>
-          <small className="text-muted">Receive notifications via email</small>
+          <small className="text-muted d-block mt-1">Receive notifications via email</small>
         </div>
 
-        <div className="mb-3">
+        <div className="mb-4">
           <div className="form-check form-switch">
             <input 
               className="form-check-input" 
@@ -52,16 +52,16 @@ const NotificationSettings = () => {
               checked={settings.pushNotifications}
               onChange={() => handleChange('pushNotifications')}
             />
-            <label className="form-check-label" htmlFor="pushNotifications">
+            <label className="form-check-label fw-semibold" htmlFor="pushNotifications" style={{ color: 'var(--text)' }}>
               Push Notifications
             </label>
           </div>
-          <small className="text-muted">Receive push notifications in browser</small>
+          <small className="text-muted d-block mt-1">Receive push notifications in browser</small>
         </div>
 
-        <hr className="my-3" />
+        <hr className="my-4 opacity-10" style={{ borderColor: 'var(--border)' }} />
 
-        <div className="mb-3">
+        <div className="mb-4">
           <div className="form-check form-switch">
             <input 
               className="form-check-input" 
@@ -70,14 +70,14 @@ const NotificationSettings = () => {
               checked={settings.assignmentReminders}
               onChange={() => handleChange('assignmentReminders')}
             />
-            <label className="form-check-label" htmlFor="assignmentReminders">
+            <label className="form-check-label fw-semibold" htmlFor="assignmentReminders" style={{ color: 'var(--text)' }}>
               Assignment Reminders
             </label>
           </div>
-          <small className="text-muted">Get reminded about upcoming assignments</small>
+          <small className="text-muted d-block mt-1">Get reminded about upcoming assignments</small>
         </div>
 
-        <div className="mb-3">
+        <div className="mb-4">
           <div className="form-check form-switch">
             <input 
               className="form-check-input" 
@@ -86,14 +86,14 @@ const NotificationSettings = () => {
               checked={settings.gradeUpdates}
               onChange={() => handleChange('gradeUpdates')}
             />
-            <label className="form-check-label" htmlFor="gradeUpdates">
+            <label className="form-check-label fw-semibold" htmlFor="gradeUpdates" style={{ color: 'var(--text)' }}>
               Grade Updates
             </label>
           </div>
-          <small className="text-muted">Notify when grades are published</small>
+          <small className="text-muted d-block mt-1">Notify when grades are published</small>
         </div>
 
-        <div className="mb-3">
+        <div className="mb-0">
           <div className="form-check form-switch">
             <input 
               className="form-check-input" 
@@ -102,11 +102,11 @@ const NotificationSettings = () => {
               checked={settings.courseAnnouncements}
               onChange={() => handleChange('courseAnnouncements')}
             />
-            <label className="form-check-label" htmlFor="courseAnnouncements">
+            <label className="form-check-label fw-semibold" htmlFor="courseAnnouncements" style={{ color: 'var(--text)' }}>
               Course Announcements
             </label>
           </div>
-          <small className="text-muted">Receive course announcements</small>
+          <small className="text-muted d-block mt-1">Receive course announcements</small>
         </div>
       </div>
     </div>

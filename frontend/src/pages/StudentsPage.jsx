@@ -26,7 +26,7 @@ export default function StudentsPage() {
         Object.keys(active).length > 0
           ? await StudentApi.search({ ...params, ...active })
           : await StudentApi.list(params)
-      setData(res.data)
+      setData(res || { content: [], totalElements: 0, totalPages: 0, page: 0, size: 20 })
     } catch (e) {
       setError(e.message)
     } finally {

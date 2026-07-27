@@ -12,7 +12,6 @@ export default function Topbar({ title, onMenu }) {
   const [provider, setProvider] = useState('Ollama')
   const [model, setModel] = useState('GPT-4o Enterprise')
   const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [searchOpen, setSearchOpen] = useState(false)
   const dropdownRef = useRef(null)
 
   useEffect(() => {
@@ -64,7 +63,7 @@ export default function Topbar({ title, onMenu }) {
   return (
     <header className="topbar enterprise-topbar">
       <div className="d-flex align-items-center gap-3">
-        <button className="hamburger btn btn-link p-0 text-dark dark-text-light" onClick={onMenu} aria-label="Toggle menu">
+        <button className="hamburger btn btn-link p-0 text-body" onClick={onMenu} aria-label="Toggle menu">
           <i className="bi bi-list fs-5" />
         </button>
         <div className="d-flex flex-column">
@@ -77,7 +76,7 @@ export default function Topbar({ title, onMenu }) {
           <i className="bi bi-search text-muted me-2" />
           <input
             type="text"
-            className="form-control border-0 bg-transparent shadow-none p-0 text-dark"
+            className="form-control border-0 bg-transparent shadow-none p-0 text-body"
             placeholder="Search resources, students, classes, or ask AI..."
           />
           <kbd className="badge bg-dark text-light border-0 ms-2">⌘K</kbd>
@@ -100,7 +99,7 @@ export default function Topbar({ title, onMenu }) {
         {/* Notifications button */}
         <button
           className="btn btn-icon rounded-circle position-relative"
-          onClick={() => navigate('/student/notifications')}
+          onClick={() => navigate('/notifications')}
           title="Notifications"
         >
           <i className="bi bi-bell fs-6" />
@@ -118,38 +117,60 @@ export default function Topbar({ title, onMenu }) {
           <i className={`bi ${theme === 'light' ? 'bi-moon-stars' : 'bi-sun'} fs-6`} />
         </button>
 
-        {/* User Profile Dropdown */}
+        {/* User Profile Dropdown Pill - 100% Adaptive Light & Dark Mode */}
         {user && (
           <div className="position-relative" ref={dropdownRef}>
             <button
-              className="user-topbar-btn d-flex align-items-center gap-2 p-1 rounded-pill border bg-card"
+              className="user-topbar-btn d-flex align-items-center gap-2 p-1 pe-2.5 rounded-pill shadow-xs border"
               onClick={() => setDropdownOpen(!dropdownOpen)}
+              style={{
+                backgroundColor: 'var(--surface)',
+                color: 'var(--text)',
+                borderColor: 'var(--border)'
+              }}
             >
-              <div className="avatar-circle-sm">
+              <div
+                className="avatar-circle-sm"
+                style={{
+                  background: 'linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)',
+                  color: '#ffffff'
+                }}
+              >
                 {(user.username || user.name || 'U').charAt(0).toUpperCase()}
               </div>
-              <span className="d-none d-md-inline fw-medium small px-1 text-truncate" style={{ maxWidth: '110px' }}>
+              <span className="d-none d-md-inline fw-semibold small px-1 text-truncate" style={{ maxWidth: '110px', color: 'var(--text)' }}>
                 {user.username || user.name || 'User'}
               </span>
-              <i className="bi bi-chevron-down small text-muted pe-1" />
+              <i className="bi bi-chevron-down small opacity-75 pe-1" style={{ color: 'var(--text)' }} />
             </button>
 
             {dropdownOpen && (
-              <div className="dropdown-menu dropdown-menu-end show shadow-lg p-2 rounded-3 mt-2" style={{ position: 'absolute', right: 0, minWidth: '220px', zIndex: 1050 }}>
-                <div className="px-3 py-2 border-bottom mb-1">
-                  <div className="fw-semibold small">{user.username || user.name || 'User'}</div>
+              <div
+                className="dropdown-menu dropdown-menu-end show shadow-lg p-2 rounded-3 mt-2"
+                style={{
+                  backgroundColor: 'var(--card)',
+                  color: 'var(--text)',
+                  borderColor: 'var(--border)',
+                  position: 'absolute',
+                  right: 0,
+                  minWidth: '220px',
+                  zIndex: 1050
+                }}
+              >
+                <div className="px-3 py-2 border-bottom mb-1" style={{ borderColor: 'var(--border)' }}>
+                  <div className="fw-semibold small" style={{ color: 'var(--text)' }}>{user.username || user.name || 'User'}</div>
                   <div className="text-muted text-xs text-truncate">{user.email || 'enterprise@aischool.io'}</div>
                 </div>
-                <button className="dropdown-item rounded-2 d-flex align-items-center gap-2 py-2 px-3" onClick={() => { setDropdownOpen(false); navigate('/profile'); }}>
+                <button className="dropdown-item rounded-2 d-flex align-items-center gap-2 py-2 px-3" style={{ color: 'var(--text)' }} onClick={() => { setDropdownOpen(false); navigate('/profile'); }}>
                   <i className="bi bi-person fs-6 text-primary" /> Profile Settings
                 </button>
-                <button className="dropdown-item rounded-2 d-flex align-items-center gap-2 py-2 px-3" onClick={() => { setDropdownOpen(false); navigate('/settings'); }}>
+                <button className="dropdown-item rounded-2 d-flex align-items-center gap-2 py-2 px-3" style={{ color: 'var(--text)' }} onClick={() => { setDropdownOpen(false); navigate('/settings'); }}>
                   <i className="bi bi-gear fs-6 text-primary" /> Account Settings
                 </button>
-                <button className="dropdown-item rounded-2 d-flex align-items-center gap-2 py-2 px-3" onClick={() => { setDropdownOpen(false); toggleTheme(); }}>
+                <button className="dropdown-item rounded-2 d-flex align-items-center gap-2 py-2 px-3" style={{ color: 'var(--text)' }} onClick={() => { setDropdownOpen(false); toggleTheme(); }}>
                   <i className={`bi ${theme === 'light' ? 'bi-moon-stars' : 'bi-sun'} fs-6 text-warning`} /> Toggle Theme
                 </button>
-                <div className="dropdown-divider my-1" />
+                <div className="dropdown-divider my-1" style={{ borderColor: 'var(--border)' }} />
                 <button className="dropdown-item rounded-2 d-flex align-items-center gap-2 py-2 px-3 text-danger" onClick={handleLogout}>
                   <i className="bi bi-box-arrow-right fs-6" /> Log out
                 </button>
@@ -161,4 +182,3 @@ export default function Topbar({ title, onMenu }) {
     </header>
   )
 }
-

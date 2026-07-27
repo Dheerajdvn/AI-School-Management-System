@@ -1,120 +1,110 @@
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { CourseApi } from '../services/api'
 import LoadingIndicator from '../components/LoadingIndicator'
-import CourseTable from '../components/CourseTable'
-import CourseForm from '../components/CourseForm'
-import CourseDetails from '../components/CourseDetails'
-import CourseSearch from '../components/CourseSearch'
-import CourseFilter from '../components/CourseFilter'
-import DeleteDialog from '../components/DeleteDialog'
+import Pagination from '../components/Pagination'
 
 export default function CoursePage() {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
   const [courses, setCourses] = useState([])
   const [page, setPage] = useState(0)
-  const [size, setSize] = useState(10)
+  const [size] = useState(10)
   const [total, setTotal] = useState(0)
-  const [q, setQ] = useState('')
-  const [status, setStatus] = useState('')
-  const [selected, setSelected] = useState(null)
-  const [editing, setEditing] = useState(null)
-  const [showForm, setShowForm] = useState(false)
-  const [showDelete, setShowDelete] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  const fetchCourses = async () => {
+  useEffect(() => {
+    loadCourses()
+  }, [page, size])
+
+  const loadCourses = async () => {
     setLoading(true)
     setError(null)
     try {
-      const res = await CourseApi.search({ title: q, status, page, size })
-      const data = res?.data || res || {}
-      const items = data.content || data.items || (Array.isArray(data) ? data : [])
-      const count = data.totalElements || data.total || items.length
-      setCourses(items)
-      setTotal(count)
+      const res = await CourseApi.list({ page, size, sortBy: 'id', direction: 'desc' })
+      const data = res?.data || res
+      setCourses(data.content || [])
+      setTotal(data.totalElements || 0)
     } catch (e) {
-      setError(e.message || 'Failed to load courses')
+      console.error(e)
+      setError('Failed to load courses')
     } finally {
       setLoading(false)
     }
   }
 
-  useEffect(() => { fetchCourses() }, [page, size, q, status])
-
-  const onAdd = () => { setEditing(null); setShowForm(true) }
-  const onEdit = (c) => { setEditing(c); setShowForm(true) }
-  const onView = (c) => setSelected(c)
-  const onDelete = (c) => { setSelected(c); setShowDelete(true) }
-
-  const handleDeleteConfirmed = async (id) => {
-    try {
-      await CourseApi.remove(id)
-      setShowDelete(false)
-      fetchCourses()
-    } catch (e) { setError(e.message) }
-  }
-
-  const handleSave = async (payload) => {
-    try {
-      if (editing) {
-        await CourseApi.update(editing.id, payload)
-      } else {
-        await CourseApi.create(payload)
-      }
-      setShowForm(false)
-      fetchCourses()
-    } catch (e) { setError(e.message); throw e }
-  }
+  if (loading) return <LoadingIndicator message="Loading courses..." />
 
   return (
     <div>
-      <div className="page-header d-flex justify-content-between align-items-center mb-3">
+      <div className="d-flex justify-content-between align-items-center mb-2">
         <div>
-          <h1>Courses</h1>
-          <p className="text-muted">Manage courses, assign teachers and view enrollments</p>
+          <h3 className="fw-bold mb-0" style={{ fontSize: '16px' }}>Courses</h3>
+          <p className="text-muted m-0" style={{ fontSize: '12px' }}>Manage educational courses and curriculum</p>
         </div>
-        <div>
-          <button className="btn btn-primary" onClick={onAdd}>Create Course</button>
-        </div>
+        <Link to="/admin/courses/new" className="btn btn-primary btn-sm">
+          <i className="bi bi-plus-lg me-1"></i>
+          Create Course
+        </Link>
       </div>
 
-      <div className="card mb-3 p-3">
-        <div className="row g-2">
-          <div className="col-md-6"><CourseSearch value={q} onChange={(v) => { setPage(0); setQ(v) }} /></div>
-          <div className="col-md-3"><CourseFilter value={status} onChange={(v) => { setPage(0); setStatus(v) }} /></div>
-          <div className="col-md-3 text-end"><small className="text-muted">{total} courses</small></div>
-        </div>
+      {error && (
+        <div className="alert alert-danger py-2" style={{ fontSize: '12px' }}>{error}</div>
+      )}
+
+      <div className="table-responsive">
+        <table className="table table-hover">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Code</th>
+              <th>Teacher</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {courses.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="text-center text-muted py-4">No courses found</td>
+              </tr>
+            ) : (
+              courses.map((course) => (
+                <tr key={course.id}>
+                  <td className="fw-medium">
+                    <Link to={`/admin/courses/${course.id}`} className="text-decoration-none">
+                      {course.title}
+                    </Link>
+                  </td>
+                  <td>{course.courseCode}</td>
+                  <td>{course.teacherName || '—'}</td>
+                  <td>
+                    <span className={`badge ${course.status === 'ACTIVE' ? 'bg-success' : 'bg-secondary'}`} style={{ fontSize: '10px' }}>
+                      {course.status || 'ACTIVE'}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="d-flex gap-1">
+                      <Link to={`/admin/courses/${course.id}`} className="btn btn-sm btn-outline-primary">
+                        <i className="bi bi-eye"></i>
+                      </Link>
+                      <Link to={`/admin/courses/${course.id}/edit`} className="btn btn-sm btn-outline-secondary">
+                        <i className="bi bi-pencil"></i>
+                      </Link>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
 
-      <div className="card">
-        <div className="card-body">
-          {loading ? <LoadingIndicator /> : error ? <div className="alert alert-danger">{error}</div> : (
-            <CourseTable
-              courses={courses}
-              onEdit={onEdit}
-              onDelete={onDelete}
-              onView={onView}
-              page={page}
-              size={size}
-              total={total}
-              onPageChange={setPage}
-              onSizeChange={setSize}
-            />
-          )}
-        </div>
-      </div>
-
-      {showForm && (
-        <CourseForm course={editing} onClose={() => setShowForm(false)} onSave={handleSave} />
-      )}
-
-      {selected && !showDelete && (
-        <CourseDetails course={selected} onClose={() => setSelected(null)} onEdit={() => onEdit(selected)} />
-      )}
-
-      {showDelete && selected && (
-        <DeleteDialog document={selected} onCancel={() => setShowDelete(false)} onConfirm={() => handleDeleteConfirmed(selected.id)} />
-      )}
+      <Pagination
+        currentPage={page}
+        totalPages={total > 0 ? Math.ceil(total / size) : 1}
+        totalElements={total}
+        onPageChange={setPage}
+      />
     </div>
   )
 }

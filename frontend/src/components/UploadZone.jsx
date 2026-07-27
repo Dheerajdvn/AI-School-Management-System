@@ -77,11 +77,11 @@ export default function UploadZone({ onUpload, loading, documentTypes = [], cour
 
   return (
     <div 
-      className={`upload-zone border border-2 border-dashed rounded-3 p-4 text-center ${dragOver ? 'border-primary bg-light' : 'border-secondary'}`}
+      className={`upload-zone border border-2 border-dashed rounded-3 p-3 text-center ${dragOver ? 'border-primary bg-light' : 'border-secondary'}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
+      style={{ cursor: loading ? 'not-allowed' : 'pointer', background: 'var(--surface)' }}
     >
       <input
         type="file"
@@ -93,53 +93,49 @@ export default function UploadZone({ onUpload, loading, documentTypes = [], cour
       />
       
       {!selectedFile ? (
-        <label htmlFor="file-upload" className="mb-0 w-100">
-          <div className="mb-3">
-            <i className="bi bi-cloud-upload" style={{ fontSize: '2.5rem', color: 'var(--primary)' }} />
+        <label htmlFor="file-upload" className="mb-0 w-100 py-2">
+          <div className="d-flex align-items-center justify-content-center gap-3">
+            <div className="fs-3 text-primary bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center" style={{ width: '48px', height: '48px' }}>
+              <i className="bi bi-cloud-upload" />
+            </div>
+            <div className="text-start">
+              <h6 className="mb-1 fw-bold" style={{ color: 'var(--text)' }}>
+                {loading ? 'Uploading...' : 'Drag & Drop your document here'}
+              </h6>
+              <p className="text-muted small mb-0">
+                PDF, DOCX, TXT supported • <span className="text-primary fw-medium" style={{ cursor: 'pointer' }}>Browse files</span>
+              </p>
+            </div>
           </div>
-          <h5 className="mb-2">
-            {loading ? 'Uploading...' : 'Drag & Drop Files Here'}
-          </h5>
-          <p className="text-muted mb-3">
-            Or click to browse • PDF, DOCX, TXT supported
-          </p>
-          <button 
-            type="button" 
-            className="btn btn-primary mt-3"
-            disabled={loading}
-            onClick={() => document.getElementById('file-upload').click()}
-          >
-            <i className="bi bi-folder2-open me-2" />
-            Choose File
-          </button>
         </label>
       ) : (
-        <div className="upload-preview text-start p-3 bg-white rounded border">
-          <div className="d-flex align-items-center justify-content-between mb-3">
+        <div className="upload-preview text-start p-3 rounded border" style={{ background: 'var(--card)', color: 'var(--text)', borderColor: 'var(--border)' }}>
+          <div className="d-flex align-items-center justify-content-between mb-2">
             <div className="d-flex align-items-center gap-2">
-              <i className="bi bi-file-text text-primary fs-4" />
+              <i className="bi bi-file-text text-primary fs-5" />
               <div>
-                <h6 className="mb-0 fw-bold">{selectedFile.name}</h6>
-                <small className="text-muted">{(selectedFile.size / 1024).toFixed(1)} KB • {selectedFile.type || 'Unknown Type'}</small>
+                <h6 className="mb-0 fw-bold small" style={{ color: 'var(--text)' }}>{selectedFile.name}</h6>
+                <small className="text-muted">{(selectedFile.size / 1024).toFixed(1)} KB • {selectedFile.type || 'Document'}</small>
               </div>
             </div>
             <button 
               type="button" 
-              className="btn-close" 
+              className="btn-close btn-close-white" 
               onClick={handleCancel}
               disabled={loading}
               title="Remove file"
             />
           </div>
 
-          <div className="row g-3 mb-3">
+          <div className="row g-2 mb-3">
             <div className="col-md-6">
-              <label className="form-label small fw-semibold">Document Type</label>
+              <label className="form-label small fw-semibold" style={{ color: 'var(--text)' }}>Document Type</label>
               <select 
                 className="form-select form-select-sm"
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
                 disabled={loading}
+                style={{ background: 'var(--input-bg, var(--card))', color: 'var(--text)', borderColor: 'var(--border)' }}
               >
                 <option value="">Select Document Type</option>
                 {documentTypes.map(dt => (
@@ -149,12 +145,13 @@ export default function UploadZone({ onUpload, loading, documentTypes = [], cour
             </div>
             {courses.length > 0 && (
               <div className="col-md-6">
-                <label className="form-label small fw-semibold">Course</label>
+                <label className="form-label small fw-semibold" style={{ color: 'var(--text)' }}>Course</label>
                 <select 
                   className="form-select form-select-sm"
                   value={selectedCourse}
                   onChange={(e) => setSelectedCourse(e.target.value)}
                   disabled={loading}
+                  style={{ background: 'var(--input-bg, var(--card))', color: 'var(--text)', borderColor: 'var(--border)' }}
                 >
                   <option value="">Select Course (Optional)</option>
                   {courses.map(c => (
@@ -176,7 +173,7 @@ export default function UploadZone({ onUpload, loading, documentTypes = [], cour
             </button>
             <button 
               type="button" 
-              className="btn btn-primary btn-sm px-4"
+              className="btn btn-primary btn-sm px-3"
               onClick={handleSave}
               disabled={loading}
             >
@@ -188,7 +185,7 @@ export default function UploadZone({ onUpload, loading, documentTypes = [], cour
               ) : (
                 <>
                   <i className="bi bi-save me-1" />
-                  Save / Upload
+                  Upload
                 </>
               )}
             </button>

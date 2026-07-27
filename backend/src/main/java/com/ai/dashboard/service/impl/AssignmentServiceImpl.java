@@ -57,6 +57,14 @@ public class AssignmentServiceImpl implements AssignmentService {
         User teacher = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("Teacher not found with id " + currentUserId));
 
+        Assignment.Status initialStatus = Assignment.Status.DRAFT;
+        if (request.getStatus() != null) {
+            try {
+                initialStatus = Assignment.Status.valueOf(request.getStatus().toUpperCase());
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+
         Assignment assignment = Assignment.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
@@ -64,7 +72,7 @@ public class AssignmentServiceImpl implements AssignmentService {
                 .dueDate(request.getDueDate())
                 .maxMarks(request.getMaxMarks())
                 .attachmentUrl(request.getAttachmentUrl())
-                .status(Assignment.Status.DRAFT)
+                .status(initialStatus)
                 .teacher(teacher)
                 .course(course)
                 .build();

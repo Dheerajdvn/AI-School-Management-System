@@ -17,9 +17,12 @@ const SettingsPage = () => {
   ]
 
   return (
-    <div className="container-fluid">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h3>Settings</h3>
+    <div>
+      <div className="d-flex justify-content-between align-items-center mb-2">
+        <div>
+          <h3 className="fw-bold mb-0" style={{ fontSize: '16px' }}>Settings</h3>
+          <p className="text-muted m-0" style={{ fontSize: '12px' }}>Configure your preferences</p>
+        </div>
       </div>
 
       <div className="row">
@@ -30,6 +33,7 @@ const SettingsPage = () => {
                 key={tab.key}
                 className={`nav-link text-start ${activeTab === tab.key ? 'active' : ''}`}
                 onClick={() => setActiveTab(tab.key)}
+                style={{ fontSize: '12px', padding: '0.4rem 0.6rem' }}
               >
                 <i className={`bi ${tab.icon} me-2`} />
                 {tab.label}
@@ -43,8 +47,8 @@ const SettingsPage = () => {
             {activeTab === 'theme' && <ThemeSwitcher />}
             {activeTab === 'language' && (
               <div className="card">
-                <div className="card-header">
-                  <h5 className="mb-0">
+                <div className="card-header py-2">
+                  <h5 className="mb-0" style={{ fontSize: '14px' }}>
                     <i className="bi bi-translate me-2" />
                     Language
                   </h5>
@@ -66,7 +70,7 @@ const SettingsPage = () => {
                       <option value="de">Deutsch</option>
                       <option value="hi">हिन्दी</option>
                     </select>
-                    <small className="text-muted">Choose your preferred language for the interface</small>
+                    <small className="text-muted" style={{ fontSize: '12px' }}>Choose your preferred language for the interface</small>
                   </div>
                 </div>
               </div>

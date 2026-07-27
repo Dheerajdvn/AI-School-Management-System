@@ -1,1 +1,187 @@
-/* Light theme specific styles */
+/* Light Theme Specific Adaptive Styles */
+
+[data-theme="light"], body.light-mode {
+  background-color: var(--bg) !important;
+  color: var(--text) !important;
+}
+
+[data-theme="light"] .main,
+body.light-mode .main,
+[data-theme="light"] .content,
+body.light-mode .content,
+[data-theme="light"] .dashboard-page,
+body.light-mode .dashboard-page {
+  background-color: var(--bg) !important;
+  color: var(--text) !important;
+}
+
+[data-theme="light"] .topbar,
+body.light-mode .topbar {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-color: var(--border) !important;
+}
+
+[data-theme="light"] .sidebar,
+body.light-mode .sidebar {
+  background-color: var(--sidebar-bg) !important;
+  color: var(--sidebar-text) !important;
+  border-color: var(--border) !important;
+}
+
+[data-theme="light"] .sidebar .nav-link,
+body.light-mode .sidebar .nav-link {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .sidebar .nav-link:hover,
+body.light-mode .sidebar .nav-link:hover {
+  background: rgba(79, 70, 229, 0.08) !important;
+  color: var(--primary) !important;
+}
+
+[data-theme="light"] .sidebar .nav-link.active,
+body.light-mode .sidebar .nav-link.active {
+  background: rgba(79, 70, 229, 0.12) !important;
+  color: var(--primary) !important;
+  font-weight: 600;
+  border-left: 3px solid var(--primary);
+}
+
+[data-theme="light"] .bg-white,
+body.light-mode .bg-white,
+[data-theme="light"] .card-header,
+body.light-mode .card-header {
+  background-color: var(--card) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+[data-theme="light"] .bg-light,
+body.light-mode .bg-light {
+  background-color: #f1f5f9 !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+[data-theme="light"] .bg-card,
+body.light-mode .bg-card,
+[data-theme="light"] .card,
+body.light-mode .card {
+  background-color: var(--card) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+[data-theme="light"] .bg-surface,
+body.light-mode .bg-surface {
+  background-color: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+[data-theme="light"] .text-dark,
+body.light-mode .text-dark,
+[data-theme="light"] .text-body,
+body.light-mode .text-body,
+[data-theme="light"] .text-body-secondary,
+body.light-mode .text-body-secondary {
+  color: var(--text) !important;
+}
+
+[data-theme="light"] .text-muted,
+body.light-mode .text-muted {
+  color: var(--muted) !important;
+}
+
+[data-theme="light"] h1, [data-theme="light"] h2, [data-theme="light"] h3, [data-theme="light"] h4, [data-theme="light"] h5, [data-theme="light"] h6,
+body.light-mode h1, body.light-mode h2, body.light-mode h3, body.light-mode h4, body.light-mode h5, body.light-mode h6,
+[data-theme="light"] .card-title,
+body.light-mode .card-title {
+  color: var(--text) !important;
+}
+
+[data-theme="light"] .table thead th,
+body.light-mode .table thead th {
+  background: #f8fafc !important;
+  color: var(--muted) !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+[data-theme="light"] .table,
+body.light-mode .table {
+  color: var(--text) !important;
+}
+
+/* Topbar user profile button light mode override */
+[data-theme="light"] .user-topbar-btn,
+body:not(.dark-mode) .user-topbar-btn {
+  background-color: #ffffff !important;
+  color: #0F172A !important;
+  border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] .user-topbar-btn span,
+body:not(.dark-mode) .user-topbar-btn span,
+[data-theme="light"] .user-topbar-btn i,
+body:not(.dark-mode) .user-topbar-btn i {
+  color: #0F172A !important;
+}
+
+/* Adaptive Inputs, Selects, Pre, and Input Groups in Light Mode */
+[data-theme="light"] .form-control,
+body.light-mode .form-control,
+[data-theme="light"] .form-select,
+body.light-mode .form-select,
+[data-theme="light"] textarea,
+body.light-mode textarea,
+[data-theme="light"] select,
+body.light-mode select {
+  background-color: #ffffff !important;
+  color: #0F172A !important;
+  border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] .form-control:focus,
+body.light-mode .form-control:focus,
+[data-theme="light"] .form-select:focus,
+body.light-mode .form-select:focus {
+  background-color: #ffffff !important;
+  color: #0F172A !important;
+  border-color: var(--primary) !important;
+}
+
+[data-theme="light"] .form-control[readonly],
+body.light-mode .form-control[readonly],
+[data-theme="light"] .form-control:disabled,
+body.light-mode .form-control:disabled {
+  background-color: #f1f5f9 !important;
+  color: #64748b !important;
+  opacity: 0.9;
+}
+
+[data-theme="light"] .input-group-text,
+body.light-mode .input-group-text {
+  background-color: #f1f5f9 !important;
+  color: #64748b !important;
+  border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] option,
+body.light-mode option {
+  background-color: #ffffff !important;
+  color: #0F172A !important;
+}
+
+[data-theme="light"] pre,
+body.light-mode pre {
+  color: #0F172A !important;
+  background-color: #f8fafc !important;
+}
+
+[data-theme="light"] .dropdown-menu,
+body.light-mode .dropdown-menu {
+  background-color: var(--card) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-lg) !important;
+}

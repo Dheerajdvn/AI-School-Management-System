@@ -34,74 +34,157 @@ export default function StudentAnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="sap-page">
-        <div className="row g-3">{[...Array(4)].map((_, i) => <div key={i} className="col-12"><div className="skeleton-row" /></div>)}</div>
-        <style>{sapStyles}</style>
+      <div className="sap-page py-4">
+        <div className="row g-3">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="col-12">
+              <div className="skeleton-row animate-pulse" style={{ height: '56px', background: 'var(--surface)', borderRadius: '12px' }} />
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="sap-page">
-      <div className="page-header-custom">
-        <h4><i className="bi bi-graph-up me-2" />Student Analytics</h4>
-        <select className="form-select" style={{ width: 'auto' }} value={selectedClass} onChange={e => setSelectedClass(e.target.value)}>
-          {classes.map(c => <option key={c}>{c}</option>)}
+    <div className="sap-page py-4">
+      <div className="page-header-custom d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+        <div>
+          <h4 className="fw-bold mb-1" style={{ color: 'var(--text)' }}>
+            <i className="bi bi-bar-chart-line-fill text-primary me-2" />Student Analytics
+          </h4>
+          <p className="text-muted small mb-0 font-medium">Track performance standings, flag students needing support, and review class attendance curves.</p>
+        </div>
+        <select 
+          className="form-select bg-dark border-secondary text-white rounded-3 py-1.5" 
+          style={{ width: 'auto', minWidth: '160px' }} 
+          value={selectedClass} 
+          onChange={e => setSelectedClass(e.target.value)}
+        >
+          {classes.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
       </div>
 
-      <div className="row g-3 mb-4">
+      <div className="row g-4 mb-4.5">
         <div className="col-md-4">
-          <div className="glass-card">
-            <div className="card-header-custom"><h5><i className="bi bi-trophy me-2 text-warning" />Top Students</h5></div>
+          <div className="glass-card shadow-sm h-100">
+            <div className="card-header-custom p-3 border-bottom">
+              <h5 className="fw-bold mb-0 text-white" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>
+                <i className="bi bi-trophy-fill text-warning me-2" />Top Performers
+              </h5>
+            </div>
             <div className="card-body p-0">
               {analytics.topStudents.map((s, i) => (
-                <div key={i} className="student-rank-item">
-                  <span className="rank-badge top">{i + 1}</span>
-                  <div><strong>{s.name}</strong><span className="small opacity-75">{s.roll}</span></div>
-                  <span className="badge bg-success">{s.avg}%</span>
+                <div key={i} className="student-rank-item d-flex align-items-center justify-content-between p-3 border-bottom border-secondary border-opacity-10">
+                  <div className="d-flex align-items-center gap-2.5">
+                    <span className="rank-badge top">{i + 1}</span>
+                    <div>
+                      <strong className="text-white" style={{ color: 'var(--text)' }}>{s.name}</strong>
+                      <span className="small text-muted d-block" style={{ fontSize: '11px' }}>{s.roll}</span>
+                    </div>
+                  </div>
+                  <span className="badge rounded-pill bg-success bg-opacity-15 text-success border border-success border-opacity-25 px-2.5 py-1 fw-bold">
+                    {s.avg}% Avg
+                  </span>
                 </div>
               ))}
             </div>
           </div>
         </div>
+
         <div className="col-md-4">
-          <div className="glass-card">
-            <div className="card-header-custom"><h5><i className="bi bi-exclamation-triangle me-2 text-danger" />Weak Students</h5></div>
+          <div className="glass-card shadow-sm h-100">
+            <div className="card-header-custom p-3 border-bottom">
+              <h5 className="fw-bold mb-0 text-white" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>
+                <i className="bi bi-exclamation-triangle-fill text-danger me-2" />Needs Support
+              </h5>
+            </div>
             <div className="card-body p-0">
               {analytics.weakStudents.map((s, i) => (
-                <div key={i} className="student-rank-item">
-                  <span className="rank-badge weak">{i + 1}</span>
-                  <div><strong>{s.name}</strong><span className="small opacity-75">{s.roll}</span></div>
-                  <span className="badge bg-danger">{s.avg}%</span>
+                <div key={i} className="student-rank-item d-flex align-items-center justify-content-between p-3 border-bottom border-secondary border-opacity-10">
+                  <div className="d-flex align-items-center gap-2.5">
+                    <span className="rank-badge weak">{i + 1}</span>
+                    <div>
+                      <strong className="text-white" style={{ color: 'var(--text)' }}>{s.name}</strong>
+                      <span className="small text-muted d-block" style={{ fontSize: '11px' }}>{s.roll}</span>
+                    </div>
+                  </div>
+                  <span className="badge rounded-pill bg-danger bg-opacity-15 text-danger border border-danger border-opacity-25 px-2.5 py-1 fw-bold">
+                    {s.avg}% Avg
+                  </span>
                 </div>
               ))}
             </div>
           </div>
         </div>
+
         <div className="col-md-4">
-          <div className="glass-card">
-            <div className="card-header-custom"><h5><i className="bi bi-lightbulb me-2 text-info" />AI Recommendations</h5></div>
-            <div className="card-body">
-              <ul className="recommendation-list">
-                {analytics.recommendations.map((r, i) => <li key={i}>{r}</li>)}
+          <div className="glass-card shadow-sm h-100">
+            <div className="card-header-custom p-3 border-bottom">
+              <h5 className="fw-bold mb-0 text-white" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>
+                <i className="bi bi-cpu text-info me-2" />AI Guidance Insights
+              </h5>
+            </div>
+            <div className="card-body p-3">
+              <ul className="recommendation-list list-unstyled mb-0 d-flex flex-column gap-2.5">
+                {analytics.recommendations.map((r, i) => (
+                  <li key={i} className="small d-flex align-items-start gap-2 text-muted font-medium">
+                    <i className="bi bi-check-circle-fill text-primary mt-0.5" />
+                    <span>{r}</span>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="row g-3">
+      <div className="row g-4">
         <div className="col-md-6">
-          <div className="glass-card">
-            <div className="card-header-custom"><h5><i className="bi bi-calendar-check me-2" />Attendance Trend</h5></div>
-            <div className="chart-body"><div className="chart-container">{analytics.attendanceData.map((val, i) => <div key={i} className="chart-bar-wrapper"><div className="chart-bar green" style={{ height: `${val}%` }}><span className="chart-tooltip">{val}%</span></div><span className="chart-label">{['M','T','W','T','F','S','S'][i]}</span></div>)}</div></div>
+          <div className="glass-card shadow-sm">
+            <div className="card-header-custom p-3 border-bottom">
+              <h5 className="fw-bold mb-0 text-white" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>
+                <i className="bi bi-calendar-check-fill text-success me-2" />Attendance Trend
+              </h5>
+            </div>
+            <div className="chart-body p-4">
+              <div className="chart-container">
+                {analytics.attendanceData.map((val, i) => (
+                  <div key={i} className="chart-bar-wrapper">
+                    <div className="chart-bar-track">
+                      <div className="chart-bar green" style={{ height: `${val}%` }}>
+                        <span className="chart-tooltip">{val}% Attendance</span>
+                      </div>
+                    </div>
+                    <span className="chart-label">{['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][i]}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
+
         <div className="col-md-6">
-          <div className="glass-card">
-            <div className="card-header-custom"><h5><i className="bi bi-card-text me-2" />Assignment Completion</h5></div>
-            <div className="chart-body"><div className="chart-container">{analytics.assignmentData.map((val, i) => <div key={i} className="chart-bar-wrapper"><div className="chart-bar blue" style={{ height: `${val}%` }}><span className="chart-tooltip">{val}%</span></div><span className="chart-label">{['M','T','W','T','F','S','S'][i]}</span></div>)}</div></div>
+          <div className="glass-card shadow-sm">
+            <div className="card-header-custom p-3 border-bottom">
+              <h5 className="fw-bold mb-0 text-white" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>
+                <i className="bi bi-file-earmark-check-fill text-primary me-2" />Assignment Completion
+              </h5>
+            </div>
+            <div className="chart-body p-4">
+              <div className="chart-container">
+                {analytics.assignmentData.map((val, i) => (
+                  <div key={i} className="chart-bar-wrapper">
+                    <div className="chart-bar-track">
+                      <div className="chart-bar blue" style={{ height: `${val}%` }}>
+                        <span className="chart-tooltip">{val}% Completed</span>
+                      </div>
+                    </div>
+                    <span className="chart-label">{['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][i]}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -112,29 +195,20 @@ export default function StudentAnalyticsPage() {
 }
 
 const sapStyles = `
-.sap-page .page-header-custom { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
-.sap-page .page-header-custom h4 { margin: 0; font-weight: 700; }
-.sap-page .glass-card { background: rgba(255,255,255,0.06); backdrop-filter: blur(12px); border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; }
-.sap-page .card-header-custom { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
-.sap-page .card-header-custom h5 { margin: 0; font-weight: 600; }
-.sap-page .card-body { padding: 1.25rem; }
-.sap-page .chart-body { padding: 1.25rem; }
-.sap-page .chart-container { display: flex; align-items: flex-end; gap: 4px; height: 160px; }
+.sap-page .glass-card { background: var(--card); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
+.sap-page .card-header-custom { border-bottom: 1px solid var(--border) !important; }
+.sap-page .student-rank-item:last-child { border-bottom: none !important; }
+.sap-page .rank-badge { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+.sap-page .rank-badge.top { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }
+.sap-page .rank-badge.weak { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+.sap-page .chart-container { display: flex; align-items: flex-end; gap: 8px; height: 160px; }
 .sap-page .chart-bar-wrapper { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; }
-.sap-page .chart-bar { width: 100%; max-width: 28px; border-radius: 4px 4px 0 0; position: relative; transition: height 0.5s ease; min-height: 4px; }
-.sap-page .chart-bar.green { background: linear-gradient(to top, #10b981, #34d399); }
-.sap-page .chart-bar.blue { background: linear-gradient(to top, #3b82f6, #60a5fa); }
-.sap-page .chart-tooltip { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); font-size: 0.65rem; background: rgba(0,0,0,0.8); padding: 2px 6px; border-radius: 4px; opacity: 0; transition: opacity 0.2s; white-space: nowrap; }
-.sap-page .chart-bar:hover .chart-tooltip { opacity: 1; }
-.sap-page .chart-label { font-size: 0.6rem; margin-top: 4px; opacity: 0.6; }
-.sap-page .student-rank-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.sap-page .student-rank-item:last-child { border-bottom: none; }
-.sap-page .rank-badge { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
-.sap-page .rank-badge.top { background: rgba(245,158,11,0.2); color: #fbbf24; }
-.sap-page .rank-badge.weak { background: rgba(239,68,68,0.2); color: #f87171; }
-.sap-page .student-rank-item > div { flex: 1; display: flex; flex-direction: column; }
-.sap-page .recommendation-list { margin: 0; padding-left: 1.25rem; font-size: 0.9rem; }
-.sap-page .recommendation-list li { margin-bottom: 0.5rem; }
-.sap-page .skeleton-row { height: 56px; border-radius: 12px; background: rgba(255,255,255,0.06); animation: pulse 1.5s infinite; }
-@keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.7; } }
+.sap-page .chart-bar-track { width: 100%; height: calc(100% - 20px); background-color: var(--surface); border-radius: 6px; display: flex; align-items: flex-end; justify-content: center; border: 1px solid var(--border); overflow: visible; }
+.sap-page .chart-bar { width: 100%; max-width: 22px; border-radius: 6px; position: relative; transition: height 0.5s ease; min-height: 4px; }
+.sap-page .chart-bar.green { background: linear-gradient(to top, #059669, #34d399); box-shadow: 0 0 8px rgba(5,150,105,0.15); }
+.sap-page .chart-bar.blue { background: linear-gradient(to top, #2563eb, #60a5fa); box-shadow: 0 0 8px rgba(37,99,235,0.15); }
+.sap-page .chart-tooltip { position: absolute; top: -28px; left: 50%; transform: translateX(-50%); font-size: 10px; background: var(--surface); color: var(--text); border: 1px solid var(--border); padding: 3px 8px; border-radius: 6px; opacity: 0; transition: opacity 0.2s ease, transform 0.2s ease; white-space: nowrap; z-index: 10; box-shadow: var(--shadow); }
+.sap-page .chart-bar:hover { transform: scaleY(1.02); }
+.sap-page .chart-bar:hover .chart-tooltip { opacity: 1; transform: translateX(-50%) translateY(-2px); }
+.sap-page .chart-label { font-size: 11px; margin-top: 6px; font-weight: 500; color: var(--muted); }
 `

@@ -1,10 +1,8 @@
 .topbar {
-  background: var(--card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  background-color: rgba(255, 255, 255, 0.85);
+  background: var(--surface);
   border-bottom: 1px solid var(--border);
-  padding: 0.75rem 1.5rem;
+  height: var(--navbar-h, 56px);
+  padding: 0 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -13,13 +11,8 @@
   z-index: 1020;
 }
 
-[data-theme="dark"] .topbar,
-body.dark-mode .topbar {
-  background-color: rgba(24, 24, 27, 0.85);
-}
-
 .topbar-title {
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   margin: 0;
   font-weight: 600;
   color: var(--text);
@@ -29,7 +22,7 @@ body.dark-mode .topbar {
 .hamburger {
   background: none;
   border: none;
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   color: var(--text);
   display: none;
   cursor: pointer;

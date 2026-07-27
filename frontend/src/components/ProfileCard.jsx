@@ -1,7 +1,7 @@
 import React from 'react'
 import { formatDate } from '../utils/format'
 
-const ProfileCard = ({ user, onEdit, onChangePassword, onUploadPicture }) => {
+const ProfileCard = ({ user, onEdit, onChangePassword, onUploadPicture, onRemovePicture }) => {
   if (!user) return null
 
   const getRoleBadgeClass = () => {
@@ -45,6 +45,16 @@ const ProfileCard = ({ user, onEdit, onChangePassword, onUploadPicture }) => {
               {(user.username || user.email || '?')[0].toUpperCase()}
             </div>
           )}
+          {user.profilePictureUrl && onRemovePicture && (
+            <button 
+              className="btn btn-sm btn-danger position-absolute bottom-0 start-0 rounded-circle"
+              style={{ width: '32px', height: '32px' }}
+              title="Remove profile picture"
+              onClick={onRemovePicture}
+            >
+              <i className="bi bi-trash-fill" />
+            </button>
+          )}
           {onUploadPicture && (
             <label 
               className="btn btn-sm btn-primary position-absolute bottom-0 end-0 rounded-circle"
@@ -62,7 +72,12 @@ const ProfileCard = ({ user, onEdit, onChangePassword, onUploadPicture }) => {
           )}
         </div>
         
-        <h5 className="card-title mb-1">{user.username}</h5>
+        <h5 className="card-title mb-1" style={{ color: 'var(--text)' }}>
+          {user.firstName || user.lastName ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : user.username}
+        </h5>
+        {(user.firstName || user.lastName) && (
+          <p className="text-muted small mb-1">@{user.username}</p>
+        )}
         <span className={getRoleBadgeClass()}>{getRoleLabel()}</span>
         
         <hr className="my-4" />
@@ -70,17 +85,17 @@ const ProfileCard = ({ user, onEdit, onChangePassword, onUploadPicture }) => {
         <div className="text-start">
           <div className="mb-3">
             <small className="text-muted d-block">Email</small>
-            <span>{user.email || '—'}</span>
+            <span style={{ color: 'var(--text)' }}>{user.email || '—'}</span>
           </div>
           
           <div className="mb-3">
             <small className="text-muted d-block">Phone</small>
-            <span>{user.phone || '—'}</span>
+            <span style={{ color: 'var(--text)' }}>{user.phone || '—'}</span>
           </div>
           
           <div className="mb-3">
             <small className="text-muted d-block">Last Login</small>
-            <span>{formatDate(user.lastLoginAt) || '—'}</span>
+            <span style={{ color: 'var(--text)' }}>{formatDate(user.lastLoginAt) || '—'}</span>
           </div>
         </div>
         

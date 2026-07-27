@@ -27,13 +27,26 @@ public class User {
     @Column(nullable = false, length = 50, unique = true)
     private String username;
 
+    @Column(name = "first_name", length = 50)
+    private String firstName;
+
+    @Column(name = "last_name", length = 50)
+    private String lastName;
+
+    @Column(name = "profile_picture_url", length = 255)
+    private String profilePictureUrl;
+
     @Column(nullable = false, length = 100, unique = true)
     private String email;
+
+    @Column(name = "phone", length = 30)
+    private String phone;
 
     @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean enabled = true;
 
     @Column(name = "account_non_expired", nullable = false)

@@ -35,14 +35,23 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.NOT_FOUND, ex.getMessage(), req, null);
     }
 
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ErrorDetail> handleConflict(ConflictException ex, HttpServletRequest req) {
+        log.warn("Conflict: {}", ex.getMessage());
+        return build(HttpStatus.CONFLICT, ex.getMessage(), req, null);
+    }
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorDetail> handleBadRequest(BadRequestException ex, HttpServletRequest req) {
         log.warn("Bad request: {}", ex.getMessage());
         return build(HttpStatus.BAD_REQUEST, ex.getMessage(), req, null);
     }
 
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorDetail> handleAccessDenied(AccessDeniedException ex, HttpServletRequest req) {
+    @ExceptionHandler({
+        org.springframework.security.access.AccessDeniedException.class,
+        org.springframework.security.authorization.AuthorizationDeniedException.class
+    })
+    public ResponseEntity<ErrorDetail> handleAccessDenied(Exception ex, HttpServletRequest req) {
         log.warn("Access denied: {}", ex.getMessage());
         return build(HttpStatus.FORBIDDEN, ex.getMessage(), req, null);
     }

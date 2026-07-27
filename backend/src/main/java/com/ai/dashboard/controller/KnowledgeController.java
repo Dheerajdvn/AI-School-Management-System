@@ -1,7 +1,11 @@
 package com.ai.dashboard.controller;
 
 import com.ai.dashboard.document.dto.UploadDocumentRequest;
+import com.ai.dashboard.document.dto.KnowledgeDashboardResponse;
 import com.ai.dashboard.document.service.DocumentService;
+import com.ai.dashboard.document.service.KnowledgeDashboardService;
+import com.ai.dashboard.document.repository.DocumentContentRepository;
+import com.ai.dashboard.document.entity.DocumentContent;
 import com.ai.dashboard.dto.ApiResponse;
 import com.ai.dashboard.dto.PagedResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,12 +31,22 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class KnowledgeController {
 
     private final DocumentService documentService;
+    private final DocumentContentRepository documentContentRepository;
+    private final KnowledgeDashboardService knowledgeDashboardService;
 
     private final List<Map<String, Object>> collections = new CopyOnWriteArrayList<>(List.of(
             new HashMap<>(Map.of("id", 1, "name", "General Documents", "count", 45)),
             new HashMap<>(Map.of("id", 2, "name", "Course Syllabi", "count", 25)),
             new HashMap<>(Map.of("id", 3, "name", "Research Papers", "count", 30))
     ));
+
+    @GetMapping("/dashboard")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_SCHOOL_ADMIN', 'ROLE_TEACHER')")
+    @Operation(summary = "Get AI Knowledge dashboard statistics")
+    public ApiResponse<KnowledgeDashboardResponse> getDashboardStats() {
+        KnowledgeDashboardResponse response = knowledgeDashboardService.getDashboardStats();
+        return ApiResponse.success(response);
+    }
 
     @GetMapping("/documents")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
@@ -42,12 +56,23 @@ public class KnowledgeController {
             @RequestParam(required = false) Integer size,
             @RequestParam(required = false) Integer limit,
             @RequestParam(required = false) String sortBy,
-            @RequestParam(required = false) String date,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String documentType,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) Long courseId,
             Authentication authentication) {
         try {
             int p = page != null ? page : 0;
             int s = size != null ? size : (limit != null ? limit : 20);
-            var pageResult = documentService.getAll(PageRequest.of(p, s));
+            
+            String resolvedType = documentType != null ? documentType : type;
+
+            org.springframework.data.domain.Sort sort = org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "uploadTime");
+            if ("id".equalsIgnoreCase(sortBy)) {
+                sort = org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "id");
+            }
+
+            var pageResult = documentService.getAll(PageRequest.of(p, s, sort), search, resolvedType, courseId);
             PagedResponse<Object> paged = PagedResponse.builder()
                     .content(List.copyOf(pageResult.getContent()))
                     .page(pageResult.getNumber())
@@ -83,6 +108,48 @@ public class KnowledgeController {
         Long userId = extractUserId(authentication);
         var res = documentService.upload(req, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("Document uploaded", res));
+    }
+
+    @GetMapping("/documents/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @Operation(summary = "Get knowledge document by ID")
+    public ApiResponse<Map<String, Object>> getDocumentById(
+            @PathVariable Long id,
+            Authentication authentication) {
+        log.info("Getting knowledge document by id: {}", id);
+        var docRes = documentService.getById(id, extractUserId(authentication), getCurrentUserRole(authentication));
+        var contentOpt = documentContentRepository.findByDocumentId(id);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", docRes.getId());
+        map.put("filename", docRes.getFilename());
+        map.put("name", docRes.getOriginalFilename());
+        map.put("title", docRes.getOriginalFilename());
+        map.put("originalFilename", docRes.getOriginalFilename());
+        map.put("contentType", docRes.getContentType());
+        map.put("fileSize", docRes.getFileSize());
+        map.put("size", formatFileSize(docRes.getFileSize()));
+        map.put("uploadedById", docRes.getUploadedById());
+        map.put("uploadedBy", docRes.getUploadedByName());
+        map.put("uploadTime", docRes.getUploadTime());
+        map.put("date", docRes.getUploadTime() != null ? docRes.getUploadTime().toString().substring(0, 10) : "");
+        map.put("type", docRes.getDocumentType());
+        map.put("subject", docRes.getCourseCode() != null ? docRes.getCourseCode() : "General");
+        map.put("collection", "General");
+        map.put("status", docRes.getProcessingStatus());
+        map.put("chunks", 5);
+        map.put("embeddings", 5);
+        map.put("extractedText", contentOpt.map(c -> c.getExtractedText()).orElse("No extracted text available"));
+        map.put("content", contentOpt.map(c -> c.getExtractedText()).orElse("No extracted text available"));
+
+        return ApiResponse.success(map);
+    }
+
+    private String formatFileSize(Long size) {
+        if (size == null) return "0 KB";
+        if (size < 1024) return size + " B";
+        if (size < 1024 * 1024) return String.format("%.1f KB", size / 1024.0);
+        return String.format("%.1f MB", size / (1024.0 * 1024.0));
     }
 
     @DeleteMapping("/documents/{id}")

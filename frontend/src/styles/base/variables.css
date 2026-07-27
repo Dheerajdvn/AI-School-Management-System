@@ -1,24 +1,57 @@
-:root {
+/* CSS Variables & Theme Definitions */
+
+/* 1. Light Mode Defaults */
+:root, [data-theme="light"], body.light-mode {
   --primary: #4F46E5;
   --primary-hover: #4338ca;
   --primary-rgb: 79, 70, 229;
   --accent: #06b6d4;
-  --bg: #F8FAFC;
-  --surface: #FFFFFF;
-  --card: #FFFFFF;
-  --sidebar-bg: #FFFFFF;
-  --sidebar-text: #0F172A;
-  --text: #0F172A;
-  --muted: #64748B;
-  --border: #E2E8F0;
-  --input-bg: #FFFFFF;
-  --input-border: #CBD5E1;
-  --table-hover: #F1F5F9;
-  --modal-bg: #FFFFFF;
-  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 20px 35px -10px rgba(0, 0, 0, 0.08);
-  --sidebar-w: 260px;
-  --radius-card: 20px;
-  --radius-btn: 10px;
-  --radius-input: 8px;
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --card: #ffffff;
+  --sidebar-bg: #ffffff;
+  --sidebar-text: #0f172a;
+  --text: #0f172a;
+  --muted: #64748b;
+  --secondary-text: #64748b;
+  --border: #e2e8f0;
+  --hover: #f1f5f9;
+  --input-bg: #ffffff;
+  --input-border: #cbd5e1;
+  --table-hover: #f1f5f9;
+  --modal-bg: #ffffff;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+  --sidebar-w: 220px;
+  --navbar-h: 56px;
+  --search-h: 34px;
+  --welcome-h: 100px;
+  --kpi-h: 64px;
+  --radius-card: 10px;
+  --radius-btn: 6px;
+  --radius-input: 6px;
+}
+
+/* 2. Dark Mode Overrides */
+[data-theme="dark"], body.dark-mode {
+  --primary: #6366F1;
+  --primary-hover: #818cf8;
+  --primary-rgb: 99, 102, 241;
+  --accent: #22d3ee;
+  --bg: #0E0F11;
+  --surface: #17181B;
+  --card: #17181B;
+  --sidebar-bg: #131417;
+  --sidebar-text: #F3F4F6;
+  --text: #F3F4F6;
+  --muted: #9CA3AF;
+  --secondary-text: #9CA3AF;
+  --border: #2A2D31;
+  --hover: #1D1F23;
+  --input-bg: #17181B;
+  --input-border: #2A2D31;
+  --table-hover: #1D1F23;
+  --modal-bg: #17181B;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.4);
 }

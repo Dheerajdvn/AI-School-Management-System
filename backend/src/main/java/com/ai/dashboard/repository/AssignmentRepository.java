@@ -20,4 +20,6 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long>, J
     Page<Assignment> findByTeacher(User teacher, Pageable pageable);
 
     Page<Assignment> findByTeacherId(Long teacherId, Pageable pageable);
+
+    long countByTeacherId(Long teacherId);
 }

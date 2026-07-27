@@ -20,8 +20,10 @@ This platform was built to demonstrate how enterprise-grade Java architectures (
 ### Who Can Use It
 - **Super Admins / Platform Owners**: Manage multi-tenant schools, system users, subscriptions, and platform-wide analytics.
 - **School Admins**: Oversee individual school operations, classes, sections, subjects, teachers, and students.
-- **Teachers**: Manage classrooms, grade assignments, generate AI quizzes and lesson plans, and review homework.
-- **Students**: Track course progress, submit assignments, interact with AI tutors, and view academic grades.
+- **Principals**: Monitor institutional performance analytics, attendance trends, financial reports, and risk detection.
+- **Teachers**: Manage classrooms, mark attendance registers, grade assignments, generate AI quizzes and lesson plans, and upload study materials.
+- **Students**: Track course progress, submit assignments, interact with AI tutors, practice quizzes, and view academic grades.
+- **Parents**: Review children's academic performance reports, track attendance statistics, pay school fees, and communicate with teachers.
 
 ### Key Objectives
 - Centralize school administrative and academic operations.
@@ -42,13 +44,19 @@ This platform was built to demonstrate how enterprise-grade Java architectures (
 - Student & Teacher Record Management with advanced pagination, search, and sorting.
 - Course Offerings, Teacher Assignments, and Student Enrollments.
 
+### 📋 Teacher Utilities
+- **Gradebook Manager**: Automated grade converters, student average calculations, LocalStorage persistence, and PDF/CSV exporter tools.
+- **Attendance Register**: Daily registers with single-action status switches and bulk markers.
+- **AI Lesson Planner**: Generate structures and outlines based on topic targets.
+- **AI Quiz Generator**: Draft dynamic question sheets instantly with multiple options and correct answer selectors.
+
 ### 📊 Dashboard & Analytics
 - Real-time statistics cards showing total users, students, teachers, courses, documents, and AI chats.
-- Interactive Chart.js visualizations for student enrollment by course, user growth, and document uploads.
+- Interactive Chart.js and custom CSS visualizations for student enrollment by course, user growth, and document uploads.
 
 ### 🤖 AI Features & RAG
 - **AI Chat Assistant**: Context-aware RAG assistant powered by Ollama and Qdrant.
-- **Document Processing**: Upload PDFs and documents [`UploadDocuments.jsx`](frontend/src/pages/knowledge/UploadDocuments.jsx:1) for automated chunking, embedding generation, and vector indexing.
+- **Document Processing**: Upload PDFs and documents for automated chunking, embedding generation, and vector indexing.
 - **AI Tools**: Dedicated AI Lesson Planner and Quiz Generator for educators.
 
 ---
@@ -134,7 +142,7 @@ frontend/
 
 Ensure you have the following installed on your system:
 - **Java Development Kit (JDK) 21**
-- **Node.js (v18+ ) & npm**
+- **Node.js (v18+) & npm**
 - **Maven (v3.8+)**
 - **MariaDB or MySQL (v10.4+)**
 - **Ollama** (installed locally for AI features)
@@ -157,7 +165,7 @@ CREATE DATABASE ai_student_dashboard CHARACTER SET utf8mb4 COLLATE utf8mb4_unico
 ```
 
 ### Step 3: Configure Backend Properties
-Edit [`backend/src/main/resources/application.yml`](backend/src/main/resources/application.yml:1) to set your database username and password:
+Edit `backend/src/main/resources/application.yml` to set your database username and password:
 ```yaml
 spring:
   datasource:
@@ -264,8 +272,102 @@ sequenceDiagram
 
 ---
 
-## 13. Screenshots
-*(TODO: Add screenshots of Login, Dashboard, Schools Management, Students Portal, and AI Chat Assistant)*
+## 13. System Screenshots
+
+Here are a few representative screenshots of the application:
+
+## 📸 System Screenshots
+
+The following screenshots showcase the major modules of **AI School Management & Analytics Platform**.
+
+---
+
+### 🌐 Landing Page
+
+![Landing Page](docs/images/landing-page.png)
+
+A modern AI-powered landing page showcasing the platform's capabilities, features, and enterprise-grade design.
+
+---
+
+### 🔐 Login
+
+![Login](docs/images/login.png)
+
+Secure JWT-based authentication with Role-Based Access Control (RBAC).
+
+---
+
+### 📊 School Admin Dashboard
+
+![School Admin Dashboard](docs/images/school-dashboard.png)
+
+Centralized dashboard for managing schools, users, courses, analytics, and AI-powered insights.
+
+---
+
+### 👨‍💼 Admin Dashboard
+
+![Admin Dashboard](docs/images/admin-dashboard.png)
+
+Platform administration with user management, subscriptions, reports, and system monitoring.
+
+---
+
+### 👨‍🏫 Teacher Dashboard
+
+![Teacher Dashboard](docs/images/teacher-dashboard.png)
+
+Teachers can manage classes, attendance, assignments, exams, grades, lesson planning, and analytics.
+
+---
+
+### 👨‍🎓 Student Dashboard
+
+![Student Dashboard](docs/images/student-dashboard.png)
+
+Students can view courses, assignments, attendance, grades, schedules, and AI-powered learning tools.
+
+---
+
+### 🤖 AI Chat Assistant (RAG)
+
+![AI Chat](docs/images/ai-chat.png)
+
+Enterprise AI Assistant powered by Spring AI, Ollama, LangChain4j, and Qdrant for Retrieval-Augmented Generation (RAG).
+
+---
+
+### 🧠 AI Quiz Generator
+
+![AI Quiz Generator](docs/images/ai-quiz-generator.png)
+
+Generate quizzes instantly using AI with configurable difficulty levels and question types.
+
+---
+
+### 📈 Analytics Dashboard
+
+![Analytics Dashboard](docs/images/analytics.png)
+
+Interactive dashboards with charts, KPIs, and real-time academic analytics.
+
+---
+
+### 📚 Knowledge Dashboard
+
+![Knowledge Dashboard](docs/images/knowledge-dashboard.png)
+
+Manage uploaded documents, vector embeddings, and AI knowledge sources.
+
+---
+
+### 📝 Attendance Management
+
+![Attendance](docs/images/attendance.png)
+
+Digital attendance tracking with role-based access and reporting.
+
 
 ---
 
@@ -293,7 +395,7 @@ sequenceDiagram
 ---
 
 ## 17. Troubleshooting
-- **Database Connection Error**: Verify MariaDB service is running and credentials in [`application.yml`](backend/src/main/resources/application.yml:1) match your local instance.
+- **Database Connection Error**: Verify MariaDB service is running and credentials in `application.yml` match your local instance.
 - **Ollama Connection Refused**: Ensure Ollama is running (`ollama serve`) and `qwen2.5:7b` model is downloaded.
 - **Qdrant Connection Error**: Ensure Qdrant container is active on port `6333`.
 
@@ -310,10 +412,9 @@ This project is licensed under the [MIT License](LICENSE).
 ---
 
 ## 20. Author
-- **Your Name**
-- GitHub: [@your-username](https://github.com/your-username)
-- LinkedIn: [Your Profile](https://linkedin.com/in/your-profile)
-- Email: your.email@example.com
+- **Dheeraj DVN**
+- GitHub: [@dheerajdvn](https://github.com/dheerajdvn)
+- Email: dheeraj.dvn@example.com
 
 ---
 
