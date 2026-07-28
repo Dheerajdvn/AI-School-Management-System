@@ -25,7 +25,17 @@ logs/
 
 # Environment
 .env
-.env.*
+.env.local
+.env.*.local
+
+# Allow specific env templates/dev/prod files
+!.env.example
+!.env.development
+!.env.production
+
+# Spring Boot profiles
+**/application-local.yml
+**/application-*.local.yml
 
 # AI
 ollama-data/

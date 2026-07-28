@@ -143,10 +143,8 @@ frontend/
 Ensure you have the following installed on your system:
 - **Java Development Kit (JDK) 21**
 - **Node.js (v18+) & npm**
-- **Maven (v3.8+)**
-- **PostgreSQL (v15+)**
-- **Ollama** (installed locally for AI features)
-- **Qdrant** (running via Docker or locally for vector search)
+- **Docker Desktop** (for local databases and cache engines)
+- **Ollama** (for local AI features)
 
 ---
 
@@ -158,63 +156,70 @@ git clone https://github.com/dheerajdvn/ai-school-management-platform.git
 cd ai-school-management-platform
 ```
 
-### Step 2: Database Setup
-Create a PostgreSQL database named `schooldb`:
-```sql
-CREATE DATABASE schooldb;
+### Step 2: Spin Up Local Services (Docker Compose)
+We use Docker Compose to run local PostgreSQL, Redis, and Qdrant instances:
+```bash
+docker-compose up -d
+```
+This starts:
+- **PostgreSQL** on port `5432` (with database `schooldb`)
+- **Redis** on port `6379`
+- **Qdrant** on port `6333`
+
+### Step 3: Run Ollama & Pull Models
+Ensure Ollama is running on your host machine and pull the required models:
+```bash
+# Pull the target code model
+ollama pull qwen2.5-coder:3b
+
+# Pull the target embedding model
+ollama pull nomic-embed-text
 ```
 
-### Step 3: Configure Backend Properties
-Edit `backend/src/main/resources/application.yml` to set your database username and password:
-```yaml
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/schooldb
-    username: postgres
-    password: postgres_password
-```
-
-### Step 4: Install and Start Ollama & Qdrant
-1. Download and run [Ollama](https://ollama.com/), then pull your desired model:
-   ```bash
-   ollama pull qwen2.5:7b
-   ```
-2. Run Qdrant (via Docker):
-   ```bash
-   docker run -p 6333:6333 -p 6334:6334 qdrant/qdrant
-   ```
-
-### Step 5: Build and Run the Backend
+### Step 4: Run the Spring Boot Backend
+Navigate to the `backend` directory and start the application. By default, it will launch under the **`dev`** profile:
 ```bash
 cd backend
 ./mvnw clean spring-boot:run
 ```
 *(On Windows PowerShell, use `mvnw.cmd spring-boot:run`)*
 
-### Step 6: Install and Run the Frontend
-Open a new terminal window:
+### Step 5: Start the React Frontend
+Open a new terminal window, navigate to the `frontend` folder, initialize packages, and start the Vite dev server:
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-### Step 7: Access the Application
-Open your browser and navigate to `http://localhost:5173`. Log in with default admin credentials or use the auto-generated demo data.
+### Step 6: Access the Application
+Open your browser and navigate to `http://localhost:5173`. Log in with default admin credentials:
+*   **Username**: `dheerajdvn`
+*   **Password**: `root@123`
 
 ---
 
-## 9. Environment Variables
+## 9. Environment Variables & Spring Profiles
 
-| Variable | Description | Default / Example |
-| :--- | :--- | :--- |
-| `SPRING_DATASOURCE_URL` | PostgreSQL connection URL | `jdbc:postgresql://localhost:5432/schooldb` |
-| `SPRING_DATASOURCE_USERNAME` | Database username | `postgres` |
-| `SPRING_DATASOURCE_PASSWORD` | Database password | `postgres` |
-| `JWT_SECRET` | Secret key for signing JWT tokens | `YourSuperSecretJwtKeyForAuthenticationWithSufficientLength` |
-| `OLLAMA_BASE_URL` | Ollama LLM service URL | `http://localhost:11434` |
-| `QDRANT_HOST` | Qdrant vector database host | `localhost` |
-| `QDRANT_PORT` | Qdrant gRPC / HTTP port | `6333` |
+### Spring Boot Profiles
+The backend utilizes standard environment profiles for clean deployment separation:
+- **`dev` (Active by Default)**: Binds to local docker services with safe, zero-config fallbacks.
+- **`prod` (Production)**: Strict profile activated via Render environments. Forces configuration bindings directly from Render properties without hardcoded backups.
+
+### Required Environment Properties
+
+| Variable | Description | Development Default | Production Target |
+| :--- | :--- | :--- | :--- |
+| `SPRING_PROFILES_ACTIVE` | Active Spring profile | `dev` | `prod` (Mandatory on Render) |
+| `SPRING_DATASOURCE_URL` | PostgreSQL connection URL | `jdbc:postgresql://localhost:5432/schooldb` | Render Neon PostgreSQL URI |
+| `SPRING_DATASOURCE_USERNAME` | Database username | `postgres` | Neon Owner Username |
+| `SPRING_DATASOURCE_PASSWORD` | Database password | `postgres` | Neon Owner Password |
+| `SPRING_REDIS_HOST` | Redis host server | `localhost` | Production Redis Endpoint |
+| `SPRING_REDIS_PORT` | Redis server port | `6379` | Production Redis Port |
+| `JWT_SECRET` | Key for signing security tokens | Auto-generated local key | Cryptographically random secret |
+| `OLLAMA_BASE_URL` | Ollama service endpoint | `http://localhost:11434` | Render Ollama Host |
+| `QDRANT_HOST` | Qdrant host server | `localhost` | Production Qdrant Host |
+| `QDRANT_PORT` | Qdrant server port | `6333` | Production Qdrant Port |
 
 ---
 
@@ -395,9 +400,9 @@ Digital attendance tracking with role-based access and reporting.
 ---
 
 ## 17. Troubleshooting
-- **Database Connection Error**: Verify PostgreSQL service is running and credentials in `application.yml` match your local instance.
-- **Ollama Connection Refused**: Ensure Ollama is running (`ollama serve`) and `qwen2.5:7b` model is downloaded.
-- **Qdrant Connection Error**: Ensure Qdrant container is active on port `6333`.
+- **Database Connection Error**: Verify your local Docker container `ai-dashboard-db` is running via `docker ps`. If running manually, verify credentials in `application-dev.yml` match your instance.
+- **Ollama Connection Refused**: Ensure the Ollama client is active in your taskbar, or run `ollama serve`. Verify you pulled `qwen2.5-coder:3b` and `nomic-embed-text`.
+- **Qdrant Connection Error**: Ensure the Qdrant container `ai-dashboard-qdrant` is active on port `6333`.
 
 ---
 
@@ -414,7 +419,7 @@ This project is licensed under the [MIT License](LICENSE).
 ## 20. Author
 - **Dheeraj DVN**
 - GitHub: [@dheerajdvn](https://github.com/dheerajdvn)
-- Email: dheeraj.dvn@example.com
+- Email: dheerajdvn@gmail.com
 
 ---
 

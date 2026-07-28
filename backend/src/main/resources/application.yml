@@ -1,30 +1,13 @@
 spring:
-  config:
-    import: optional:classpath:application-${spring.profiles.active:dev}.yml
+  profiles:
+    active: dev # Default profile for local development
 
   application:
     name: ai-student-dashboard
 
-  data:
-    redis:
-      host: ${SPRING_REDIS_HOST:localhost}
-      port: ${SPRING_REDIS_PORT:6379}
-      repositories:
-        enabled: false
-
-  datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/schooldb}
-    username: neondb_owner
-    password: npg_6gSFZMBU1ApK
-    driver-class-name: org.postgresql.Driver
-
-    hikari:
-      maximum-pool-size: 15
-      minimum-idle: 5
-      idle-timeout: 30000
-      max-lifetime: 1800000
-      connection-timeout: 30000
-      leak-detection-threshold: 60000
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
 
   jpa:
     hibernate:
@@ -37,18 +20,16 @@ spring:
         jdbc:
           batch_size: 50
 
-  jackson:
-    serialization:
-      fail-on-empty-beans: false
+  data:
+    redis:
+      repositories:
+        enabled: false
 
 server:
   port: ${PORT:8080}
   servlet:
     context-path: /api
 
-# ============================================
-# AI Configuration
-# ============================================
 ai:
   slow-query-threshold-ms: 5000
   slow-ollama-threshold-ms: 30000
@@ -62,41 +43,11 @@ ai:
     max-conversations-per-user: 20
     context-history-limit: 3
 
-  ollama:
-    base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
-    model: ${OLLAMA_MODEL:qwen2.5-coder:3b}
-    temperature: 0.2
-    timeout: 120
-    max-tokens: 2048
-
-  embedding:
-    provider: ollama
-    model: nomic-embed-text
-    timeout: 30s
-    base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
-
   vector:
-    provider: qdrant
-    host: ${QDRANT_HOST:localhost}
-    port: ${QDRANT_PORT:6333}
     collection: course_documents
     dimension: 768
     timeout: 30s
 
-# ============================================
-# Application Security
-# ============================================
-app:
-  cors:
-    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000,http://localhost:8080}
-
-  jwt:
-    secret: ${JWT_SECRET}
-    expiration: ${JWT_EXPIRATION:86400000}
-
-# ============================================
-# Logging
-# ============================================
 logging:
   level:
     root: INFO
@@ -106,9 +57,6 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
-# ============================================
-# Swagger
-# ============================================
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -117,9 +65,6 @@ springdoc:
   api-docs:
     path: /v3/api-docs
 
-# ============================================
-# Actuator
-# ============================================
 management:
   endpoints:
     web:

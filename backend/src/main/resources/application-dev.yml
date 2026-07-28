@@ -1,0 +1,38 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/schooldb}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
+
+ai:
+  ollama:
+    base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+    model: ${OLLAMA_MODEL:qwen2.5-coder:3b}
+    temperature: 0.2
+    timeout: 120
+    max-tokens: 2048
+
+  embedding:
+    provider: ollama
+    model: nomic-embed-text
+    timeout: 30s
+    base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+
+  vector:
+    provider: qdrant
+    host: ${QDRANT_HOST:localhost}
+    port: ${QDRANT_PORT:6333}
+
+app:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000,http://localhost:8080}
+  jwt:
+    # A safe, long default JWT secret for local development only
+    secret: ${JWT_SECRET:local-dev-very-long-secret-key-that-exceeds-256-bits-for-hmac-sha-signing}
+    expiration: ${JWT_EXPIRATION:86400000}
