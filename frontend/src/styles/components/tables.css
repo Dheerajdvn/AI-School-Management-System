@@ -3,7 +3,9 @@
   border: 1px solid var(--border);
   background: var(--card);
   box-shadow: none;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {

@@ -62,3 +62,124 @@
     visibility: visible;
   }
 }
+
+/* Custom Mobile Drawer Styles for Landing Page */
+.mobile-nav-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 290px;
+  background-color: #0c0d12;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 1050;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.mobile-nav-drawer.open {
+  transform: translateX(0);
+}
+
+.mobile-nav-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(8, 9, 12, 0.7);
+  backdrop-filter: blur(8px);
+  z-index: 1045;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.mobile-nav-backdrop.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Touch-friendly interactive buttons */
+.btn, .sidebar-nav-link, .nav-link, .hero-btn-primary, .hero-btn-secondary, button {
+  min-height: 44px;
+}
+
+/* Global Responsive Refinements */
+@media (max-width: 1024px) {
+  .apple-section {
+    padding-top: 80px !important;
+    padding-bottom: 80px !important;
+  }
+}
+
+@media (max-width: 767.98px) {
+  /* Landing page adaptations */
+  .apple-section {
+    padding-top: 50px !important;
+    padding-bottom: 50px !important;
+  }
+  
+  .apple-heading {
+    font-size: 2.2rem !important;
+  }
+  
+  .hero-cta-wrapper {
+    flex-direction: column;
+    width: 100%;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .hero-btn-primary, .hero-btn-secondary {
+    width: 100%;
+    height: 52px;
+  }
+  
+  /* Footer responsive layout */
+  footer .row {
+    flex-direction: column;
+    text-align: center;
+    gap: 2rem;
+  }
+  
+  footer .text-end {
+    text-align: center !important;
+    margin-top: 1rem;
+  }
+
+  /* Table styling enhancements on mobile */
+  .table {
+    font-size: 11px;
+  }
+  
+  /* Form adjustments */
+  .form-control, .form-select {
+    min-height: 44px;
+  }
+  
+  /* Modal responsive sizing */
+  .modal-dialog {
+    margin: 0.5rem;
+    max-width: calc(100% - 1rem);
+  }
+  
+  .modal-content {
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .apple-heading {
+    font-size: 1.8rem !important;
+  }
+  
+  .card {
+    padding: 1.25rem !important;
+  }
+}

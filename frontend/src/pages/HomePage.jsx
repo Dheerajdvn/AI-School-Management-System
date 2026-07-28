@@ -17,6 +17,28 @@ export default function HomePage() {
   const [openFaq, setOpenFaq] = useState(0)
   const [scrolled, setScrolled] = useState(false)
   const [activeRagStep, setActiveRagStep] = useState(0)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setMobileMenuOpen(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [mobileMenuOpen])
 
   const canvasRef = useRef(null)
 
@@ -317,11 +339,19 @@ export default function HomePage() {
             </span>
           </Link>
 
-          <button className="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
+          {/* Mobile Hamburger Toggle Button */}
+          <button 
+            className="navbar-toggler border-0 d-lg-none" 
+            type="button" 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-expanded={mobileMenuOpen}
+            aria-label="Toggle navigation menu"
+          >
             <span className="navbar-toggler-icon" />
           </button>
 
-          <div className="collapse navbar-collapse" id="navContent">
+          {/* Desktop Navigation Menu (hidden on mobile) */}
+          <div className="collapse navbar-collapse d-none d-lg-flex" id="navContent">
             <ul className="navbar-menu mx-auto d-flex align-items-center gap-4 list-unstyled mb-0 py-2 py-lg-0 small fw-medium">
               <li><a href="#features" className="nav-link text-white-50 text-white-hover">Features</a></li>
               <li><a href="#rag-pipeline" className="nav-link text-white-50 text-white-hover">AI Architecture</a></li>
@@ -349,6 +379,93 @@ export default function HomePage() {
               </Link>
             </div>
           </div>
+
+          {/* Custom Slide-In Mobile Drawer */}
+          <div className={`mobile-nav-drawer ${mobileMenuOpen ? 'open' : ''}`}>
+            <div className="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom border-secondary border-opacity-25">
+              <span className="fw-bold text-white fs-5">Menu</span>
+              <button 
+                type="button" 
+                className="btn-close btn-close-white" 
+                onClick={() => setMobileMenuOpen(false)}
+                aria-label="Close menu"
+              />
+            </div>
+            
+            <ul className="navbar-menu flex-column d-flex gap-3 list-unstyled mb-0 py-2 small fw-medium">
+              <li>
+                <a 
+                  href="#features" 
+                  className="nav-link text-white-50 text-white-hover fs-6"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Features
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="#rag-pipeline" 
+                  className="nav-link text-white-50 text-white-hover fs-6"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  AI Architecture
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="#comparison" 
+                  className="nav-link text-white-50 text-white-hover fs-6"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Why AI School OS
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="#testimonials" 
+                  className="nav-link text-white-50 text-white-hover fs-6"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Testimonials
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="#faq" 
+                  className="nav-link text-white-50 text-white-hover fs-6"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  FAQ
+                </a>
+              </li>
+            </ul>
+
+            <div className="d-flex flex-column gap-3 mt-auto">
+              <button
+                className="btn btn-outline-light rounded-pill px-3 py-2.5 font-semibold w-100"
+                onClick={() => { setMobileMenuOpen(false); setDemoModalOpen(true); }}
+                style={{ borderColor: 'rgba(255, 255, 255, 0.2)' }}
+              >
+                Book a Demo
+              </button>
+
+              <Link
+                to="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="btn btn-primary rounded-pill px-4 py-2.5 font-semibold text-white d-flex align-items-center justify-content-center gap-1.5 shadow-glow w-100"
+                style={{ background: 'linear-gradient(135deg, #4f46e5 0%, #0284c7 100%)', border: 'none' }}
+              >
+                <span>Get Started</span>
+                <i className="bi bi-arrow-right small" />
+              </Link>
+            </div>
+          </div>
+          
+          {/* Mobile Drawer Backdrop */}
+          <div 
+            className={`mobile-nav-backdrop ${mobileMenuOpen ? 'open' : ''}`} 
+            onClick={() => setMobileMenuOpen(false)} 
+          />
         </div>
       </nav>
 
