@@ -14,9 +14,10 @@ spring:
 
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/schooldb}
-    username: postgres
-    password: postgres
+    username: neondb_owner
+    password: npg_6gSFZMBU1ApK
     driver-class-name: org.postgresql.Driver
+
     hikari:
       maximum-pool-size: 15
       minimum-idle: 5
@@ -29,24 +30,24 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: false
+    open-in-view: false
     properties:
       hibernate:
         format_sql: true
         jdbc:
           batch_size: 50
-    open-in-view: false
 
   jackson:
     serialization:
       fail-on-empty-beans: false
 
 server:
-  port: 8080
+  port: ${PORT:8080}
   servlet:
     context-path: /api
 
 # ============================================
-# AI / Ollama Configuration
+# AI Configuration
 # ============================================
 ai:
   slow-query-threshold-ms: 5000
@@ -62,8 +63,8 @@ ai:
     context-history-limit: 3
 
   ollama:
-    base-url: http://localhost:11434
-    model: qwen2.5-coder:3b
+    base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+    model: ${OLLAMA_MODEL:qwen2.5-coder:3b}
     temperature: 0.2
     timeout: 120
     max-tokens: 2048
@@ -72,36 +73,42 @@ ai:
     provider: ollama
     model: nomic-embed-text
     timeout: 30s
-    base-url: http://localhost:11434
+    base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
 
   vector:
     provider: qdrant
-    host: localhost
-    port: 6333
+    host: ${QDRANT_HOST:localhost}
+    port: ${QDRANT_PORT:6333}
     collection: course_documents
     dimension: 768
     timeout: 30s
 
-# JWT & Application Security Configuration
+# ============================================
+# Application Security
+# ============================================
 app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000,http://localhost:8080}
+
   jwt:
-    secret: ${JWT_SECRET:enterprise_secured_jwt_signing_key_for_development_purposes_only_32bytes}
+    secret: ${JWT_SECRET}
     expiration: ${JWT_EXPIRATION:86400000}
 
+# ============================================
 # Logging
+# ============================================
 logging:
   level:
     root: INFO
     com.ai.dashboard: DEBUG
     org.hibernate.SQL: WARN
-    org.hibernate.type.descriptor.sql.BasicBinder: WARN
 
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
-# Swagger / OpenAPI
+# ============================================
+# Swagger
+# ============================================
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -110,7 +117,9 @@ springdoc:
   api-docs:
     path: /v3/api-docs
 
+# ============================================
 # Actuator
+# ============================================
 management:
   endpoints:
     web:
