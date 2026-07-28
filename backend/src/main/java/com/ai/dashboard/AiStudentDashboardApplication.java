@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 public class AiStudentDashboardApplication {
 
     public static void main(String[] args) {
+        java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("UTC"));
         SpringApplication.run(AiStudentDashboardApplication.class, args);
     }
 }

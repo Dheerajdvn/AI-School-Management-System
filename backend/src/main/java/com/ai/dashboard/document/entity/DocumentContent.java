@@ -26,7 +26,7 @@ public class DocumentContent {
     private Document document;
 
     @Lob
-    @Column(name = "extracted_text", columnDefinition = "LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
+    @Column(name = "extracted_text", columnDefinition = "TEXT")
     private String extractedText;
 
     @Column(name = "extracted_at", nullable = false)

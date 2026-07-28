@@ -128,7 +128,7 @@ frontend/
 | | Spring Boot | 3.x | Rapid application development framework |
 | | Spring Data JPA | 3.x | Object-Relational Mapping & repositories |
 | | Spring Security | 6.x | Authentication and method security |
-| **Database** | MariaDB / MySQL | 10.x+ | Relational data persistence |
+| **Database** | PostgreSQL | 15.x+ | Relational data persistence |
 | | H2 Database | Latest | In-memory database for unit/integration testing |
 | **AI & Search** | Spring AI / LangChain4j | Latest | LLM abstraction and orchestration framework |
 | | Ollama | Latest | Local LLM runner (e.g. `qwen2.5:7b` / `llama3`) |
@@ -144,7 +144,7 @@ Ensure you have the following installed on your system:
 - **Java Development Kit (JDK) 21**
 - **Node.js (v18+) & npm**
 - **Maven (v3.8+)**
-- **MariaDB or MySQL (v10.4+)**
+- **PostgreSQL (v15+)**
 - **Ollama** (installed locally for AI features)
 - **Qdrant** (running via Docker or locally for vector search)
 
@@ -159,9 +159,9 @@ cd ai-school-management-platform
 ```
 
 ### Step 2: Database Setup
-Create a MariaDB database named `ai_student_dashboard`:
+Create a PostgreSQL database named `schooldb`:
 ```sql
-CREATE DATABASE ai_student_dashboard CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE schooldb;
 ```
 
 ### Step 3: Configure Backend Properties
@@ -169,9 +169,9 @@ Edit `backend/src/main/resources/application.yml` to set your database username 
 ```yaml
 spring:
   datasource:
-    url: jdbc:mariadb://localhost:3306/ai_student_dashboard
-    username: root
-    password: your_db_password
+    url: jdbc:postgresql://localhost:5432/schooldb
+    username: postgres
+    password: postgres_password
 ```
 
 ### Step 4: Install and Start Ollama & Qdrant
@@ -208,9 +208,9 @@ Open your browser and navigate to `http://localhost:5173`. Log in with default a
 
 | Variable | Description | Default / Example |
 | :--- | :--- | :--- |
-| `SPRING_DATASOURCE_URL` | MariaDB connection URL | `jdbc:mariadb://localhost:3306/ai_student_dashboard` |
-| `SPRING_DATASOURCE_USERNAME` | Database username | `root` |
-| `SPRING_DATASOURCE_PASSWORD` | Database password | `root@123` |
+| `SPRING_DATASOURCE_URL` | PostgreSQL connection URL | `jdbc:postgresql://localhost:5432/schooldb` |
+| `SPRING_DATASOURCE_USERNAME` | Database username | `postgres` |
+| `SPRING_DATASOURCE_PASSWORD` | Database password | `postgres` |
 | `JWT_SECRET` | Secret key for signing JWT tokens | `YourSuperSecretJwtKeyForAuthenticationWithSufficientLength` |
 | `OLLAMA_BASE_URL` | Ollama LLM service URL | `http://localhost:11434` |
 | `QDRANT_HOST` | Qdrant vector database host | `localhost` |
@@ -395,7 +395,7 @@ Digital attendance tracking with role-based access and reporting.
 ---
 
 ## 17. Troubleshooting
-- **Database Connection Error**: Verify MariaDB service is running and credentials in `application.yml` match your local instance.
+- **Database Connection Error**: Verify PostgreSQL service is running and credentials in `application.yml` match your local instance.
 - **Ollama Connection Refused**: Ensure Ollama is running (`ollama serve`) and `qwen2.5:7b` model is downloaded.
 - **Qdrant Connection Error**: Ensure Qdrant container is active on port `6333`.
 

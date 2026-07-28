@@ -59,9 +59,9 @@ public interface StudentRepository extends
      * Count students grouped by year-month of joining_date.
      */
     @Query(value = """
-            SELECT DATE_FORMAT(s.joining_date, '%Y-%m') AS label, COUNT(*) AS value
+            SELECT TO_CHAR(s.joining_date, 'YYYY-MM') AS label, COUNT(*) AS value
             FROM student s
-            GROUP BY DATE_FORMAT(s.joining_date, '%Y-%m')
+            GROUP BY TO_CHAR(s.joining_date, 'YYYY-MM')
             ORDER BY label ASC
             """, nativeQuery = true)
     List<LabelValue> countMonthlyJoining();

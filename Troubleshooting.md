@@ -33,23 +33,23 @@ docker logs <redis-container-id>
 - Verify Redis container is accessible
 - Check firewall rules
 
-### MariaDB Connection
+### PostgreSQL Connection
 
 **Error: Connection refused**
 ```bash
-# Check MariaDB status
-docker ps | grep mariadb
+# Check PostgreSQL status
+docker ps | grep postgres
 
 # Test connection
-mariadb -h localhost -u root -p -D ai_student_dashboard
+psql -h localhost -U postgres -d schooldb
 
 # Check logs
-docker logs <mariadb-container-id>
+docker logs <postgres-container-id>
 ```
 
 **Solution:**
 - Verify `SPRING_DATASOURCE_URL`, `USERNAME`, `PASSWORD` in [`application.yml`](backend/src/main/resources/application.yml:1)
-- Ensure MariaDB is running on correct port (default: 3306)
+- Ensure PostgreSQL is running on correct port (default: 5432)
 - Check if database exists
 
 ### Ollama Not Running

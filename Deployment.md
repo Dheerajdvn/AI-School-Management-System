@@ -41,7 +41,7 @@ management:
 # Run with Docker
 docker build -t ai-dashboard:latest .
 docker run -d -p 8080:8080 \
-  -e SPRING_DATASOURCE_URL=jdbc:mariadb://mariadb:3306/ai_student_dashboard \
+  -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/schooldb \
   -e SPRING_REDIS_HOST=redis \
   ai-dashboard:latest
 ```
@@ -78,7 +78,7 @@ server {
 ### Backend Required
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `SPRING_DATASOURCE_URL` | MariaDB JDBC URL | - |
+| `SPRING_DATASOURCE_URL` | PostgreSQL JDBC URL | - |
 | `SPRING_DATASOURCE_USERNAME` | DB username | - |
 | `SPRING_DATASOURCE_PASSWORD` | DB password | - |
 | `SPRING_REDIS_HOST` | Redis host | localhost |
@@ -95,18 +95,19 @@ server {
 
 ## Service Configuration
 
-### MariaDB
+### PostgreSQL
 ```bash
 # docker-compose.yml
-mariadb:
-  image: mariadb:10.11
+postgres:
+  image: postgres:15-alpine
   environment:
-    MYSQL_DATABASE: ai_student_dashboard
-    MYSQL_ROOT_PASSWORD: root@123
+    POSTGRES_DB: schooldb
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: postgres
   volumes:
-    - mariadb_data:/var/lib/mysql
+    - db-data:/var/lib/postgresql/data
   ports:
-    - "3306:3306"
+    - "5432:5432"
 ```
 
 ### Redis
