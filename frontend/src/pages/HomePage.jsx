@@ -192,24 +192,24 @@ export default function HomePage() {
   // Testimonials Dataset
   const testimonials = [
     {
-      name: 'Dr. Robert Vance',
-      role: 'Principal, Stanford High School',
+      name: 'Dr. Rajeev Verma',
+      role: 'Principal, Hyderabad Public School',
       image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
       rating: 5,
       text: 'AI School OS transformed our administrative efficiency by 70%. The automated rubric grading and RAG document search are absolute game changers for our faculty.',
       stats: 'Saved 15 Hours/Wk per Educator'
     },
     {
-      name: 'Elena Rostova',
-      role: 'Academic Director, Oakridge International',
+      name: 'Smt. Lakshmi Rao',
+      role: 'Academic Director, Oakridge International School, Hyderabad',
       image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
       rating: 5,
       text: 'Our students love the 24/7 AI tutor. Doubts that used to take days to clarify are now solved instantly with precise textbook citations.',
       stats: '+88% Student Retention'
     },
     {
-      name: 'Marcus Sterling',
-      role: 'Chief Technology Officer, St. Mary Trust',
+      name: 'Sri Rajesh Reddy',
+      role: "Chief Technology Officer, St. Mary's Educational Society, Hyderabad",
       image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
       rating: 5,
       text: 'The local Ollama integration guarantees student data privacy, while the multi-campus command center gives our executive team 100% real-time visibility.',
@@ -515,7 +515,7 @@ export default function HomePage() {
             Trusted by leading educational institutions & enterprise systems worldwide
           </p>
           <div className="d-flex flex-wrap align-items-center justify-content-center gap-4 gap-md-5 opacity-75">
-            {['MIT', 'STANFORD', 'BERKELEY', 'HARVARD', 'NUS', 'OXFORD ACADEMY'].map((uni, idx) => (
+            {['IIT HYDERABAD', 'BITS PILANI', 'IIIT HYDERABAD', 'HPS BEGUMPET', 'OAKRIDGE', 'CHIREC'].map((uni, idx) => (
               <span key={idx} className="fw-extrabold font-monospace text-muted fs-5 text-white-hover transition-all cursor-pointer" style={{ letterSpacing: '2px' }}>
                 {uni}
               </span>
@@ -902,9 +902,8 @@ export default function HomePage() {
                 Next-generation enterprise AI platform for school management, automated grading, RAG document search, and executive analytics.
               </p>
               <div className="d-flex gap-3 text-muted">
-                <a href="https://github.com" target="_blank" rel="noreferrer" className="text-muted text-white-hover fs-5"><i className="bi bi-github" /></a>
-                <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="text-muted text-white-hover fs-5"><i className="bi bi-linkedin" /></a>
-                <a href="https://twitter.com" target="_blank" rel="noreferrer" className="text-muted text-white-hover fs-5"><i className="bi bi-twitter" /></a>
+                <a href="https://github.com/Dheerajdvn" target="_blank" rel="noreferrer" className="text-muted text-white-hover fs-5"><i className="bi bi-github" /></a>
+                <a href="https://www.linkedin.com/in/dheerajdvn/" target="_blank" rel="noreferrer" className="text-muted text-white-hover fs-5"><i className="bi bi-linkedin" /></a>
               </div>
             </div>
 
@@ -931,9 +930,9 @@ export default function HomePage() {
             <div className="col-lg-4">
               <h6 className="fw-bold text-white mb-3 x-small text-uppercase tracking-wider">Contact & Support</h6>
               <ul className="list-unstyled d-flex flex-column gap-2 small text-muted mb-0">
-                <li><i className="bi bi-envelope me-2 text-primary" /> enterprise@aischoolos.io</li>
-                <li><i className="bi bi-telephone me-2 text-primary" /> +1 (800) 555-AI-OS</li>
-                <li><i className="bi bi-geo-alt me-2 text-primary" /> Silicon Valley, CA, USA</li>
+                <li><i className="bi bi-envelope me-2 text-primary" /> dheerajdvn@gmail.com</li>
+                <li><i className="bi bi-telephone me-2 text-primary" /> +91 XXXXXXXXXX</li>
+                <li><i className="bi bi-geo-alt me-2 text-primary" /> Madhapur, Hyderabad, India</li>
               </ul>
             </div>
           </div>
@@ -963,7 +962,7 @@ export default function HomePage() {
               </div>
               <div className="mb-3">
                 <label className="form-label text-muted small fw-semibold">Institution Name</label>
-                <input type="text" className="form-control style-input" placeholder="e.g. Stanford High School" required />
+                <input type="text" className="form-control style-input" placeholder="e.g. Hyderabad Public School" required />
               </div>
               <div className="mb-3">
                 <label className="form-label text-muted small fw-semibold">Role</label>

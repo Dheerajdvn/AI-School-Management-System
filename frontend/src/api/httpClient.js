@@ -65,7 +65,8 @@ httpClient.interceptors.response.use(
         tokenStore.clear()
       }
 
-      if (window.location.pathname !== '/login') {
+      const requestUrl = originalRequest?.url || ''
+      if (window.location.pathname !== '/login' && !requestUrl.includes('/ai/health')) {
         window.location.href = '/login'
       }
     }

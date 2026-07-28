@@ -59,8 +59,7 @@ public class AiController {
     }
 
     @GetMapping("/health")
-    @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Check AI service health (all authenticated users)")
+    @Operation(summary = "Check AI service health")
     public ApiResponse<Map<String, Object>> health(Authentication authentication) {
         String username = authentication != null ? authentication.getName() : "anonymous";
         UserAiConfigDto userConfig = null;

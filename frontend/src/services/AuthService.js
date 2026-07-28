@@ -187,9 +187,9 @@ api.interceptors.response.use(
 
     // Handle 401 and 403 identically - redirect to login
     if (status === 401 || status === 403) {
-      // Don't intercept login or auth/me calls to avoid redirect loops
+      // Don't intercept login, auth/me, or ai/health calls to avoid redirect loops
       const url = error.config?.url || ''
-      if (url.includes('/auth/login') || url.includes('/auth/me')) {
+      if (url.includes('/auth/login') || url.includes('/auth/me') || url.includes('/ai/health')) {
         return Promise.reject(error)
       }
 
