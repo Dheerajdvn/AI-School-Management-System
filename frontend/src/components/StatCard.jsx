@@ -1,12 +1,12 @@
 import React from 'react'
 
-const GRADIENTS = {
-  primary: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-  success: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-  warning: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-  info: 'linear-gradient(135deg, #06b6d4 0%, #0284c7 100%)',
-  danger: 'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)',
-  purple: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)'
+const SOLID_COLORS = {
+  primary: 'var(--primary)',
+  success: '#10b981',
+  warning: '#f59e0b',
+  info: 'var(--accent)',
+  danger: '#ef4444',
+  purple: '#8b5cf6'
 }
 
 export default function StatCard({ icon, label, value, color = 'primary', onClick, active = false, trend = null }) {
@@ -28,7 +28,7 @@ export default function StatCard({ icon, label, value, color = 'primary', onClic
           style={{
             width: '46px',
             height: '46px',
-            background: GRADIENTS[color] || GRADIENTS.primary,
+            background: SOLID_COLORS[color] || SOLID_COLORS.primary,
             fontSize: '1.25rem'
           }}
         >

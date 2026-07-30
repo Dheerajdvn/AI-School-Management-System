@@ -23,27 +23,59 @@ public class RefreshTokenController {
     @PostMapping("/refresh")
     @Operation(summary = "Refresh access token")
     public ResponseEntity<TokenResponse> refreshToken(
-            @RequestBody RefreshTokenRequest request) {
-        String refreshToken = request.refreshToken();
-        Long userId = refreshTokenService.validateRefreshToken(refreshToken);
+            @CookieValue(name = "refreshToken", required = false) String cookieRefreshToken,
+            @RequestBody(required = false) RefreshTokenRequest request,
+            jakarta.servlet.http.HttpServletResponse response) {
+        String token = (cookieRefreshToken != null && !cookieRefreshToken.isBlank())
+                ? cookieRefreshToken
+                : (request != null ? request.refreshToken() : null);
+
+        if (token == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Long userId = refreshTokenService.validateRefreshToken(token);
         if (userId == null) {
             return ResponseEntity.badRequest().build();
         }
         UserDetails userDetails = userDetailsService.loadUserById(userId);
         String newAccessToken = jwtService.generateToken(userDetails, userId);
+        String newRefreshToken = refreshTokenService.createRefreshToken(userId);
+
+        org.springframework.http.ResponseCookie cookie = org.springframework.http.ResponseCookie.from("refreshToken", newRefreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(7 * 24 * 60 * 60)
+                .sameSite("None")
+                .build();
+        response.addHeader(org.springframework.http.HttpHeaders.SET_COOKIE, cookie.toString());
+
         return ResponseEntity.ok(new TokenResponse(newAccessToken));
     }
 
     @PostMapping("/logout-all")
     @Operation(summary = "Logout from all devices")
     public ResponseEntity<Void> logoutAllDevices(
-            @RequestHeader("Authorization") String authHeader) {
-        if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
-            return ResponseEntity.badRequest().build();
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            jakarta.servlet.http.HttpServletResponse response) {
+        if (authHeader != null && authHeader.startsWith(BEARER_PREFIX)) {
+            String token = authHeader.substring(BEARER_PREFIX.length());
+            Long userId = jwtService.extractUserId(token);
+            if (userId != null) {
+                refreshTokenService.revokeAllUserTokens(userId);
+            }
         }
-        String token = authHeader.substring(BEARER_PREFIX.length());
-        Long userId = jwtService.extractUserId(token);
-        refreshTokenService.revokeAllUserTokens(userId);
+
+        org.springframework.http.ResponseCookie cookie = org.springframework.http.ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .sameSite("None")
+                .build();
+        response.addHeader(org.springframework.http.HttpHeaders.SET_COOKIE, cookie.toString());
+
         return ResponseEntity.ok().build();
     }
 

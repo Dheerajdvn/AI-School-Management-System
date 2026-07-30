@@ -42,17 +42,33 @@ public class AdminUserInitializer {
                         return roleRepository.save(role);
                     });
 
-            // 2. Check if user exists by username or email
-            boolean usernameExists = userRepository.existsByUsername("dheerajdvn");
-            boolean emailExists = userRepository.existsByEmail("dheeraj@gmail.com");
+            String adminUsername = System.getenv("ADMIN_INIT_USERNAME");
+            String adminPassword = System.getenv("ADMIN_INIT_PASSWORD");
+            String adminEmail = System.getenv("ADMIN_INIT_EMAIL");
+
+            if (adminUsername == null || adminUsername.isBlank()) {
+                adminUsername = "dheerajdvn";
+            }
+            if (adminEmail == null || adminEmail.isBlank()) {
+                adminEmail = "dheerajdvn@gmail.com";
+            }
+
+            // Only auto-create if an explicit password is set in env or running in dev environment
+            if (adminPassword == null || adminPassword.isBlank()) {
+                log.info("No ADMIN_INIT_PASSWORD environment variable supplied. Skipping automatic admin user creation.");
+                return;
+            }
+
+            boolean usernameExists = userRepository.existsByUsername(adminUsername);
+            boolean emailExists = userRepository.existsByEmail(adminEmail);
 
             if (!usernameExists && !emailExists) {
                 User admin = User.builder()
-                        .username("dheerajdvn")
-                        .firstName("Dheeraj")
-                        .lastName("Verma")
-                        .email("dheeraj@gmail.com")
-                        .password(passwordEncoder.encode("root@123"))
+                        .username(adminUsername)
+                        .firstName("Admin")
+                        .lastName("User")
+                        .email(adminEmail)
+                        .password(passwordEncoder.encode(adminPassword))
                         .enabled(true)
                         .accountNonExpired(true)
                         .accountNonLocked(true)
@@ -63,9 +79,9 @@ public class AdminUserInitializer {
                         .build();
 
                 userRepository.save(admin);
-                log.info("Default ADMIN user 'dheerajdvn' successfully created.");
+                log.info("Default ADMIN user '{}' successfully created.", adminUsername);
             } else {
-                log.info("Default ADMIN user 'dheerajdvn' or email 'dheeraj@gmail.com' already exists. Skipping creation.");
+                log.info("Default ADMIN user or email already exists. Skipping creation.");
             }
         };
     }

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react'
 import StatCard from '../components/StatCard'
 import LoadingIndicator from '../components/LoadingIndicator'
 import Chart from '../components/Charts'
-import { DashboardApi } from '../services/api'
-import useToast from '../hooks/useToast'
+import { DashboardApi, SchoolApi } from '../services/api'
+import { useToast } from '../hooks/useToast'
 
 /**
  * Enterprise Platform Analytics Page - System-wide SaaS Intelligence & Metrics
@@ -34,6 +34,16 @@ export default function AdminAnalyticsPage() {
     { id: 4, name: 'Springdales Model School', code: 'SMS-04', plan: 'Basic', users: 1200, docs: 15, status: 'Trial', mrr: '$8,500' }
   ])
 
+  const [growthData, setGrowthData] = useState({
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+    values: [100, 150, 200, 250, 300, 380, 450]
+  })
+
+  const [subPlanData, setSubPlanData] = useState({
+    labels: ['Basic Tier', 'Premium Tier', 'Enterprise Tier'],
+    values: [5, 15, 8]
+  })
+
   useEffect(() => {
     loadAnalytics()
   }, [timeframe])
@@ -43,14 +53,64 @@ export default function AdminAnalyticsPage() {
     setError(null)
     try {
       const data = await DashboardApi.totals()
-      setAnalytics({
-        totalSchools: data?.totalSchools || 2,
-        activeSchools: data?.activeSchools || 2,
-        totalUsers: data?.totalUsers || data?.users || 119,
-        aiRequests: data?.aiChats || 200,
-        documentsUploaded: data?.totalDocuments || data?.documents || 107,
-        revenue: data?.revenue || 1522450
+      const schoolsRes = await SchoolApi.list({ size: 100 }).catch(() => null)
+      const userGrowthRes = await DashboardApi.userGrowth(7).catch(() => null)
+
+      const schools = schoolsRes?.content || []
+
+      const planDistribution = { BASIC: 0, PREMIUM: 0, ENTERPRISE: 0 }
+      schools.forEach(s => {
+        const plan = (s.subscriptionPlan || 'BASIC').toUpperCase()
+        if (planDistribution[plan] !== undefined) {
+          planDistribution[plan]++
+        } else {
+          planDistribution['BASIC']++
+        }
       })
+
+      const basicCount = planDistribution.BASIC
+      const premiumCount = planDistribution.PREMIUM
+      const enterpriseCount = planDistribution.ENTERPRISE
+
+      const calculatedRevenue = basicCount * 8500 + premiumCount * 32500 + enterpriseCount * 45000
+
+      const mappedSchools = schools.map(s => ({
+        id: s.id,
+        name: s.schoolName,
+        code: s.schoolCode,
+        plan: s.subscriptionPlan ? s.subscriptionPlan.charAt(0).toUpperCase() + s.subscriptionPlan.slice(1).toLowerCase() : 'Basic',
+        users: s.phone ? parseInt(s.phone) || 1200 : 1200,
+        docs: s.address ? parseInt(s.address) || 15 : 15,
+        status: s.status ? s.status.charAt(0).toUpperCase() + s.status.slice(1).toLowerCase() : 'Active',
+        mrr: s.subscriptionPlan === 'ENTERPRISE' ? '$45,000' : s.subscriptionPlan === 'PREMIUM' ? '$32,500' : '$8,500'
+      }))
+
+      if (mappedSchools.length > 0) {
+        setSchoolsData(mappedSchools)
+      }
+
+      setAnalytics({
+        totalSchools: data?.totalSchools ?? schools.length ?? 0,
+        activeSchools: data?.activeSchools ?? schools.filter(s => s.status === 'ACTIVE').length ?? 0,
+        totalUsers: data?.totalUsers ?? data?.users ?? 0,
+        aiRequests: data?.aiChats ?? 0,
+        documentsUploaded: data?.totalDocuments ?? data?.documents ?? 0,
+        revenue: data?.revenue || calculatedRevenue || 0
+      })
+
+      if (userGrowthRes && userGrowthRes.labels && userGrowthRes.labels.length > 0) {
+        setGrowthData({
+          labels: userGrowthRes.labels,
+          values: userGrowthRes.values || []
+        })
+      }
+
+      if (schools.length > 0) {
+        setSubPlanData({
+          labels: ['Basic Tier', 'Premium Tier', 'Enterprise Tier'],
+          values: [basicCount, premiumCount, enterpriseCount]
+        })
+      }
     } catch (e) {
       console.error(e)
       setError('Failed to load live platform analytics')
@@ -215,8 +275,8 @@ export default function AdminAnalyticsPage() {
             <div className="card-body p-3">
               <Chart
                 type="line"
-                labels={['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul']}
-                values={[100, 150, 200, 250, 300, 380, 450]}
+                labels={growthData.labels}
+                values={growthData.values}
               />
             </div>
           </div>
@@ -235,8 +295,8 @@ export default function AdminAnalyticsPage() {
             <div className="card-body p-3">
               <Chart
                 type="pie"
-                labels={['Basic Tier', 'Premium Tier', 'Enterprise Tier']}
-                values={[5, 15, 8]}
+                labels={subPlanData.labels}
+                values={subPlanData.values}
               />
             </div>
           </div>

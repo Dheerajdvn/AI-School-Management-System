@@ -1,0 +1,127 @@
+/* Command Palette Modal Styles */
+.command-palette-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+  z-index: 1060;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 10vh;
+}
+
+.command-palette-card {
+  width: 100%;
+  max-width: 580px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card, 16px);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: modalSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.command-palette-search-wrapper {
+  display: flex;
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.command-palette-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 1rem;
+  padding: var(--space-2) 0;
+}
+
+.command-palette-input:focus {
+  outline: none;
+}
+
+.command-palette-results {
+  max-height: 380px;
+  overflow-y: auto;
+  padding: var(--space-2) 0;
+}
+
+.command-palette-category-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: var(--space-2) var(--space-4) var(--space-1);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.command-palette-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2.5) var(--space-4);
+  color: var(--text);
+  text-decoration: none;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.command-palette-item:hover,
+.command-palette-item.selected {
+  background: var(--hover);
+  color: var(--primary);
+}
+
+.command-palette-item-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  transition: all 0.15s;
+}
+
+.command-palette-item:hover .command-palette-item-icon,
+.command-palette-item.selected .command-palette-item-icon {
+  background: var(--primary);
+  color: #fff;
+}
+
+.command-palette-item-label {
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.command-palette-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2.5) var(--space-4);
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+@keyframes modalSlideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

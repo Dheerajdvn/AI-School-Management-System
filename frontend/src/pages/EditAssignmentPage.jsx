@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { AssignmentApi, CourseApi } from '../services/api'
 import LoadingIndicator from '../components/LoadingIndicator'
-import useToast from '../hooks/useToast'
+import { useToast } from '../hooks/useToast'
 
 export default function EditAssignmentPage() {
   const { id } = useParams()

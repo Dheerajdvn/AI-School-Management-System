@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
 
 const ThemeContext = createContext({
   theme: 'light',
@@ -11,31 +10,26 @@ export const ThemeProvider = ({ children }) => {
     return localStorage.getItem('app_theme') || localStorage.getItem('theme') || 'light'
   })
 
-  const location = useLocation()
-
   useEffect(() => {
-    // Check if the current page is one of the public dark-only pages (home or login)
-    const isPublicDarkOnlyPage = location.pathname === '/' || location.pathname === '/login'
-    const activeTheme = isPublicDarkOnlyPage ? 'dark' : theme
-
     localStorage.setItem('app_theme', theme)
-    document.documentElement.setAttribute('data-theme', activeTheme)
+    document.documentElement.setAttribute('data-theme', theme)
+    document.documentElement.setAttribute('data-bs-theme', theme)
     
-    if (activeTheme === 'dark') {
+    if (theme === 'dark') {
       document.body.classList.add('dark-mode')
       document.body.classList.remove('light-mode')
     } else {
       document.body.classList.add('light-mode')
       document.body.classList.remove('dark-mode')
     }
-  }, [theme, location.pathname])
+  }, [theme])
 
   const toggleTheme = () => {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'))
   }
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   )

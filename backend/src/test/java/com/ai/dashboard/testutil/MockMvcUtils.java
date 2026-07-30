@@ -7,11 +7,15 @@ public class MockMvcUtils {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public static String jsonPost(String url, Object body) throws Exception {
+    public static String toJson(Object body) throws Exception {
         return objectMapper.writeValueAsString(body);
     }
 
-    public static String jsonPut(String url, Object body) throws Exception {
+    public static String jsonPost(Object body) throws Exception {
+        return objectMapper.writeValueAsString(body);
+    }
+
+    public static String jsonPut(Object body) throws Exception {
         return objectMapper.writeValueAsString(body);
     }
 }

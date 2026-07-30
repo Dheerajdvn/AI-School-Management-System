@@ -9,11 +9,20 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import org.springframework.data.jpa.repository.EntityGraph;
+import java.util.Optional;
+
 /**
  * Repository for Assignment entity with specification support.
  */
 @Repository
 public interface AssignmentRepository extends JpaRepository<Assignment, Long>, JpaSpecificationExecutor<Assignment> {
+
+    @EntityGraph(attributePaths = {"course", "teacher"})
+    Page<Assignment> findAll(org.springframework.data.jpa.domain.Specification<Assignment> spec, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"course", "teacher"})
+    Optional<Assignment> findById(Long id);
 
     Page<Assignment> findByCourse(Course course, Pageable pageable);
 

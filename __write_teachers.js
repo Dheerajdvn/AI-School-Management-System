@@ -1,1 +1,0 @@
-const fs = require('fs'); const path = 'frontend/src/pages/school/TeachersPage.jsx'; let content = ''; process.stdin.on('data', d => content += d); process.stdin.on('end', () => { fs.writeFileSync(path, content, 'utf8'); console.log('Written ' + content.length + ' bytes'); });

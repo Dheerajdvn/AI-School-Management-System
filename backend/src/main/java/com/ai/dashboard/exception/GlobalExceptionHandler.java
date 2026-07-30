@@ -126,9 +126,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<ErrorDetail> handleDataAccess(DataAccessException ex, HttpServletRequest req) {
-        log.error("Database error executing AI SQL: {}", ex.getMessage());
+        log.error("Database error: {}", ex.getMessage(), ex);
         return build(HttpStatus.BAD_REQUEST,
-                "Database error: " + rootMessage(ex), req, null);
+                "Database operation failed. Please check input parameters.", req, null);
     }
 
     @ExceptionHandler(Exception.class)

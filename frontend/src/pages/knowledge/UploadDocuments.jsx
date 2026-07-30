@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { knowledgeService } from '../../services/knowledgeService'
-import useToast from '../../hooks/useToast'
+import { useToast } from '../../hooks/useToast'
 
 export default function UploadDocuments() {
   const navigate = useNavigate()

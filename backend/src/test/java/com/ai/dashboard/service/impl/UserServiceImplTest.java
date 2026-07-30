@@ -124,6 +124,8 @@ class UserServiceImplTest {
 
     @Test
     void deleteUser_existingId_deletesUser() {
+        User user = TestBuilders.buildUser(1L, "user1", "user1@example.com", "ROLE_USER");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         doNothing().when(userRepository).deleteById(1L);
         assertDoesNotThrow(() -> userService.deleteUser(1L));
         verify(userRepository, times(1)).deleteById(1L);

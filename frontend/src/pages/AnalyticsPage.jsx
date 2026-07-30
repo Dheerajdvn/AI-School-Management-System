@@ -6,7 +6,7 @@ import DateRangeFilter from '../components/DateRangeFilter'
 import ExportButtons from '../components/ExportButtons'
 import DashboardService from '../services/DashboardService'
 import LoadingIndicator from '../components/LoadingIndicator'
-import useToast from '../hooks/useToast'
+import { useToast } from '../hooks/useToast'
 
 export default function AnalyticsPage() {
   const { success: showSuccess, error: showError } = useToast()

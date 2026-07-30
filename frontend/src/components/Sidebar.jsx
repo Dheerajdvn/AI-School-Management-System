@@ -159,7 +159,7 @@ export default function Sidebar({ open, onClose }) {
           </div>
         </div>
 
-        <div className="sidebar-search-hint px-3 mb-2">
+        <div className="sidebar-search-hint px-3 mb-2" onClick={() => window.dispatchEvent(new CustomEvent('open-quick-search'))} style={{ cursor: 'pointer' }}>
           <div className="search-pill">
             <i className="bi bi-search text-muted me-2" />
             <span className="text-muted small">Quick search...</span>

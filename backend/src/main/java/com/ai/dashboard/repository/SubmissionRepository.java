@@ -11,11 +11,19 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.EntityGraph;
+
 /**
  * Repository for Submission entity with specification support.
  */
 @Repository
 public interface SubmissionRepository extends JpaRepository<Submission, Long>, JpaSpecificationExecutor<Submission> {
+
+    @EntityGraph(attributePaths = {"assignment", "student", "gradedBy", "assignment.course"})
+    Page<Submission> findAll(org.springframework.data.jpa.domain.Specification<Submission> spec, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"assignment", "student", "gradedBy", "assignment.course"})
+    Optional<Submission> findById(Long id);
 
     Page<Submission> findByAssignment(Assignment assignment, Pageable pageable);
 

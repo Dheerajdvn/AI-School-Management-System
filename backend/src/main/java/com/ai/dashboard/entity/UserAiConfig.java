@@ -30,6 +30,7 @@ public class UserAiConfig {
     private String provider;
 
     @Column(name = "api_key", length = 1000)
+    @Convert(converter = com.ai.dashboard.util.AesEncryptionConverter.class)
     private String apiKey;
 
     @Column(name = "base_url", length = 500)

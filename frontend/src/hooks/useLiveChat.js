@@ -66,5 +66,3 @@ export function useLiveChat(conversationId) {
     disconnect,
   }
 }
-
-export default useLiveChat

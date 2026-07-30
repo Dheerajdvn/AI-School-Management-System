@@ -55,17 +55,17 @@ export default function AskAiPage() {
       {/* Hero AI Banner */}
       <div className="row mb-4">
         <div className="col-12">
-          <div className="p-5 rounded-4 shadow-lg text-white position-relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #18181b 0%, #27272a 50%, #09090b 100%)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+          <div className="p-5 rounded-4 border" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}>
             <div className="position-absolute top-0 end-0 p-4 opacity-10 d-none d-md-block">
-              <i className="bi bi-cpu" style={{ fontSize: '8rem' }} />
+              <i className="bi bi-cpu" style={{ fontSize: '8rem', color: 'var(--text)' }} />
             </div>
             <div className="position-relative z-1" style={{ maxWidth: '800px' }}>
-              <div className="d-inline-flex align-items-center bg-white bg-opacity-10 px-3 py-1 rounded-pill mb-3 backdrop-blur">
+              <div className="d-inline-flex align-items-center bg-primary bg-opacity-10 px-3 py-1 rounded-pill mb-3 text-primary">
                 <span className="spinner-grow spinner-grow-sm text-success me-2" role="status" />
                 <span className="small fw-semibold text-uppercase tracking-wider">Natural Language to SQL Engine</span>
               </div>
-              <h1 className="display-6 fw-bold mb-2">Ask AI in Plain English</h1>
-              <p className="lead mb-4 text-white-50">
+              <h1 className="display-6 fw-bold mb-2 text-body">Ask AI in Plain English</h1>
+              <p className="lead mb-4 text-muted">
                 Type any analytical query about your student database. Our enterprise AI instantly converts your question into optimized SQL, executes it securely, and visualizes results.
               </p>
 

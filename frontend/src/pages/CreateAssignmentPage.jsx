@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { AssignmentApi, CourseApi } from '../services/api'
-import useToast from '../hooks/useToast'
+import { useToast } from '../hooks/useToast'
 
 export default function CreateAssignmentPage() {
   const navigate = useNavigate()

@@ -85,6 +85,8 @@ class EnrollmentServiceImplTest {
         User student = buildStudent(1L);
         User teacher = buildTeacher(2L);
         Course course = buildCourse(1L, teacher, Course.Status.ACTIVE);
+        when(userRepository.findById(2L)).thenReturn(Optional.of(student));
+        when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
         EnrollmentRequest request = TestBuilders.buildEnrollmentRequest(2L, 1L);
         assertThrows(AccessDeniedException.class, () -> enrollmentService.enrollStudent(request, 1L, "ROLE_STUDENT"));
     }
@@ -94,6 +96,8 @@ class EnrollmentServiceImplTest {
         User student = buildStudent(1L);
         User teacher = buildTeacher(2L);
         Course course = buildCourse(1L, teacher, Course.Status.ACTIVE);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(student));
+        when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
         EnrollmentRequest request = TestBuilders.buildEnrollmentRequest(1L, 1L);
         assertThrows(AccessDeniedException.class, () -> enrollmentService.enrollStudent(request, 2L, "ROLE_TEACHER"));
     }

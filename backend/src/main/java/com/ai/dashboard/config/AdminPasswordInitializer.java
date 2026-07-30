@@ -54,12 +54,17 @@ public class AdminPasswordInitializer {
             if (isBcrypt && hasRoleAdmin) {
                 log.info("Admin password verified.");
             } else {
-                admin.setPassword(passwordEncoder.encode("root@123"));
-                if (!hasRoleAdmin) {
-                    admin.getRoles().add(adminRole);
+                String envAdminPassword = System.getenv("ADMIN_INIT_PASSWORD");
+                if (envAdminPassword != null && !envAdminPassword.isBlank()) {
+                    admin.setPassword(passwordEncoder.encode(envAdminPassword));
+                    if (!hasRoleAdmin) {
+                        admin.getRoles().add(adminRole);
+                    }
+                    userRepository.save(admin);
+                    log.info("Admin password updated using environment variable configuration.");
+                } else {
+                    log.warn("Admin password is non-standard or missing ROLE_ADMIN, but ADMIN_INIT_PASSWORD env var is not set. Skipping automatic password overwrite.");
                 }
-                userRepository.save(admin);
-                log.info("Admin password repaired.");
             }
         };
     }

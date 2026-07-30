@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { knowledgeService } from '../../services/knowledgeService'
-import useToast from '../../hooks/useToast'
+import { useToast } from '../../hooks/useToast'
 
 export default function Collections() {
   const { success, error } = useToast()

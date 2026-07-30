@@ -1,32 +1,10 @@
-import axios from 'axios'
-import { API_BASE_URL } from '../constants/api'
+import httpClient from '../api/httpClient'
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
-
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    if (config.data instanceof FormData) {
-      delete config.headers['Content-Type']
-      delete config.headers.common?.['Content-Type']
-      delete config.headers.post?.['Content-Type']
-    }
-    return config
-  },
-  (error) => Promise.reject(error)
-)
+const api = httpClient
 
 export const RagApi = {
-  chat: (message) => api.post('/ai/chat', { message }).then(r => r.data?.data || r.data),
-  streamChat: (message) => api.post('/ai/chat/stream', { message }, { responseType: 'stream' }).then(r => r.data),
+  chat: (question, courseId) => api.post('/rag/chat', { question, courseId }).then(r => r.data?.data || r.data),
+  streamChat: (question, courseId) => api.post('/rag/chat/stream', { question, courseId }, { responseType: 'stream' }).then(r => r.data),
   reindex: (id) => api.post(`/rag/reindex/${id}`).then(r => r.data?.data || r.data),
   reindexAll: () => api.post('/rag/reindex-all').then(r => r.data?.data || r.data),
 }
@@ -112,7 +90,10 @@ export const SubmissionApi = {
   search: (params) => api.get('/submissions/search', { params }).then(r => r.data?.data || r.data),
   getByAssignment: (assignmentId, params) => api.get(`/submissions/assignment/${assignmentId}`, { params }).then(r => r.data?.data || r.data),
   get: (id) => api.get(`/submissions/${id}`).then(r => r.data?.data || r.data),
-  create: (data) => api.post('/submissions', data).then(r => r.data?.data || r.data),
+  create: (data, assignmentId) => {
+    const aid = assignmentId || data?.assignmentId
+    return api.post('/submissions', data, { params: aid ? { assignmentId: aid } : {} }).then(r => r.data?.data || r.data)
+  },
 }
 
 export const CourseApi = {

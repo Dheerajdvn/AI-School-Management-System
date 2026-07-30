@@ -14,11 +14,20 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.data.jpa.repository.EntityGraph;
+import java.util.Optional;
+
 /**
  * Repository for Document entity.
  */
 @Repository
 public interface DocumentRepository extends JpaRepository<Document, Long>, JpaSpecificationExecutor<Document> {
+
+    @EntityGraph(attributePaths = {"uploadedBy", "course"})
+    Page<Document> findAll(org.springframework.data.jpa.domain.Specification<Document> spec, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"uploadedBy", "course"})
+    Optional<Document> findById(Long id);
 
     Page<Document> findByCourseId(Long courseId, Pageable pageable);
 

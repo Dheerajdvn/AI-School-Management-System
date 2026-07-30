@@ -42,6 +42,11 @@ public class SecurityConfig {
     private String allowedOriginsConfig;
 
     @Bean
+    public org.springframework.web.filter.ForwardedHeaderFilter forwardedHeaderFilter() {
+        return new org.springframework.web.filter.ForwardedHeaderFilter();
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -51,7 +56,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/ai/health").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**").permitAll()
-                        .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
+                        .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/actuator/**").hasAnyAuthority("ROLE_SUPER_ADMIN", "ROLE_ADMIN")
                         .requestMatchers("/uploads/**").permitAll()
                         .anyRequest().authenticated()

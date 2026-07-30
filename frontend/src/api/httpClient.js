@@ -5,6 +5,7 @@ import { tokenStore, resolveTokenExpiry } from './tokenStore'
 const httpClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: API_TIMEOUT_MS,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -14,10 +15,9 @@ let refreshPromise = null
 
 const refreshAccessToken = async () => {
   const refreshToken = tokenStore.getRefreshToken()
-  if (!refreshToken) return null
-
   const response = await axios.post(`${API_BASE_URL}/auth/refresh`, { refreshToken }, {
     timeout: API_TIMEOUT_MS,
+    withCredentials: true,
   })
   const payload = response.data?.data || response.data
   const expiry = resolveTokenExpiry(payload)

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import useToast from '../../hooks/useToast'
+import { useToast } from '../../hooks/useToast'
 
 export default function ViewResults() {
   const { success: showSuccess } = useToast()

@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -53,7 +54,10 @@ public class UserController {
             @RequestParam(value = "sortBy", defaultValue = "username") String sortBy,
             @RequestParam(value = "direction", defaultValue = "asc") String direction
     ) {
-        Pageable pageable = PageRequest.of(page, size);
+        Set<String> allowedSortFields = Set.of("id", "username", "email", "createdAt", "updatedAt", "enabled");
+        String validSortBy = allowedSortFields.contains(sortBy) ? sortBy : "id";
+        Sort.Direction sortDir = "desc".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, Math.min(size, 100), Sort.by(sortDir, validSortBy));
         return ApiResponse.success(userService.listUsers(q, role, pageable));
     }
 

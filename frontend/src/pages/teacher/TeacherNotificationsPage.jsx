@@ -119,10 +119,6 @@ export default function TeacherNotificationsPage() {
           ))}
         </div>
       )}
-
-      <style>{`
-        .notification-card:hover { transform: translateX(4px); border-color: var(--primary) !important; }
-      `}</style>
     </div>
   )
 }

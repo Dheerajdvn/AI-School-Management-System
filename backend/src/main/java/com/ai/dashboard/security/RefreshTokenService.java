@@ -18,36 +18,73 @@ public class RefreshTokenService {
     private static final String USER_TOKENS_PREFIX = "user_tokens:";
     private static final long REFRESH_TOKEN_EXPIRY = 7; // 7 days
 
+    private final java.util.Map<String, Long> memoryStore = new java.util.concurrent.ConcurrentHashMap<>();
+
     public String createRefreshToken(Long userId) {
         String refreshToken = UUID.randomUUID().toString();
-        String key = REFRESH_TOKEN_PREFIX + refreshToken;
-        redisTemplate.opsForValue().set(key, userId.toString(), REFRESH_TOKEN_EXPIRY, TimeUnit.DAYS);
-        redisTemplate.opsForSet().add(USER_TOKENS_PREFIX + userId, refreshToken);
+        try {
+            if (redisTemplate != null && redisTemplate.getConnectionFactory() != null) {
+                String key = REFRESH_TOKEN_PREFIX + refreshToken;
+                redisTemplate.opsForValue().set(key, userId.toString(), REFRESH_TOKEN_EXPIRY, TimeUnit.DAYS);
+                redisTemplate.opsForSet().add(USER_TOKENS_PREFIX + userId, refreshToken);
+            }
+        } catch (Exception e) {
+            // Fallback to memory store if Redis is unavailable
+        }
+        memoryStore.put(refreshToken, userId);
         return refreshToken;
     }
 
     public Long validateRefreshToken(String refreshToken) {
-        String key = REFRESH_TOKEN_PREFIX + refreshToken;
-        String userId = redisTemplate.opsForValue().get(key);
-        return userId != null ? Long.valueOf(userId) : null;
+        if (refreshToken == null || refreshToken.isBlank()) {
+            return null;
+        }
+        try {
+            if (redisTemplate != null && redisTemplate.getConnectionFactory() != null) {
+                String key = REFRESH_TOKEN_PREFIX + refreshToken;
+                String userId = redisTemplate.opsForValue().get(key);
+                if (userId != null) {
+                    return Long.valueOf(userId);
+                }
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+        return memoryStore.get(refreshToken);
     }
 
     public void revokeRefreshToken(String refreshToken) {
-        String key = REFRESH_TOKEN_PREFIX + refreshToken;
-        String userId = redisTemplate.opsForValue().get(key);
-        if (userId != null) {
-            redisTemplate.delete(key);
-            redisTemplate.opsForSet().remove(USER_TOKENS_PREFIX + userId, refreshToken);
+        if (refreshToken == null) return;
+        memoryStore.remove(refreshToken);
+        try {
+            if (redisTemplate != null && redisTemplate.getConnectionFactory() != null) {
+                String key = REFRESH_TOKEN_PREFIX + refreshToken;
+                String userId = redisTemplate.opsForValue().get(key);
+                if (userId != null) {
+                    redisTemplate.delete(key);
+                    redisTemplate.opsForSet().remove(USER_TOKENS_PREFIX + userId, refreshToken);
+                }
+            }
+        } catch (Exception e) {
+            // ignore
         }
     }
 
     public void revokeAllUserTokens(Long userId) {
-        String userTokensKey = USER_TOKENS_PREFIX + userId;
-        var tokens = redisTemplate.opsForSet().members(userTokensKey);
-        if (tokens != null) {
-            tokens.forEach(token -> redisTemplate.delete(REFRESH_TOKEN_PREFIX + token));
+        if (userId == null) return;
+        memoryStore.values().removeIf(id -> id.equals(userId));
+        try {
+            if (redisTemplate != null && redisTemplate.getConnectionFactory() != null) {
+                String userTokensKey = USER_TOKENS_PREFIX + userId;
+                var tokens = redisTemplate.opsForSet().members(userTokensKey);
+                if (tokens != null) {
+                    tokens.forEach(token -> redisTemplate.delete(REFRESH_TOKEN_PREFIX + token));
+                }
+                redisTemplate.delete(userTokensKey);
+            }
+        } catch (Exception e) {
+            // ignore
         }
-        redisTemplate.delete(userTokensKey);
     }
 
     public String generateAccessTokenFromRefreshToken(String refreshToken) {

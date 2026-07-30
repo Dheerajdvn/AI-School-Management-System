@@ -66,4 +66,11 @@ public interface RagService {
      * Reindex all documents in the system.
      */
     void reindexAll();
+
+    /**
+     * Check if vector store and AI services are reachable.
+     *
+     * @return true if healthy
+     */
+    boolean health();
 }

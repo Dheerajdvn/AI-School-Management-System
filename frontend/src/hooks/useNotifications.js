@@ -5,7 +5,7 @@ import { notificationSocket } from '../services/notificationSocket'
 
 export function useNotifications() {
   const { user } = useAuth()
-  const { success, info } = useToastContext()
+  const { info } = useToastContext()
   const [notifications, setNotifications] = useState([])
   const [unreadCount, setUnreadCount] = useState(0)
 
@@ -56,5 +56,3 @@ export function useNotifications() {
     disconnect,
   }
 }
-
-export default useNotifications

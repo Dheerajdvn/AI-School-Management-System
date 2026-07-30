@@ -18,7 +18,8 @@ import java.time.LocalDateTime;
     @Index(name = "idx_document_uploaded_by", columnList = "uploaded_by"),
     @Index(name = "idx_document_course", columnList = "course_id"),
     @Index(name = "idx_document_type", columnList = "document_type"),
-    @Index(name = "idx_document_processing_status", columnList = "processing_status")
+    @Index(name = "idx_document_processing_status", columnList = "processing_status"),
+    @Index(name = "idx_document_course_status", columnList = "course_id, processing_status")
 })
 @Getter
 @Setter

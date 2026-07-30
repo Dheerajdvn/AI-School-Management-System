@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { aiChatService } from '../../services/aiService'
-import useToast from '../../hooks/useToast'
+import { useToast } from '../../hooks/useToast'
 
 export default function AIChat() {
   const [messages, setMessages] = useState([

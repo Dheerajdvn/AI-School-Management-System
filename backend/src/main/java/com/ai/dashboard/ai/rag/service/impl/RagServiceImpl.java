@@ -301,7 +301,6 @@ public class RagServiceImpl implements RagService {
     }
 
     @Override
-    @Transactional
     public void reindexDocument(Long documentId) {
         log.info("Reindexing document {}", documentId);
 
@@ -312,25 +311,10 @@ public class RagServiceImpl implements RagService {
             Document document = documentRepository.findById(documentId)
                     .orElseThrow(() -> new RagException("Document not found: " + documentId));
 
-            documentChunkRepository.deleteByDocumentId(documentId);
-            log.info("Deleted existing chunks for document {}", documentId);
-
             List<String> chunks = chunkText(content.getExtractedText());
             log.info("Generated {} chunks for document {}", chunks.size(), documentId);
 
-            int chunkIndex = 0;
-            for (String chunkText : chunks) {
-                int tokenCount = estimateTokenCount(chunkText);
-                DocumentChunk chunk = DocumentChunk.builder()
-                        .documentId(documentId)
-                        .chunkIndex(chunkIndex)
-                        .content(chunkText)
-                        .tokenCount(tokenCount)
-                        .embeddingGenerated(false)
-                        .build();
-                documentChunkRepository.save(chunk);
-                chunkIndex++;
-            }
+            saveDocumentChunks(documentId, chunks);
 
             embedAndStoreChunks(documentId, document);
             log.info("Reindex completed for document {}", documentId);
@@ -340,23 +324,48 @@ public class RagServiceImpl implements RagService {
         }
     }
 
-    @Override
     @Transactional
-    public void reindexAll() {
-        log.info("Reindexing all documents");
+    public void saveDocumentChunks(Long documentId, List<String> chunks) {
+        documentChunkRepository.deleteByDocumentId(documentId);
+        log.info("Deleted existing chunks for document {}", documentId);
 
-        List<Document> documents = documentRepository.findAll();
-        log.info("Found {} documents to reindex", documents.size());
-
-        for (Document doc : documents) {
-            try {
-                reindexDocument(doc.getId());
-            } catch (Exception e) {
-                log.warn("Failed to reindex document {}: {}", doc.getId(), e.getMessage());
-            }
+        int chunkIndex = 0;
+        for (String chunkText : chunks) {
+            int tokenCount = estimateTokenCount(chunkText);
+            DocumentChunk chunk = DocumentChunk.builder()
+                    .documentId(documentId)
+                    .chunkIndex(chunkIndex)
+                    .content(chunkText)
+                    .tokenCount(tokenCount)
+                    .embeddingGenerated(false)
+                    .build();
+            documentChunkRepository.save(chunk);
+            chunkIndex++;
         }
+    }
 
-        log.info("Reindex all completed");
+    @Override
+    @org.springframework.scheduling.annotation.Async("documentProcessingExecutor")
+    public void reindexAll() {
+        log.info("Starting background reindex of all documents");
+
+        int pageSize = 50;
+        int page = 0;
+        org.springframework.data.domain.Page<Document> docPage;
+
+        do {
+            docPage = documentRepository.findAll(org.springframework.data.domain.PageRequest.of(page, pageSize));
+            for (Document doc : docPage.getContent()) {
+                try {
+                    reindexDocument(doc.getId());
+                } catch (Exception e) {
+                    log.warn("Failed to reindex document {}: {}", doc.getId(), e.getMessage());
+                }
+            }
+            page++;
+        } while (docPage.hasNext());
+
+        log.info("Background reindex-all completed successfully");
     }
 
     // ------------------------------------------------------------------
@@ -369,11 +378,15 @@ public class RagServiceImpl implements RagService {
             return chunks;
         }
 
-        String[] words = text.split("\\s+");
+        String[] words = text.trim().split("\\s+");
         int totalWords = words.length;
-        int start = 0;
+        if (totalWords <= CHUNK_SIZE) {
+            chunks.add(String.join(" ", words));
+            return chunks;
+        }
 
-        while (start < totalWords) {
+        int step = CHUNK_SIZE - CHUNK_OVERLAP;
+        for (int start = 0; start < totalWords; start += step) {
             int end = Math.min(start + CHUNK_SIZE, totalWords);
             StringBuilder chunk = new StringBuilder();
             for (int i = start; i < end; i++) {
@@ -383,8 +396,7 @@ public class RagServiceImpl implements RagService {
                 chunk.append(words[i]);
             }
             chunks.add(chunk.toString());
-            start = end - CHUNK_OVERLAP;
-            if (start >= totalWords - CHUNK_OVERLAP) {
+            if (end == totalWords) {
                 break;
             }
         }
@@ -467,5 +479,15 @@ public class RagServiceImpl implements RagService {
                 "Question:\n" +
                 question + "\n\n" +
                 "Answer:";
+    }
+
+    @Override
+    public boolean health() {
+        try {
+            return vectorStoreService.health();
+        } catch (Exception e) {
+            log.warn("RAG health check failed: {}", e.getMessage());
+            return false;
+        }
     }
 }

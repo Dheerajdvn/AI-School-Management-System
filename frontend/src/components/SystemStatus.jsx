@@ -18,31 +18,42 @@ const SystemStatus = () => {
   const checkStatus = async () => {
     setLoading(true)
     try {
-      const apiRes = await fetch(window.location.origin + '/api/actuator/health')
-        .then(r => r.ok ? 'healthy' : 'degraded')
-        .catch(() => 'healthy')
-      const aiRes = await AiApi.health()
-        .then(() => 'healthy')
-        .catch(() => 'healthy')
-      const dbRes = await DashboardApi.totals()
-        .then(() => 'healthy')
-        .catch(() => 'healthy')
-
+      const response = await fetch(window.location.origin + '/api/actuator/health')
+      const data = await response.json()
+      
+      const apiStatus = data.status === 'UP' ? 'healthy' : 'degraded'
+      const dbStatus = data.components?.db?.status === 'UP' ? 'healthy' : 'degraded'
+      const redisStatus = data.components?.redis?.status === 'UP' ? 'healthy' : 'degraded'
+      const ollamaStatus = data.components?.ollama?.status === 'UP' ? 'healthy' : 'degraded'
+      
       setStatus({
-        api: apiRes,
-        database: dbRes,
-        redis: 'healthy',
-        ollama: aiRes,
-        qdrant: 'healthy'
+        api: apiStatus,
+        database: dbStatus,
+        redis: redisStatus,
+        ollama: ollamaStatus,
+        qdrant: apiStatus === 'healthy' ? 'healthy' : 'degraded'
       })
     } catch (e) {
-      setStatus({
-        api: 'healthy',
-        database: 'healthy',
-        redis: 'healthy',
-        ollama: 'healthy',
-        qdrant: 'healthy'
-      })
+      // Actuator might return 503 status code when down, try to parse JSON if response is available
+      try {
+        const response = await fetch(window.location.origin + '/api/actuator/health')
+        const data = await response.json()
+        setStatus({
+          api: data.status === 'UP' ? 'healthy' : 'degraded',
+          database: data.components?.db?.status === 'UP' ? 'healthy' : 'degraded',
+          redis: data.components?.redis?.status === 'UP' ? 'healthy' : 'degraded',
+          ollama: data.components?.ollama?.status === 'UP' ? 'healthy' : 'degraded',
+          qdrant: data.status === 'UP' ? 'healthy' : 'degraded'
+        })
+      } catch (err) {
+        setStatus({
+          api: 'degraded',
+          database: 'degraded',
+          redis: 'degraded',
+          ollama: 'degraded',
+          qdrant: 'degraded'
+        })
+      }
     } finally {
       setLoading(false)
     }

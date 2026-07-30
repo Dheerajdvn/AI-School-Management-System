@@ -1,0 +1,214 @@
+.sp-page .stat-card {
+  display: flex;
+  align-items: center;
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+  gap: var(--space-4);
+}
+
+.sp-page .stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+
+.sp-page .stat-card.gradient-card.blue {
+  border-color: rgba(59,130,246,0.3);
+  background: linear-gradient(135deg, rgba(59,130,246,0.1), transparent);
+}
+.sp-page .stat-card.gradient-card.green {
+  border-color: rgba(16,185,129,0.3);
+  background: linear-gradient(135deg, rgba(16,185,129,0.1), transparent);
+}
+.sp-page .stat-card.gradient-card.orange {
+  border-color: rgba(245,158,11,0.3);
+  background: linear-gradient(135deg, rgba(245,158,11,0.1), transparent);
+}
+.sp-page .stat-card.gradient-card.purple {
+  border-color: rgba(139,92,246,0.3);
+  background: linear-gradient(135deg, rgba(139,92,246,0.1), transparent);
+}
+.sp-page .stat-card.gradient-card.red {
+  border-color: rgba(239,68,68,0.3);
+  background: linear-gradient(135deg, rgba(239,68,68,0.1), transparent);
+}
+.sp-page .stat-card.gradient-card.cyan {
+  border-color: rgba(6,182,212,0.3);
+  background: linear-gradient(135deg, rgba(6,182,212,0.1), transparent);
+}
+
+.sp-page .stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  background: var(--hover);
+  flex-shrink: 0;
+}
+
+.sp-page .stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.sp-page .stat-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sp-page .stat-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+.sp-page .chart-card {
+  background: var(--card);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.sp-page .card-header-custom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.sp-page .card-header-custom h5 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.sp-page .chart-body {
+  padding: var(--space-4);
+}
+
+.sp-page .chart-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 160px;
+}
+
+.sp-page .chart-bar-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.sp-page .chart-bar {
+  width: 100%;
+  max-width: 28px;
+  border-radius: 4px 4px 0 0;
+  position: relative;
+  transition: height 0.5s ease;
+  min-height: 4px;
+}
+
+.sp-page .chart-bar.green {
+  background: var(--primary);
+}
+.sp-page .chart-bar.blue {
+  background: var(--accent);
+}
+.sp-page .chart-bar.orange {
+  background: #f59e0b;
+}
+
+.sp-page .chart-tooltip {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.65rem;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 2px 6px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.sp-page .chart-bar:hover .chart-tooltip {
+  opacity: 1;
+}
+
+.sp-page .chart-label {
+  font-size: 0.6rem;
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.sp-page .deadline-item,
+.sp-page .class-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.sp-page .deadline-item:last-child,
+.sp-page .class-item:last-child {
+  border-bottom: none;
+}
+
+.sp-page .deadline-info,
+.sp-page .class-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.sp-page .deadline-info strong,
+.sp-page .class-info strong {
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.sp-page .deadline-info span,
+.sp-page .class-info span {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.sp-page .deadline-date,
+.sp-page .class-time {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.sp-page .class-room {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.sp-page .skeleton-card {
+  height: 80px;
+  border-radius: var(--radius-card);
+  background: var(--hover);
+  animation: spPulse 1.5s infinite;
+}
+
+@keyframes spPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}

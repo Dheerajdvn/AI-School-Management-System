@@ -78,7 +78,8 @@ class CourseServiceImplTest {
         User teacher = buildTeacher(1L);
         when(userRepository.findById(1L)).thenReturn(Optional.of(teacher));
         when(courseRepository.existsByCourseCode("CS101")).thenReturn(false);
-        CourseRequest request = TestBuilders.buildCourseRequest("CS101", "Title", "Desc", 1L, "INACTIVE");
+        when(courseRepository.save(any(Course.class))).thenAnswer(i -> i.getArgument(0));
+        CourseRequest request = TestBuilders.buildCourseRequest("CS101", "Title", "Desc", 1L, "INVALID_STATUS");
         assertThrows(BadRequestException.class, () -> courseService.createCourse(request, 1L, "ROLE_TEACHER"));
     }
 
@@ -167,6 +168,11 @@ class CourseServiceImplTest {
             java.lang.reflect.Method method = CourseServiceImpl.class.getDeclaredMethod("parseStatus", String.class);
             method.setAccessible(true);
             return (Course.Status) method.invoke(service, status);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            if (e.getCause() instanceof RuntimeException re) {
+                throw re;
+            }
+            throw new RuntimeException(e.getCause());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -52,4 +52,8 @@ public class ConversationSession {
     @Column(name = "total_tokens")
     @Builder.Default
     private Integer totalTokens = 0;
+
+    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private java.util.List<ChatMessage> messages = new java.util.ArrayList<>();
 }

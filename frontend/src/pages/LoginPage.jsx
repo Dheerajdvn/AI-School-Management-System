@@ -171,43 +171,13 @@ export default function LoginPage() {
             >
               {/* Header Branding */}
               <div className="text-center mb-4">
-                <div className="d-inline-flex p-3 rounded-4 mb-3 text-white shadow-glow-lg" style={{ background: 'linear-gradient(135deg, #6366F1 0%, #0EA5E9 100%)' }}>
+                <div className="d-inline-flex p-3 rounded-4 mb-3 text-white" style={{ backgroundColor: 'var(--primary)' }}>
                   <i className="bi bi-mortarboard-fill fs-2" />
                 </div>
                 <h3 className="fw-extrabold mb-1.5 tracking-tight" style={{ fontSize: '24px', color: 'var(--text)' }}>Welcome Back</h3>
                 <p className="text-muted small mb-0">Sign in to access AI School OS Command Center</p>
               </div>
 
-              {/* Quick Demo Credentials Autofill Selector */}
-              <div className="mb-4 p-3 rounded-3 border" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}>
-                <div className="d-flex justify-content-between align-items-center mb-2">
-                  <span className="x-small text-uppercase tracking-wider text-muted fw-semibold" style={{ fontSize: '10px' }}>Quick Demo Login:</span>
-                  <span className="badge rounded-pill x-small" style={{ fontSize: '9px', backgroundColor: 'rgba(99, 102, 241, 0.12)', color: '#6366f1', border: '1px solid rgba(99, 102, 241, 0.2)' }}>1-Click Fill</span>
-                </div>
-                <div className="d-flex flex-wrap gap-1.5">
-                  {[
-                    { role: 'Super Admin', u: 'admin', p: 'admin123' },
-                    { role: 'School Admin', u: 'schooladmin', p: 'admin123' },
-                    { role: 'Teacher', u: 'teacher', p: 'teacher123' },
-                    { role: 'Student', u: 'student', p: 'student123' }
-                  ].map(item => (
-                    <button
-                      key={item.role}
-                      type="button"
-                      className={`btn btn-xs rounded-pill px-2.5 py-1 font-medium transition-all ${activeDemoRole === item.role ? 'btn-primary' : 'btn-outline-secondary'}`}
-                      style={{ 
-                        fontSize: '11px', 
-                        backgroundColor: activeDemoRole === item.role ? '#4f46e5' : 'var(--hover)',
-                        borderColor: activeDemoRole === item.role ? '#4f46e5' : 'var(--border)',
-                        color: activeDemoRole === item.role ? '#ffffff' : 'var(--text)'
-                      }}
-                      onClick={() => fillDemoRole(item.role, item.u, item.p)}
-                    >
-                      {item.role}
-                    </button>
-                  ))}
-                </div>
-              </div>
 
               {/* Error Alert */}
               {error && (
@@ -320,58 +290,6 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-
-      <style>{`
-        .style-login-input {
-          background-color: var(--input-bg) !important;
-          border: 1px solid var(--input-border) !important;
-          color: var(--text) !important;
-          font-size: 14px;
-          transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-        .style-login-input:focus {
-          background-color: var(--input-bg) !important;
-          border-color: #6366f1 !important;
-          box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25) !important;
-          color: var(--text) !important;
-        }
-        .style-login-input::placeholder {
-          color: var(--muted) !important;
-          opacity: 0.7;
-        }
-        .login-btn-primary {
-          height: 52px;
-          border-radius: 14px;
-          background: linear-gradient(135deg, #6366F1 0%, #0EA5E9 100%);
-          color: #FFFFFF !important;
-          font-weight: 600;
-          font-size: 16px;
-          border: none;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          text-decoration: none;
-          box-shadow: 0 8px 24px -4px rgba(99, 102, 241, 0.45);
-          transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
-          cursor: pointer;
-        }
-        .login-btn-primary:hover {
-          transform: translateY(-2px) scale(1.02);
-          box-shadow: 0 14px 32px -4px rgba(99, 102, 241, 0.65);
-          color: #FFFFFF !important;
-        }
-        .login-btn-primary:active {
-          transform: translateY(0px) scale(0.98);
-        }
-        .style-checkbox {
-          background-color: var(--input-bg);
-          border-color: var(--border);
-        }
-        .style-checkbox:checked {
-          background-color: #6366f1;
-          border-color: #6366f1;
-        }
-      `}</style>
     </div>
   )
 }

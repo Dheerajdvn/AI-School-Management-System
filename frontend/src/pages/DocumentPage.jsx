@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { DocumentApi, CourseApi } from '../services/api'
 import LoadingIndicator from '../components/LoadingIndicator'
 import Pagination from '../components/Pagination'
-import useToast from '../hooks/useToast'
+import { useToast } from '../hooks/useToast'
 
 export default function DocumentPage() {
   const { success: showSuccess, error: showError } = useToast()
@@ -535,20 +535,6 @@ export default function DocumentPage() {
           </div>
         </div>
       )}
-
-      <style>{`
-        .modal-backdrop-custom {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.6);
-          backdrop-filter: blur(4px);
-          z-index: 1050;
-          padding: 1rem;
-        }
-      `}</style>
     </div>
   )
 }

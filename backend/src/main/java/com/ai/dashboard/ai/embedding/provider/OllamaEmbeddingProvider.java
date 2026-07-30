@@ -75,27 +75,13 @@ public class OllamaEmbeddingProvider implements EmbeddingProvider {
             return Collections.emptyList();
         }
 
-        // Process in batches
-        int batchSize = properties.getBatchSize();
+        Map<String, List<Float>> cache = new HashMap<>();
         List<List<Float>> results = new ArrayList<>(texts.size());
-        
-        List<String> uniqueTexts = texts.stream()
-                .filter(Objects::nonNull)
-                .map(this::normalizeText)
-                .distinct()
-                .collect(Collectors.toList());
 
-        for (int i = 0; i < uniqueTexts.size(); i += batchSize) {
-            int end = Math.min(i + batchSize, uniqueTexts.size());
-            List<String> batch = uniqueTexts.subList(i, end);
-            
-            log.debug("Processing batch {}/{} (size={})", 
-                    (i / batchSize + 1), 
-                    (uniqueTexts.size() + batchSize - 1) / batchSize,
-                    batch.size());
-
-            List<List<Float>> batchResults = generateBatch(batch);
-            results.addAll(batchResults);
+        for (String text : texts) {
+            String normalized = normalizeText(text);
+            List<Float> embedding = cache.computeIfAbsent(normalized, this::generateEmbedding);
+            results.add(embedding);
         }
 
         return results;

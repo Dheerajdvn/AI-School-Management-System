@@ -15,7 +15,8 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "document_chunks", indexes = {
     @Index(name = "idx_docchunk_document", columnList = "document_id"),
-    @Index(name = "idx_docchunk_embedding", columnList = "embedding_generated")
+    @Index(name = "idx_docchunk_embedding", columnList = "embedding_generated"),
+    @Index(name = "idx_docchunk_doc_index", columnList = "document_id, chunk_index")
 })
 @Data
 @Builder
@@ -27,8 +28,21 @@ public class DocumentChunk {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "document_id", nullable = false)
-    private Long documentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "document_id", nullable = false)
+    private com.ai.dashboard.document.entity.Document document;
+
+    public Long getDocumentId() {
+        return document != null ? document.getId() : null;
+    }
+
+    public void setDocumentId(Long documentId) {
+        if (documentId != null) {
+            this.document = com.ai.dashboard.document.entity.Document.builder().id(documentId).build();
+        } else {
+            this.document = null;
+        }
+    }
 
     @Column(name = "chunk_index", nullable = false)
     private Integer chunkIndex;
@@ -47,4 +61,13 @@ public class DocumentChunk {
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    public static class DocumentChunkBuilder {
+        public DocumentChunkBuilder documentId(Long documentId) {
+            if (documentId != null) {
+                this.document = com.ai.dashboard.document.entity.Document.builder().id(documentId).build();
+            }
+            return this;
+        }
+    }
 }

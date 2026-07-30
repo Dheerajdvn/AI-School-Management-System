@@ -53,7 +53,7 @@ const SubmissionTable = ({
                 <tr key={s.id}>
                   <td className="ps-3">
                     <div className="d-flex align-items-center gap-2">
-                      <div className="avatar-circle-sm bg-primary bg-opacity-20 text-primary fw-bold" style={{ width: '32px', height: '32px', fontSize: '12px' }}>
+                      <div className="avatar-circle bg-primary bg-opacity-20 text-primary fw-bold" style={{ width: '32px', height: '32px', fontSize: '12px' }}>
                         {(s.studentName || 'S').charAt(0).toUpperCase()}
                       </div>
                       <div>

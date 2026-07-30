@@ -39,3 +39,8 @@ app:
   jwt:
     secret: ${JWT_SECRET}
     expiration: ${JWT_EXPIRATION:86400000}
+
+management:
+  endpoint:
+    health:
+      show-details: when-authorized

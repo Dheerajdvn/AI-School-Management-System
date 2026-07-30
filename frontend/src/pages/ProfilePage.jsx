@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../context/AuthContext'
-import useToast from '../hooks/useToast'
+import { useToast } from '../hooks/useToast'
 import LoadingIndicator from '../components/LoadingIndicator'
 import { UserApi } from '../services/api'
+import { useTheme } from '../context/ThemeContext'
 
 /**
  * Enterprise Production Profile Module with Profile Photo Upload & Dark Theme Alignment.
  * Includes Personal Details, Security & Password, Preferences, and Activity Log.
  */
 export default function ProfilePage() {
+  const { theme: globalTheme, setTheme } = useTheme()
   const { user } = useAuth()
   const { success: showSuccess, error: showError } = useToast()
   const [activeTab, setActiveTab] = useState('personal')
@@ -41,12 +43,16 @@ export default function ProfilePage() {
 
   // Preferences State
   const [preferences, setPreferences] = useState({
-    theme: 'dark',
+    theme: globalTheme || 'light',
     emailNotifications: true,
     assignmentAlerts: true,
     systemAnnouncements: false,
     language: 'English'
   })
+
+  useEffect(() => {
+    setPreferences(prev => ({ ...prev, theme: globalTheme }))
+  }, [globalTheme])
 
   useEffect(() => {
     if (user) {
@@ -173,8 +179,7 @@ export default function ProfilePage() {
 
   return (
     <div className="container-fluid p-0 animate-fade">
-      {/* Header Banner */}
-      <div className="card border-0 mb-4 overflow-hidden shadow-sm" style={{ background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)', borderRadius: '16px' }}>
+      <div className="card mb-4 overflow-hidden border" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)', borderRadius: '16px' }}>
         <div className="card-body p-4 position-relative">
           <div className="d-flex flex-column flex-md-row align-items-center gap-4">
             {/* Avatar & Photo Upload Trigger */}
@@ -185,7 +190,7 @@ export default function ProfilePage() {
                   width: '96px',
                   height: '96px',
                   fontSize: '2.5rem',
-                  background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                  background: 'var(--primary)',
                   color: '#fff',
                   border: '3px solid rgba(255,255,255,0.2)'
                 }}
@@ -507,11 +512,11 @@ export default function ProfilePage() {
                       <h6 className="fw-bold mb-3" style={{ fontSize: '13px' }}>Interface Theme</h6>
                       <div className="d-flex gap-3">
                         <label className={`btn btn-outline-primary d-flex align-items-center gap-2 flex-grow-1 ${preferences.theme === 'dark' ? 'active' : ''}`}>
-                          <input type="radio" name="theme" checked={preferences.theme === 'dark'} onChange={() => setPreferences({ ...preferences, theme: 'dark' })} hidden />
+                          <input type="radio" name="theme" checked={preferences.theme === 'dark'} onChange={() => { setPreferences({ ...preferences, theme: 'dark' }); setTheme('dark'); }} hidden />
                           <i className="bi bi-moon-stars" /> Dark Mode
                         </label>
                         <label className={`btn btn-outline-secondary d-flex align-items-center gap-2 flex-grow-1 ${preferences.theme === 'light' ? 'active' : ''}`}>
-                          <input type="radio" name="theme" checked={preferences.theme === 'light'} onChange={() => setPreferences({ ...preferences, theme: 'light' })} hidden />
+                          <input type="radio" name="theme" checked={preferences.theme === 'light'} onChange={() => { setPreferences({ ...preferences, theme: 'light' }); setTheme('light'); }} hidden />
                           <i className="bi bi-sun" /> Light Mode
                         </label>
                       </div>
@@ -645,20 +650,6 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
-
-      <style>{`
-        .modal-backdrop-custom {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.6);
-          backdrop-filter: blur(4px);
-          z-index: 1050;
-          padding: 1rem;
-        }
-      `}</style>
     </div>
   )
 }

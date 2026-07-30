@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import StatCard from '../components/StatCard'
 import DashboardSkeleton from '../components/DashboardSkeleton'
-import QuickActions from '../components/QuickActions'
 import RecentActivity from '../components/RecentActivity'
 import SystemStatus from '../components/SystemStatus'
 import DashboardService from '../services/DashboardService'
 import Chart from '../components/Charts'
-import LoadingIndicator from '../components/LoadingIndicator'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
-import useToast from '../hooks/useToast'
+import { useToast } from '../hooks/useToast'
 
 export default function DashboardPage() {
   const { user } = useAuth()
@@ -81,39 +79,72 @@ export default function DashboardPage() {
 
   return (
     <div className="dashboard-page animate-fade">
-      <div className="card p-2 mb-2 position-relative overflow-hidden border-0" style={{ background: 'linear-gradient(135deg, var(--primary) 0%, #3b82f6 100%)', borderRadius: 'var(--radius-card)', minHeight: 'var(--welcome-h, 100px)' }}>
-        <div className="position-absolute top-0 end-0 p-3 opacity-10 d-none d-md-block">
-          <i className="bi bi-cpu display-1 text-white" />
-        </div>
-        <div className="row align-items-center position-relative z-1">
-          <div className="col-lg-8">
-            <div className="badge bg-white text-primary mb-1 px-2 py-0 rounded-pill fw-semibold" style={{ fontSize: '10px' }}>
-              <i className="bi bi-stars me-1" /> AI-Powered School Management OS
-            </div>
-            <h2 className="fw-bold mb-1 text-white" style={{ fontSize: '18px' }}>Welcome back, {user?.username || user?.name || 'Administrator'}</h2>
-            <p className="mb-2 text-white-50" style={{ fontSize: '12px' }}>
-              All systems operational. AI LLM online with real-time analytics.
+      {/* Slim Top Welcome and Actions Banner */}
+      <div className="card p-3 mb-2 border-0 text-white" style={{ backgroundColor: 'var(--primary)', borderRadius: 'var(--radius-card)' }}>
+        <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 position-relative z-1">
+          <div>
+            <h4 className="fw-bold mb-0.5" style={{ fontSize: '15px' }}>
+              Welcome back, {user?.username || user?.name || 'Administrator'}
+            </h4>
+            <p className="mb-0 text-white-50" style={{ fontSize: '11px' }}>
+              All systems operational. AI Core online with real-time analytics.
             </p>
-            <div className="d-flex flex-wrap gap-2">
-              <button className="btn btn-light btn-sm text-primary fw-semibold rounded-pill px-2" onClick={handleLaunchAi} style={{ height: '28px', fontSize: '11px' }}>
-                <i className="bi bi-robot me-1" /> Launch AI Tutor
+          </div>
+          
+          <div className="d-flex align-items-center gap-2 flex-wrap">
+            <button className="btn btn-light btn-sm text-primary fw-semibold rounded-pill px-2.5" onClick={handleLaunchAi} style={{ height: '28px', fontSize: '10px' }}>
+              <i className="bi bi-robot me-1" /> Launch AI Tutor
+            </button>
+            <button className="btn btn-outline-light btn-sm fw-semibold rounded-pill px-2.5" onClick={() => navigate('/knowledge')} style={{ height: '28px', fontSize: '10px' }}>
+              <i className="bi bi-lightbulb me-1" /> Knowledge Center
+            </button>
+
+            {/* Quick Actions Dropdown */}
+            <div className="dropdown">
+              <button 
+                className="btn btn-outline-light btn-sm fw-semibold rounded-pill dropdown-toggle px-2.5" 
+                type="button" 
+                id="quickActionsDropdown" 
+                data-bs-toggle="dropdown" 
+                aria-expanded="false"
+                style={{ height: '28px', fontSize: '10px' }}
+              >
+                <i className="bi bi-lightning-charge-fill me-1" /> Quick Actions
               </button>
-              <button className="btn btn-outline-light btn-sm fw-semibold rounded-pill px-2" onClick={() => navigate('/knowledge')} style={{ height: '28px', fontSize: '11px' }}>
-                <i className="bi bi-lightbulb me-1" /> Knowledge Center
-              </button>
+              <ul className="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="quickActionsDropdown" style={{ fontSize: '11px' }}>
+                <li>
+                  <button className="dropdown-item py-1.5" onClick={() => navigate('/admin/students')}>
+                    <i className="bi bi-person-plus me-2 text-primary" /> Add Student
+                  </button>
+                </li>
+                <li>
+                  <button className="dropdown-item py-1.5" onClick={() => navigate('/admin/courses')}>
+                    <i className="bi bi-book me-2 text-secondary" /> Add Course
+                  </button>
+                </li>
+                <li>
+                  <button className="dropdown-item py-1.5" onClick={() => navigate('/admin/documents')}>
+                    <i className="bi bi-file-earmark-arrow-up me-2 text-info" /> Upload Document
+                  </button>
+                </li>
+                <li>
+                  <hr className="dropdown-divider my-1" />
+                </li>
+                <li>
+                  <button className="dropdown-item py-1.5" onClick={() => navigate('/admin/chat')}>
+                    <i className="bi bi-chat-dots me-2 text-success" /> Open AI Chat
+                  </button>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="d-flex justify-content-between align-items-center mb-2">
-        <div>
-          <h3 className="fw-bold mb-0" style={{ fontSize: '15px' }}>Analytics & Metrics</h3>
-          <p className="text-muted m-0" style={{ fontSize: '12px' }}>Real-time platform overview</p>
-        </div>
-        <div className="d-none d-md-block">
-          <QuickActions />
-        </div>
+      {/* Section Header */}
+      <div className="d-flex align-items-baseline gap-2 mb-2">
+        <h4 className="fw-bold mb-0" style={{ fontSize: '13.5px', color: 'var(--text)' }}>Analytics & Metrics</h4>
+        <span className="text-muted" style={{ fontSize: '11px' }}>— Real-time platform overview</span>
       </div>
 
       {error && (
@@ -131,23 +162,24 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <div className="row g-2 mb-2">
-        <div className="col-sm-6 col-md-4">
+      {/* Condense Stat Cards into a neat responsive row */}
+      <div className="row g-2 mb-3">
+        <div className="col-6 col-md-4 col-xl-2">
           <StatCard label="Total Users" value={totals?.totalUsers ?? totals?.users ?? '—'} icon="bi-people" color="primary" active={selectedMetric === 'Total Users'} onClick={() => handleCardClick('Total Users', '/admin/users')} />
         </div>
-        <div className="col-sm-6 col-md-4">
+        <div className="col-6 col-md-4 col-xl-2">
           <StatCard label="Total Students" value={totals?.students ?? '—'} icon="bi-mortarboard" color="success" active={selectedMetric === 'Total Students'} onClick={() => handleCardClick('Total Students', '/admin/students')} />
         </div>
-        <div className="col-sm-6 col-md-4">
+        <div className="col-6 col-md-4 col-xl-2">
           <StatCard label="Total Teachers" value={totals?.teachers ?? '—'} icon="bi-person-badge" color="info" active={selectedMetric === 'Total Teachers'} onClick={() => handleCardClick('Total Teachers', '/admin/users')} />
         </div>
-        <div className="col-sm-6 col-md-4">
+        <div className="col-6 col-md-4 col-xl-2">
           <StatCard label="Total Courses" value={totals?.courses ?? '—'} icon="bi-journal-bookmark" color="warning" active={selectedMetric === 'Total Courses'} onClick={() => handleCardClick('Total Courses', '/admin/courses')} />
         </div>
-        <div className="col-sm-6 col-md-4">
+        <div className="col-6 col-md-4 col-xl-2">
           <StatCard label="Total Documents" value={totals?.documents ?? '—'} icon="bi-file-earmark-text" color="danger" active={selectedMetric === 'Total Documents'} onClick={() => handleCardClick('Total Documents', '/admin/documents')} />
         </div>
-        <div className="col-sm-6 col-md-4">
+        <div className="col-6 col-md-4 col-xl-2">
           <StatCard label="Total AI Chats" value={totals?.aiChats ?? '—'} icon="bi-chat-dots" color="info" active={selectedMetric === 'Total AI Chats'} onClick={() => handleCardClick('Total AI Chats', '/admin/chat')} />
         </div>
       </div>

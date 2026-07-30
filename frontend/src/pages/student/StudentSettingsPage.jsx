@@ -1,8 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useTheme } from '../../context/ThemeContext'
 
 export default function StudentSettingsPage() {
+  const { theme, setTheme } = useTheme()
   const [settings, setSettings] = useState({
-    theme: 'dark',
+    theme: theme || 'light',
     language: 'en',
     emailNotifications: true,
     pushNotifications: true,
@@ -11,7 +13,16 @@ export default function StudentSettingsPage() {
     profileVisibility: 'school',
   })
 
-  const handleChange = (field, value) => setSettings(prev => ({ ...prev, [field]: value }))
+  useEffect(() => {
+    setSettings(prev => ({ ...prev, theme }))
+  }, [theme])
+
+  const handleChange = (field, value) => {
+    setSettings(prev => ({ ...prev, [field]: value }))
+    if (field === 'theme' && (value === 'light' || value === 'dark')) {
+      setTheme(value)
+    }
+  }
 
   return (
     <div className="ssp-page">

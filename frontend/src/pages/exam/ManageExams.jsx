@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import useToast from '../../hooks/useToast'
+import { useToast } from '../../hooks/useToast'
 
 export default function ManageExams() {
   const { success: showSuccess } = useToast()
@@ -261,35 +261,6 @@ export default function ManageExams() {
           </div>
         </div>
       )}
-
-      <style>{`
-        .modal-overlay-custom {
-          position: fixed;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(0, 0, 0, 0.75);
-          backdrop-filter: blur(8px);
-          z-index: 1060;
-          padding: 1rem;
-        }
-        .style-modal-input {
-          background-color: rgba(255, 255, 255, 0.04) !important;
-          border: 1px solid rgba(255, 255, 255, 0.12) !important;
-          color: #ffffff !important;
-          font-size: 14px;
-          border-radius: 8px !important;
-          padding: 0.6rem 0.85rem;
-        }
-        .style-modal-input:focus {
-          background-color: rgba(255, 255, 255, 0.07) !important;
-          border-color: #6366f1 !important;
-          box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25) !important;
-          color: #ffffff !important;
-        }
-        .style-modal-input option {
-          background-color: #17181b;
-          color: #ffffff;
-        }
-      `}</style>
     </div>
   )
 }

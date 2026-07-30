@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import useToast from '../../hooks/useToast'
+import { useToast } from '../../hooks/useToast'
 
 export default function StudyMaterialsPage() {
   const { success: showSuccess } = useToast()

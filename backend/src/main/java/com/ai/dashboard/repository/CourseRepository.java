@@ -11,11 +11,19 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.EntityGraph;
+
 /**
  * Repository for Course entity with specification support.
  */
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long>, JpaSpecificationExecutor<Course> {
+
+    @EntityGraph(attributePaths = {"teacher"})
+    Page<Course> findAll(org.springframework.data.jpa.domain.Specification<Course> spec, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"teacher"})
+    Optional<Course> findById(Long id);
 
     Optional<Course> findByCourseCode(String courseCode);
 

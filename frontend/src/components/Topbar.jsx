@@ -71,13 +71,14 @@ export default function Topbar({ title, onMenu }) {
         </div>
       </div>
 
-      <div className="topbar-search-wrapper d-none d-lg-flex align-items-center flex-grow-1 mx-4 max-w-400">
+      <div className="topbar-search-wrapper d-none d-lg-flex align-items-center flex-grow-1 mx-4 max-w-400" onClick={() => window.dispatchEvent(new CustomEvent('open-quick-search'))} style={{ cursor: 'pointer' }}>
         <div className="input-group input-group-sm bg-surface rounded-pill border px-3 py-1 w-100 align-items-center">
           <i className="bi bi-search text-muted me-2" />
           <input
             type="text"
             className="form-control border-0 bg-transparent shadow-none p-0 text-body"
             placeholder="Search resources, students, classes, or ask AI..."
+            readOnly
           />
           <kbd className="badge bg-dark text-light border-0 ms-2">⌘K</kbd>
         </div>
@@ -130,9 +131,9 @@ export default function Topbar({ title, onMenu }) {
               }}
             >
               <div
-                className="avatar-circle-sm"
+                className="avatar-circle"
                 style={{
-                  background: 'linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)',
+                  background: 'var(--primary)',
                   color: '#ffffff'
                 }}
               >

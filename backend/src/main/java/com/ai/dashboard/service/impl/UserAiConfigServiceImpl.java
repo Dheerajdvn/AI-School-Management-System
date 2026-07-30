@@ -36,8 +36,13 @@ public class UserAiConfigServiceImpl implements UserAiConfigService {
     @Override
     @Transactional(readOnly = true)
     public UserAiConfigDto getUserConfig(String username) {
-        UserAiConfig config = findOrCreate(username);
-        return toDto(config);
+        if (username != null && !userRepository.existsByUsername(username)) {
+            throw new IllegalArgumentException("User not found: " + username);
+        }
+
+        return configRepository.findByUserUsername(username)
+                .map(this::toDto)
+                .orElseGet(this::defaultConfigDto);
     }
 
     @Override
@@ -168,6 +173,19 @@ public class UserAiConfigServiceImpl implements UserAiConfigService {
                             .build();
                     return configRepository.save(config);
                 });
+    }
+
+    private UserAiConfigDto defaultConfigDto() {
+        return UserAiConfigDto.builder()
+                .provider("Ollama")
+                .baseUrl("http://localhost:11434")
+                .model("qwen2.5-coder:3b")
+                .temperature(0.2)
+                .maxTokens(2048)
+                .streamingEnabled(true)
+                .aiSuggestionsEnabled(true)
+                .isConnected(false)
+                .build();
     }
 
     private UserAiConfigDto toDto(UserAiConfig config) {

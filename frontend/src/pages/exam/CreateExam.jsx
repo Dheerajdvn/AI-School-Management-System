@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import useToast from '../../hooks/useToast'
+import { useToast } from '../../hooks/useToast'
 
 export default function CreateExam() {
   const navigate = useNavigate()
@@ -181,31 +181,6 @@ export default function CreateExam() {
           </div>
         </div>
       </div>
-
-      <style>{`
-        .style-exam-input {
-          background-color: rgba(255, 255, 255, 0.04) !important;
-          border: 1px solid rgba(255, 255, 255, 0.12) !important;
-          color: #ffffff !important;
-          font-size: 14px;
-          border-radius: 10px !important;
-          padding: 0.65rem 0.95rem;
-          transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-        .style-exam-input:focus {
-          background-color: rgba(255, 255, 255, 0.07) !important;
-          border-color: #6366f1 !important;
-          box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25) !important;
-          color: #ffffff !important;
-        }
-        .style-exam-input::placeholder {
-          color: #6b7280 !important;
-        }
-        .style-exam-input option {
-          background-color: #17181b;
-          color: #ffffff;
-        }
-      `}</style>
     </div>
   )
 }

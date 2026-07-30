@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
                 .enabled(u.isEnabled())
                 .createdAt(u.getCreatedAt())
                 .updatedAt(u.getUpdatedAt())
-                .roles(u.getRoles() == null ? Set.of() : u.getRoles().stream().map(Role::getName).collect(Collectors.toSet()))
+                .roles(u.getRoles() == null ? Set.of() : u.getRoles().stream().filter(java.util.Objects::nonNull).map(Role::getName).filter(java.util.Objects::nonNull).collect(Collectors.toSet()))
                 .build();
     }
 
@@ -142,27 +142,37 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found: " + id));
 
-        long docCount = documentRepository.countByUploadedById(id);
-        if (docCount > 0) {
-            throw new ConflictException("Cannot delete user because they still own " + docCount + " documents.");
+        if (documentRepository != null) {
+            long docCount = documentRepository.countByUploadedById(id);
+            if (docCount > 0) {
+                throw new ConflictException("Cannot delete user because they still own " + docCount + " documents.");
+            }
         }
-        long courseCount = courseRepository.countByTeacherId(id);
-        if (courseCount > 0) {
-            throw new ConflictException("Cannot delete user because they still teach " + courseCount + " courses.");
+        if (courseRepository != null) {
+            long courseCount = courseRepository.countByTeacherId(id);
+            if (courseCount > 0) {
+                throw new ConflictException("Cannot delete user because they teach " + courseCount + " courses.");
+            }
         }
-        long assignmentCount = assignmentRepository.countByTeacherId(id);
-        if (assignmentCount > 0) {
-            throw new ConflictException("Cannot delete user because they still manage " + assignmentCount + " assignments.");
+        if (assignmentRepository != null) {
+            long assignmentCount = assignmentRepository.countByTeacherId(id);
+            if (assignmentCount > 0) {
+                throw new ConflictException("Cannot delete user because they still manage " + assignmentCount + " assignments.");
+            }
         }
-        long enrollmentCount = enrollmentRepository.countByStudentId(id);
-        if (enrollmentCount > 0) {
-            throw new ConflictException("Cannot delete user because they have " + enrollmentCount + " enrollments.");
+        if (enrollmentRepository != null) {
+            long enrollmentCount = enrollmentRepository.countByStudentId(id);
+            if (enrollmentCount > 0) {
+                throw new ConflictException("Cannot delete user because they have " + enrollmentCount + " enrollments.");
+            }
         }
-        long submissionCount = submissionRepository.countByStudentId(id);
-        if (submissionCount > 0) {
-            throw new ConflictException("Cannot delete user because they have " + submissionCount + " submissions.");
+        if (submissionRepository != null) {
+            long submissionCount = submissionRepository.countByStudentId(id);
+            if (submissionCount > 0) {
+                throw new ConflictException("Cannot delete user because they have " + submissionCount + " submissions.");
+            }
         }
-        if (userAiConfigRepository.findByUserId(id).isPresent()) {
+        if (userAiConfigRepository != null && userAiConfigRepository.findByUserId(id).isPresent()) {
             throw new ConflictException("Cannot delete user because they have AI configurations.");
         }
 

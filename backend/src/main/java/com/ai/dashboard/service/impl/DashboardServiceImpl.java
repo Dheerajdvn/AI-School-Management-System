@@ -2,6 +2,7 @@ package com.ai.dashboard.service.impl;
 
 import com.ai.dashboard.ai.rag.repository.ChatMessageRepository;
 import com.ai.dashboard.document.repository.DocumentRepository;
+import com.ai.dashboard.document.entity.Document;
 import com.ai.dashboard.dto.*;
 import com.ai.dashboard.entity.*;
 import com.ai.dashboard.exception.AccessDeniedException;
@@ -213,17 +214,16 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     @Transactional(readOnly = true)
     public List<Map<String, Object>> getEnrollmentByCourse() {
-        List<Course> courses = courseRepository.findAll();
-        return courses.stream()
-                .map(course -> {
+        List<Object[]> rows = enrollmentRepository.countEnrollmentsGroupByCourse();
+        return rows.stream()
+                .map(row -> {
                     Map<String, Object> entry = new HashMap<>();
-                    entry.put("label", course.getTitle() != null ? course.getTitle() : course.getCourseCode());
-                    long count = enrollmentRepository.findAll(
-                            EnrollmentSpecifications.hasCourseId(course.getId())
-                    ).stream().count();
+                    String label = row[0] != null ? row[0].toString() : "Course";
+                    long count = ((Number) row[1]).longValue();
                     if (count == 0) {
-                        count = 15L + (Math.abs((course.getTitle() != null ? course.getTitle() : "course").hashCode()) % 15);
+                        count = 15L + (Math.abs(label.hashCode()) % 15);
                     }
+                    entry.put("label", label);
                     entry.put("value", count);
                     return entry;
                 })
@@ -236,23 +236,16 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate now = LocalDate.now();
         LocalDate start = now.minusMonths(months - 1).withDayOfMonth(1);
 
-        List<Enrollment> enrollments = enrollmentRepository.findAll();
+        List<Object[]> rows = enrollmentRepository.countEnrollmentsMonthly(start);
 
-        Map<Integer, Long> countsByMonth = new HashMap<>();
-        for (int i = 0; i < 12; i++) {
-            countsByMonth.put(i, 0L);
-        }
-
-        for (Enrollment enrollment : enrollments) {
-            LocalDate enrollmentDate = enrollment.getEnrollmentDate();
-            if (enrollmentDate != null && !enrollmentDate.isBefore(start)) {
-                int monthIndex = 11 - (int) ChronoUnit.MONTHS.between(
-                        enrollmentDate.withDayOfMonth(1),
-                        now.withDayOfMonth(1)
-                );
-                if (monthIndex >= 0 && monthIndex < 12) {
-                    countsByMonth.merge(monthIndex, 1L, Long::sum);
-                }
+        Map<String, Long> monthKeyToCount = new HashMap<>();
+        for (Object[] row : rows) {
+            if (row[0] != null && row[1] != null && row[2] != null) {
+                int year = ((Number) row[0]).intValue();
+                int monthVal = ((Number) row[1]).intValue();
+                long count = ((Number) row[2]).longValue();
+                String key = String.format("%d-%02d", year, monthVal);
+                monthKeyToCount.put(key, count);
             }
         }
 
@@ -263,8 +256,8 @@ public class DashboardServiceImpl implements DashboardService {
             LocalDate month = now.minusMonths(i).withDayOfMonth(1);
             String label = month.getMonth().name().substring(0, 3) + " " + month.getYear();
             labels.add(label);
-            int monthIndex = 11 - i;
-            values.add(monthIndex < 12 ? countsByMonth.getOrDefault(monthIndex, 0L) : 0L);
+            String key = String.format("%d-%02d", month.getYear(), month.getMonthValue());
+            values.add(monthKeyToCount.getOrDefault(key, 0L));
         }
 
         Map<String, Object> response = new HashMap<>();
@@ -276,18 +269,21 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     @Transactional(readOnly = true)
     public List<Map<String, Object>> getRecentDocuments(int limit) {
-        List<Enrollment> recent = enrollmentRepository.findAll(
-                PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "enrollmentDate"))
-        ).getContent();
+        if (documentRepository == null) {
+            return Collections.emptyList();
+        }
+        PageRequest pageRequest = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "uploadTime"));
+        org.springframework.data.domain.Page<Document> docsPage = documentRepository.findAll(pageRequest);
+        List<Document> recent = docsPage.getContent();
 
-        return recent.stream().map(enrollment -> {
+        return recent.stream().map(doc -> {
             Map<String, Object> map = new HashMap<>();
-            map.put("id", enrollment.getId());
-            String courseCode = (enrollment.getCourse() != null) ? enrollment.getCourse().getCourseCode() : "Unknown";
-            String username = (enrollment.getStudent() != null) ? enrollment.getStudent().getUsername() : "Unknown";
-            map.put("name", "Enrollment: " + courseCode);
-            map.put("uploadTime", enrollment.getEnrollmentDate() != null ? enrollment.getEnrollmentDate().atStartOfDay() : null);
-            map.put("uploadedBy", username);
+            map.put("id", doc.getId());
+            map.put("name", doc.getOriginalFilename());
+            map.put("uploadTime", doc.getUploadTime());
+            map.put("uploadedBy", doc.getUploadedBy() != null ? doc.getUploadedBy().getUsername() : "system");
+            map.put("status", doc.getProcessingStatus() != null ? doc.getProcessingStatus().name() : "PENDING");
+            map.put("type", doc.getDocumentType() != null ? doc.getDocumentType().name() : "OTHER");
             return map;
         }).collect(Collectors.toList());
     }

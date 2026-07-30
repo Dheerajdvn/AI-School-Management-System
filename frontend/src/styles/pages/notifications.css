@@ -1,0 +1,5 @@
+/* Notifications Page Styles */
+.notification-card:hover {
+  transform: translateX(4px);
+  border-color: var(--primary) !important;
+}

@@ -44,5 +44,3 @@ export function useDocumentProcessing() {
     getStatusBadge,
   }
 }
-
-export default useDocumentProcessing

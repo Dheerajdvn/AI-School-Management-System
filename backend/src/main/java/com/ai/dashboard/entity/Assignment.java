@@ -19,7 +19,9 @@ import java.time.LocalDateTime;
     @Index(name = "idx_assignment_course", columnList = "course_id"),
     @Index(name = "idx_assignment_teacher", columnList = "teacher_id"),
     @Index(name = "idx_assignment_status", columnList = "status"),
-    @Index(name = "idx_assignment_due_date", columnList = "due_date")
+    @Index(name = "idx_assignment_due_date", columnList = "due_date"),
+    @Index(name = "idx_assignment_status_course", columnList = "status, course_id"),
+    @Index(name = "idx_assignment_status_teacher", columnList = "status, teacher_id")
 })
 @EntityListeners(AuditingEntityListener.class)
 @Getter

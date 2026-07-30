@@ -76,8 +76,10 @@
 }
 
 .btn-icon {
-  width: 34px;
-  height: 34px;
+  width: 34px !important;
+  height: 34px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -85,6 +87,18 @@
   border: 1px solid var(--border) !important;
   color: var(--muted) !important;
   transition: all 0.15s ease;
+}
+
+.avatar-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50% !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #fff;
+  font-size: 0.75rem;
 }
 
 .btn-icon:hover {

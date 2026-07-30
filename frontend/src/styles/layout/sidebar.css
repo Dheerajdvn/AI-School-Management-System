@@ -151,7 +151,7 @@ body.dark-mode .sidebar-nav-link.active {
 .avatar-circle {
   width: 28px;
   height: 28px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  background: var(--primary);
   color: #fff;
   font-weight: 700;
   border-radius: 50%;

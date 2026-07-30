@@ -131,7 +131,7 @@ class GradeServiceImplTest {
         submission.setObtainedMarks(85);
         when(submissionRepository.findById(1L)).thenReturn(Optional.of(submission));
         when(submissionRepository.save(any(Submission.class))).thenAnswer(i -> i.getArgument(0));
-        GradeResponse response = gradeService.publishGrade(1L, 1L, "ROLE_TEACHER");
+        GradeResponse response = gradeService.publishGrade(1L, 2L, "ROLE_TEACHER");
         assertTrue(response.getPublished());
     }
 
@@ -143,7 +143,7 @@ class GradeServiceImplTest {
         Assignment assignment = buildAssignment(1L, course, teacher, Assignment.Status.PUBLISHED);
         Submission submission = buildSubmission(1L, assignment, student, Submission.Status.SUBMITTED);
         when(submissionRepository.findById(1L)).thenReturn(Optional.of(submission));
-        assertThrows(BadRequestException.class, () -> gradeService.publishGrade(1L, 1L, "ROLE_TEACHER"));
+        assertThrows(BadRequestException.class, () -> gradeService.publishGrade(1L, 2L, "ROLE_TEACHER"));
     }
 
     @Test
@@ -182,6 +182,9 @@ class GradeServiceImplTest {
 
     @Test
     void getStatistics_noGradedSubmissions_returnsEmptyStatistics() {
+        User teacher = buildTeacher(1L);
+        Course course = buildCourse(1L, teacher, Course.Status.ACTIVE);
+        when(courseRepository.findById(1L)).thenReturn(Optional.of(course));
         when(submissionRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class)))
                 .thenReturn(List.of());
         GradeStatistics stats = gradeService.getStatistics(1L, null, 1L, "ROLE_TEACHER");

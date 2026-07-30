@@ -51,8 +51,8 @@ export default function MyCoursesPage() {
                     <span className="small">Progress</span>
                     <span className="small"><strong>{course.progress}%</strong></span>
                   </div>
-                  <div className="progress" style={{ height: '6px', borderRadius: '3px', background: 'rgba(255,255,255,0.1)' }}>
-                    <div className="progress-bar" style={{ width: `${course.progress}%`, background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)', borderRadius: '3px' }} />
+                  <div className="progress" style={{ height: '6px', borderRadius: '3px', backgroundColor: 'var(--hover)' }}>
+                    <div className="progress-bar" style={{ width: `${course.progress}%`, backgroundColor: 'var(--primary)', borderRadius: '3px' }} />
                   </div>
                 </div>
                 <div className="course-stats">
@@ -72,25 +72,6 @@ export default function MyCoursesPage() {
           </div>
         ))}
       </div>
-
-      <style>{mcpStyles}</style>
     </div>
   )
 }
-
-const mcpStyles = `
-.mcp-page .page-header-custom { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
-.mcp-page .page-header-custom h4 { margin: 0; font-weight: 700; }
-.mcp-page .course-card { background: rgba(255,255,255,0.06); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 1.25rem; transition: all 0.3s; display: flex; flex-direction: column; height: 100%; }
-.mcp-page .course-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); border-color: rgba(59,130,246,0.3); }
-.mcp-page .course-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
-.mcp-page .course-icon { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, rgba(59,130,246,0.3), rgba(59,130,246,0.1)); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #60a5fa; flex-shrink: 0; }
-.mcp-page .course-title h5 { margin: 0; font-weight: 600; }
-.mcp-page .course-title span { font-size: 0.8rem; opacity: 0.7; }
-.mcp-page .course-body { flex: 1; }
-.mcp-page .course-stats { font-size: 0.85rem; opacity: 0.8; margin: 0.75rem 0; }
-.mcp-page .course-footer { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-.mcp-page .course-actions { display: flex; gap: 0.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.08); }
-.mcp-page .skeleton-row { height: 180px; border-radius: 16px; background: rgba(255,255,255,0.06); animation: pulse 1.5s infinite; }
-@keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.7; } }
-`

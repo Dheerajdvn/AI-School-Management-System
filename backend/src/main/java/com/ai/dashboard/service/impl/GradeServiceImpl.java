@@ -178,15 +178,16 @@ public class GradeServiceImpl implements GradeService {
             validateTeacherOrAdminAccessForCourse(course, currentUserId, currentUserRole);
         }
 
-        // Get all graded submissions
-        List<Submission> submissions = submissionRepository.findAll(
-                SubmissionSpecifications.hasCourseId(courseId));
-
-        if (assignmentId != null) {
-            submissions = submissions.stream()
-                    .filter(s -> s.getAssignment().getId().equals(assignmentId))
-                    .collect(Collectors.toList());
+        // Build specification for database query
+        org.springframework.data.jpa.domain.Specification<Submission> spec = org.springframework.data.jpa.domain.Specification.where(null);
+        if (courseId != null) {
+            spec = spec.and(SubmissionSpecifications.hasCourseId(courseId));
         }
+        if (assignmentId != null) {
+            spec = spec.and(SubmissionSpecifications.hasAssignmentId(assignmentId));
+        }
+
+        List<Submission> submissions = submissionRepository.findAll(spec);
 
         // Filter only graded submissions
         List<Submission> gradedSubmissions = submissions.stream()

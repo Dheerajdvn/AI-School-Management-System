@@ -53,6 +53,7 @@ public class AuthenticationController {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final com.ai.dashboard.service.AuditLogService auditLogService;
+    private final com.ai.dashboard.security.RefreshTokenService refreshTokenService;
 
     @PostMapping("/register")
     @Operation(summary = "Register a new user")
@@ -91,7 +92,9 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     @Operation(summary = "Authenticate user and return JWT token")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<ApiResponse<LoginResponse>> login(
+            @Valid @RequestBody LoginRequest request,
+            jakarta.servlet.http.HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
@@ -103,7 +106,19 @@ public class AuthenticationController {
         auditLogService.log(request.getUsername(), "LOGIN", "Auth", "User logged in successfully", "127.0.0.1");
         log.info("User logged in successfully: {}", request.getUsername());
 
-        return ResponseEntity.ok(ApiResponse.success("Login successful", buildLoginResponse(userDetails, user != null ? user.getId() : null, token)));
+        LoginResponse loginResponse = buildLoginResponse(userDetails, user != null ? user.getId() : null, token);
+        if (loginResponse.getRefreshToken() != null) {
+            org.springframework.http.ResponseCookie cookie = org.springframework.http.ResponseCookie.from("refreshToken", loginResponse.getRefreshToken())
+                    .httpOnly(true)
+                    .secure(true)
+                    .path("/")
+                    .maxAge(7 * 24 * 60 * 60)
+                    .sameSite("None")
+                    .build();
+            response.addHeader(org.springframework.http.HttpHeaders.SET_COOKIE, cookie.toString());
+        }
+
+        return ResponseEntity.ok(ApiResponse.success("Login successful", loginResponse));
     }
 
     @PostMapping("/assign-role/{userId}")
@@ -137,9 +152,12 @@ public class AuthenticationController {
                 .withZone(ZoneId.systemDefault())
                 .format(Instant.now().plusSeconds(86400));
 
+        String refreshToken = refreshTokenService.createRefreshToken(user.getId());
+
         return LoginResponse.builder()
                 .id(user.getId())
                 .token(jwtService.generateToken(createUserDetails(user), user.getId()))
+                .refreshToken(refreshToken)
                 .tokenType("Bearer")
                 .username(user.getUsername())
                 .email(user.getEmail())
@@ -157,9 +175,12 @@ public class AuthenticationController {
                 .withZone(ZoneId.systemDefault())
                 .format(Instant.now().plusSeconds(86400));
 
+        String refreshToken = userId != null ? refreshTokenService.createRefreshToken(userId) : null;
+
         return LoginResponse.builder()
                 .id(userId)
                 .token(token)
+                .refreshToken(refreshToken)
                 .tokenType("Bearer")
                 .username(userDetails.getUsername())
                 .roles(roles)

@@ -8,6 +8,7 @@ import Sidebar from './components/Sidebar'
 import Topbar from './components/Topbar'
 import LoadingIndicator from './components/LoadingIndicator'
 import FloatingAIAssistant from './components/FloatingAIAssistant'
+import QuickSearchModal from './components/QuickSearchModal'
 
 // Lazy-loaded page-level components
 const AdminDashboard = lazy(() => import('./pages/DashboardPage'))
@@ -270,9 +271,8 @@ function ProtectedLayout({ children }) {
 export default function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
+      <AppRoutes />
+      <QuickSearchModal />
     </ThemeProvider>
   )
 }
@@ -1348,11 +1348,7 @@ function AppRoutes() {
           path="/home"
           element={
             <ProtectedRoute>
-              <ProtectedLayout>
-                <Suspense fallback={<LoadingIndicator message="Loading..." />}>
-                  <HomePage />
-                </Suspense>
-              </ProtectedLayout>
+              <RoleBasedDashboardRedirect />
             </ProtectedRoute>
           }
         />
@@ -1798,7 +1794,7 @@ function AppRoutes() {
         {/* Catch-all for 404 */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-      {/* Floating AI Assistant - available on all pages */}
+      {/* Floating AI Assistant handles public and authenticated modes internally */}
       <FloatingAIAssistant />
     </>
   )

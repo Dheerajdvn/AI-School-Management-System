@@ -1,3 +1,0 @@
-import os, base64
-path = os.path.join("frontend","src","pages","school","TeachersPage.jsx")
-os.makedirs(os.path.dirname(path), exist_ok=True)

@@ -16,9 +16,14 @@
 @import "./components/modals.css";
 @import "./components/dropdown.css";
 @import "./components/badges.css";
+@import "./components/command-palette.css";
 @import "./components/chat.css";
 
 @import "./pages/dashboard.css";
+@import "./pages/student-dashboard.css";
+@import "./pages/my-courses.css";
+@import "./pages/exams.css";
+@import "./pages/notifications.css";
 @import "./pages/landing.css";
 @import "./pages/login.css";
 @import "./pages/profile.css";

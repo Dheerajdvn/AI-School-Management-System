@@ -21,6 +21,7 @@ public class DocumentProcessingServiceImpl implements DocumentProcessingService 
 
     private final DocumentRepository documentRepository;
     private final ParserService parserService;
+    private final com.ai.dashboard.ai.rag.service.RagService ragService;
 
     @Override
     @Async("documentProcessingExecutor")
@@ -39,8 +40,10 @@ public class DocumentProcessingServiceImpl implements DocumentProcessingService 
             documentRepository.saveAndFlush(document);
             log.info("Status updated to PROCESSING for documentId={}", documentId);
 
-            log.info("Chunking completed / Text extraction started for documentId={}", documentId);
             parserService.extractText(document);
+
+            log.info("Auto-indexing documentId={}", documentId);
+            ragService.reindexDocument(documentId);
 
             // Re-fetch managed entity
             document = documentRepository.findById(documentId).orElse(document);

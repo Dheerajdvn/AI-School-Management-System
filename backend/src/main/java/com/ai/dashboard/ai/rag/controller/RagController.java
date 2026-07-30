@@ -77,7 +77,7 @@ public class RagController {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     @Operation(summary = "Check RAG service health")
     public ApiResponse<Boolean> health() {
-        boolean isHealthy = ragService.answerQuestion("health check") != null;
+        boolean isHealthy = ragService.health();
         return ApiResponse.success(isHealthy);
     }
 

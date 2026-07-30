@@ -1,23 +1,24 @@
-const TOKEN_KEY = 'token'
-const REFRESH_TOKEN_KEY = 'refreshToken'
-const TOKEN_EXPIRY_KEY = 'tokenExpiry'
+let inMemoryToken = null
+let inMemoryExpiry = null
 
 export const tokenStore = {
-  getToken: () => localStorage.getItem(TOKEN_KEY),
+  getToken: () => inMemoryToken,
   setToken: (token, expiry) => {
-    localStorage.setItem(TOKEN_KEY, token)
-    localStorage.setItem(TOKEN_EXPIRY_KEY, expiry.toString())
+    inMemoryToken = token
+    inMemoryExpiry = expiry ? expiry.toString() : null
   },
-  getRefreshToken: () => localStorage.getItem(REFRESH_TOKEN_KEY),
-  setRefreshToken: (token) => localStorage.setItem(REFRESH_TOKEN_KEY, token),
-  removeRefreshToken: () => localStorage.removeItem(REFRESH_TOKEN_KEY),
-  getTokenExpiry: () => localStorage.getItem(TOKEN_EXPIRY_KEY),
+  getRefreshToken: () => null,
+  setRefreshToken: () => {},
+  removeRefreshToken: () => {},
+  getTokenExpiry: () => inMemoryExpiry,
   clear: () => {
-    localStorage.removeItem(TOKEN_KEY)
-    localStorage.removeItem(REFRESH_TOKEN_KEY)
-    localStorage.removeItem(TOKEN_EXPIRY_KEY)
+    inMemoryToken = null
+    inMemoryExpiry = null
+    localStorage.removeItem('token')
+    localStorage.removeItem('refreshToken')
+    localStorage.removeItem('tokenExpiry')
   },
-  isAuthenticated: () => !!localStorage.getItem(TOKEN_KEY),
+  isAuthenticated: () => !!inMemoryToken,
 }
 
 export const resolveTokenExpiry = ({ expiresIn, expiresAt } = {}) => {

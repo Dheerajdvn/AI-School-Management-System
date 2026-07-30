@@ -18,5 +18,3 @@ export function useWebSocket() {
 
   return { connected, connectionState }
 }
-
-export default useWebSocket

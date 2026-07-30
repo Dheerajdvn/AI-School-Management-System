@@ -1,0 +1,95 @@
+/* Student My Courses Page Styles */
+.mcp-page .page-header-custom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.mcp-page .page-header-custom h4 {
+  margin: 0;
+  font-weight: 700;
+}
+
+.mcp-page .course-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
+  transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.mcp-page .course-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+
+.mcp-page .course-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.mcp-page .course-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.mcp-page .course-title h5 {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.mcp-page .course-title span {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.mcp-page .course-body {
+  flex: 1;
+}
+
+.mcp-page .course-stats {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: var(--space-3) 0;
+}
+
+.mcp-page .course-footer {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: var(--space-4);
+}
+
+.mcp-page .course-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+.mcp-page .skeleton-row {
+  height: 180px;
+  border-radius: var(--radius-card);
+  background: var(--hover);
+  animation: mcpPulse 1.5s infinite;
+}
+
+@keyframes mcpPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
