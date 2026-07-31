@@ -32,6 +32,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
 
     @Override
+    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        return uri != null && uri.contains("health");
+    }
+
+    @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
