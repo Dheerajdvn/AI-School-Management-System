@@ -9,6 +9,8 @@ import Topbar from './components/Topbar'
 import LoadingIndicator from './components/LoadingIndicator'
 import FloatingAIAssistant from './components/FloatingAIAssistant'
 import QuickSearchModal from './components/QuickSearchModal'
+import ErrorBoundary from './components/ErrorBoundary'
+
 
 // Lazy-loaded page-level components
 const AdminDashboard = lazy(() => import('./pages/DashboardPage'))
@@ -215,6 +217,7 @@ function RoleBasedTopbar({ onMenu }) {
  * Layout component wrapping protected pages with sidebar and topbar
  */
 function ProtectedLayout({ children }) {
+  const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = React.useState(() => window.innerWidth >= 992)
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen)
   const closeSidebar = () => setSidebarOpen(false)
@@ -258,7 +261,9 @@ function ProtectedLayout({ children }) {
       <div className={`main ${!sidebarOpen ? 'expanded' : ''}`}>
         <RoleBasedTopbar onMenu={toggleSidebar} />
         <div className="content">
-          {children}
+          <ErrorBoundary key={location.pathname} resetKey={location.pathname}>
+            {children}
+          </ErrorBoundary>
         </div>
       </div>
     </div>
@@ -304,6 +309,7 @@ function RoleBasedDashboardRedirect() {
  */
 function AppRoutes() {
   const { isAuthenticated, loading } = useAuth()
+  const location = useLocation()
 
   // Show loading spinner while checking authentication status
   if (loading) {
@@ -324,9 +330,11 @@ function AppRoutes() {
           path="/" 
           element={
             isAuthenticated ? <RoleBasedDashboardRedirect /> : (
-              <Suspense fallback={<LoadingIndicator message="Loading..." />}>
-                <HomePage />
-              </Suspense>
+              <ErrorBoundary key={location.pathname} resetKey={location.pathname}>
+                <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                  <HomePage />
+                </Suspense>
+              </ErrorBoundary>
             )
           } 
         />
@@ -335,9 +343,11 @@ function AppRoutes() {
         <Route 
           path="/login" 
           element={isAuthenticated ? <Navigate to="/" replace /> : (
-            <Suspense fallback={<LoadingIndicator message="Loading..." />}>
-              <LoginPage />
-            </Suspense>
+            <ErrorBoundary key={location.pathname} resetKey={location.pathname}>
+              <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                <LoginPage />
+              </Suspense>
+            </ErrorBoundary>
           )} 
         />
 

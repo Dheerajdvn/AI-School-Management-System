@@ -42,11 +42,11 @@ export default function RoleShowcase() {
   const current = roles[activeRole]
 
   return (
-    <section className="landing-section py-5 border-top" style={{ borderColor: 'var(--border)' }}>
+    <section className="landing-section" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
       <div className="container" style={{ maxWidth: '960px' }}>
-        <div className="text-center mb-4">
-          <h2 className="fw-bold mb-2" style={{ color: 'var(--text)' }}>Tailored Experiences for Every Role</h2>
-          <p className="text-muted mx-auto" style={{ maxWidth: '580px' }}>
+        <div className="text-center mb-3" style={{ marginBottom: '20px' }}>
+          <h2 className="fw-bold mb-2" style={{ color: 'var(--text)', fontSize: '1.9rem' }}>Tailored Experiences for Every Role</h2>
+          <p className="text-muted mx-auto mb-3" style={{ maxWidth: '580px', fontSize: '0.95rem', lineHeight: 1.5 }}>
             Multi-tenant role-based access control (RBAC) ensures each user gets exact tools.
           </p>
         </div>
@@ -70,25 +70,25 @@ export default function RoleShowcase() {
         </div>
 
         {/* Role Content Card */}
-        <div className="p-4 rounded-3 border animate-role-content landing-card" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+        <div className="p-4 rounded-4 animate-role-content landing-card">
           <div className="d-flex align-items-center gap-3 mb-3">
             <div className="d-flex align-items-center justify-content-center rounded-3 bg-primary-subtle text-primary" 
                  style={{ width: '48px', height: '48px', fontSize: '1.4rem' }}>
               <i className={`bi ${current.icon}`}></i>
             </div>
             <div>
-              <h4 className="fw-bold mb-0" style={{ color: 'var(--text)' }}>{current.title}</h4>
-              <span className="small text-muted">{current.subtitle}</span>
+              <h4 className="fw-bold mb-0" style={{ color: '#F8F8FA' }}>{current.title}</h4>
+              <span className="small text-muted" style={{ color: '#707784' }}>{current.subtitle}</span>
             </div>
           </div>
 
           <div className="row g-3 mt-2">
             {current.items.map((item, idx) => (
               <div key={idx} className="col-12 col-md-6">
-                <div className="p-3 rounded border h-100 d-flex align-items-start gap-2" 
-                     style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
-                  <i className="bi bi-check-circle-fill text-success mt-1"></i>
-                  <span className="small fw-medium" style={{ color: 'var(--text)', lineHeight: 1.5 }}>{item}</span>
+                <div className="p-3 rounded-3 h-100 d-flex align-items-start gap-2" 
+                     style={{ background: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                  <i className="bi bi-check-circle-fill text-primary mt-1"></i>
+                  <span className="small fw-medium" style={{ color: '#F8F8FA', lineHeight: 1.5 }}>{item}</span>
                 </div>
               </div>
             ))}

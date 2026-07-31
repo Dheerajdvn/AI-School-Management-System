@@ -13,12 +13,12 @@ export default function RagPipelineShowcase() {
   ]
 
   return (
-    <section className="landing-section py-5 border-top" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
+    <section className="landing-section" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
       <div className="container" style={{ maxWidth: '1080px' }}>
-        <div className="text-center mb-5">
-          <span className="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 mb-2">RAG Architecture</span>
-          <h2 className="fw-bold mb-2" style={{ color: 'var(--text)' }}>How the RAG Pipeline Answers Course Questions</h2>
-          <p className="text-muted mx-auto" style={{ maxWidth: '640px' }}>
+        <div className="text-center mb-3" style={{ marginBottom: '20px' }}>
+          <span className="badge bg-primary-subtle text-primary px-3 py-1 mb-2">RAG Architecture</span>
+          <h2 className="fw-bold mb-2" style={{ color: 'var(--text)', fontSize: '1.9rem' }}>How the RAG Pipeline Answers Course Questions</h2>
+          <p className="text-muted mx-auto mb-3" style={{ maxWidth: '640px', fontSize: '0.95rem', lineHeight: 1.5 }}>
             From PDF upload to vector retrieval and LLM response generation with page-level citations.
           </p>
         </div>
@@ -29,21 +29,25 @@ export default function RagPipelineShowcase() {
             <div key={s.step} className="col-6 col-md-4 col-lg-2">
               <button
                 onClick={() => setActiveStep(idx)}
-                className={`p-3 rounded-3 border w-100 text-start transition-all landing-card ${activeStep === idx ? 'border-primary shadow-sm step-button-active' : ''}`}
-                style={{ background: activeStep === idx ? 'var(--card)' : 'var(--bg)', borderColor: activeStep === idx ? 'var(--primary)' : 'var(--border)' }}
+                className={`p-3 rounded-4 w-100 text-start transition-all landing-card ${activeStep === idx ? 'step-button-active' : ''}`}
+                style={{
+                  background: activeStep === idx ? 'rgba(26, 26, 32, 0.9)' : 'rgba(20, 20, 24, 0.8)',
+                  border: activeStep === idx ? '1px solid rgba(109, 124, 255, 0.4)' : '1px solid rgba(255, 255, 255, 0.08)',
+                  boxShadow: activeStep === idx ? '0 8px 24px rgba(109, 124, 255, 0.15)' : '0 4px 16px rgba(0,0,0,0.25)'
+                }}
               >
                 <div className="d-flex align-items-center justify-content-between mb-2">
-                  <span className="badge bg-secondary-subtle text-secondary">{s.step}</span>
+                  <span className="badge bg-primary-subtle text-primary">{s.step}</span>
                   <i className={`bi ${s.icon} ${activeStep === idx ? 'text-primary' : 'text-muted'}`}></i>
                 </div>
-                <div className="fw-semibold small text-truncate" style={{ color: 'var(--text)' }}>{s.title}</div>
+                <div className="fw-semibold small text-truncate" style={{ color: '#F8F8FA' }}>{s.title}</div>
               </button>
             </div>
           ))}
         </div>
 
         {/* Selected Step Showcase Box */}
-        <div className="p-4 rounded-3 border" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
+        <div className="p-4 rounded-4 landing-card">
           <div className="row align-items-center g-4">
             <div className="col-12 col-md-6">
               <div className="d-inline-flex align-items-center gap-2 px-3 py-1 mb-3 rounded-pill bg-primary-subtle text-primary fw-semibold small">
@@ -70,8 +74,8 @@ export default function RagPipelineShowcase() {
             </div>
 
             <div className="col-12 col-md-6">
-              <div className="p-3 rounded border font-monospace small" style={{ background: 'var(--bg)', borderColor: 'var(--border)', color: 'var(--text)' }}>
-                <div className="d-flex align-items-center justify-content-between pb-2 mb-2 border-bottom" style={{ borderColor: 'var(--border)' }}>
+              <div className="p-3 rounded-3 font-monospace small" style={{ background: 'color-mix(in srgb, var(--text) 4%, var(--bg))', color: 'var(--text)' }}>
+                <div className="d-flex align-items-center justify-content-between pb-2 mb-2">
                   <span className="text-muted">// Pipeline Execution Terminal</span>
                   <span className="badge bg-success-subtle text-success">STATUS: OK</span>
                 </div>

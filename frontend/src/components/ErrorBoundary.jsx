@@ -18,6 +18,12 @@ export default class ErrorBoundary extends React.Component {
     }
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.state.hasError && prevProps.resetKey !== this.props.resetKey) {
+      this.setState({ hasError: false, error: null })
+    }
+  }
+
   render() {
     if (this.state.hasError) {
       return this.props.fallback || (
@@ -26,9 +32,9 @@ export default class ErrorBoundary extends React.Component {
             <i className="bi bi-exclamation-triangle text-danger" style={{ fontSize: '4rem' }} />
             <h2 className="mt-3">Something went wrong</h2>
             <p className="text-muted">{this.state.error?.message || 'An unexpected error occurred'}</p>
-            <button className="btn btn-primary mt-3" onClick={() => window.location.reload()}>
+            <button className="btn btn-primary mt-3" onClick={() => this.setState({ hasError: false, error: null })}>
               <i className="bi bi-arrow-clockwise me-1" />
-              Reload Page
+              Try Again
             </button>
           </div>
         </div>

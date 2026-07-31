@@ -23,16 +23,16 @@ export default function FAQ() {
   ]
 
   return (
-    <section className="landing-section py-5 border-top" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
+    <section className="landing-section" style={{ paddingTop: '40px', paddingBottom: '32px' }}>
       <div className="container" style={{ maxWidth: '800px' }}>
-        <div className="text-center mb-4">
-          <h2 className="fw-bold mb-2" style={{ color: 'var(--text)' }}>Frequently Asked Questions</h2>
-          <p className="text-muted">Technical overview and architecture details.</p>
+        <div className="text-center mb-3" style={{ marginBottom: '20px' }}>
+          <h2 className="fw-bold mb-2" style={{ color: 'var(--text)', fontSize: '1.9rem' }}>Frequently Asked Questions</h2>
+          <p className="text-muted mb-3" style={{ fontSize: '0.95rem', lineHeight: 1.5 }}>Technical overview and architecture details.</p>
         </div>
 
-        <div className="d-flex flex-column gap-3">
+        <div className="d-flex flex-column gap-2.5">
           {faqs.map((faq, idx) => (
-            <div key={idx} className="border rounded-3 overflow-hidden landing-card-static" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
+            <div key={idx} className="rounded-3 overflow-hidden landing-card-static">
               <button
                 onClick={() => setOpenFaq(openFaq === idx ? -1 : idx)}
                 className="w-100 p-3 text-start bg-transparent border-0 d-flex align-items-center justify-content-between font-weight-bold"
@@ -42,7 +42,7 @@ export default function FAQ() {
                 <i className={`bi ${openFaq === idx ? 'bi-dash-lg' : 'bi-plus-lg'} text-primary`}></i>
               </button>
               {openFaq === idx && (
-                <div className="px-3 pb-3 pt-0 border-top text-muted small" style={{ borderColor: 'var(--border)', lineHeight: 1.6 }}>
+                <div className="px-3 pb-3 pt-0 text-muted small" style={{ lineHeight: 1.6 }}>
                   {faq.a}
                 </div>
               )}

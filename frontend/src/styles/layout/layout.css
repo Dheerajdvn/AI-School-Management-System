@@ -12,5 +12,49 @@
 }
 
 .content {
-  padding: 0.85rem 1rem;
+  padding: 1.25rem 1.75rem;
+  max-width: 1400px;
+  width: 100%;
+}
+
+/* Global Spacing System & Page Density (GitHub / Linear SaaS Standards) */
+.page-section, .dashboard-section {
+  padding-top: 24px;
+  padding-bottom: 24px;
+}
+
+/* Page Spacing Utilities (16px, 24px, 32px max gaps) */
+.page-header {
+  margin-bottom: 20px !important;
+}
+
+.filter-bar, .search-bar, .toolbar-row {
+  margin-bottom: 16px !important;
+}
+
+.table-wrapper, .card-grid {
+  margin-bottom: 24px !important;
+}
+
+/* Compact 44px-48px Row Standard across List, Accordion, Settings & Management rows */
+.accordion-item,
+.settings-row,
+.management-row,
+.data-row,
+.list-item-row {
+  min-height: 44px;
+  max-height: 48px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0.5rem 1rem;
+}
+
+.accordion-button {
+  min-height: 42px;
+  padding: 0.6rem 1rem !important;
+  font-weight: 500;
+  font-size: 0.88rem;
+  background-color: var(--card) !important;
+  color: var(--text) !important;
 }

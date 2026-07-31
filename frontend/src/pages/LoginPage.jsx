@@ -48,31 +48,14 @@ export default function LoginPage() {
     const particles = Array.from({ length: particleCount }, () => ({
       x: Math.random() * (canvas.width || 800),
       y: Math.random() * (canvas.height || 600),
-      vx: (Math.random() - 0.5) * 0.35,
-      vy: (Math.random() - 0.5) * 0.35,
-      radius: Math.random() * 2 + 1,
-      color: Math.random() > 0.5 ? '#6366f1' : '#38bdf8'
+      vx: (Math.random() - 0.5) * 0.18,
+      vy: (Math.random() - 0.5) * 0.18,
+      radius: Math.random() * 1 + 1,
+      alpha: Math.random() * 0.15 + 0.15
     }))
 
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x
-          const dy = particles[i].y - particles[j].y
-          const dist = Math.sqrt(dx * dx + dy * dy)
-
-          if (dist < 140) {
-            ctx.beginPath()
-            ctx.moveTo(particles[i].x, particles[i].y)
-            ctx.lineTo(particles[j].x, particles[j].y)
-            ctx.strokeStyle = `rgba(99, 102, 241, ${0.15 * (1 - dist / 140)})`
-            ctx.lineWidth = 0.8
-            ctx.stroke()
-          }
-        }
-      }
 
       particles.forEach(p => {
         p.x += p.vx
@@ -83,9 +66,7 @@ export default function LoginPage() {
 
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
-        ctx.fillStyle = p.color
-        ctx.shadowBlur = 6
-        ctx.shadowColor = p.color
+        ctx.fillStyle = `rgba(148, 163, 184, ${p.alpha})`
         ctx.fill()
       })
 

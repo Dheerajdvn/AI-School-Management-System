@@ -1,0 +1,22 @@
+name: Render Random Keep-Alive Ping
+
+on:
+  schedule:
+    # Runs trigger check every 5 minutes
+    - cron: '*/5 * * * *'
+  workflow_dispatch: # Allows manual trigger testing
+
+jobs:
+  ping-render-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Random Delay (0-300 seconds for 5-10 minute randomized intervals)
+        run: |
+          DELAY=$((RANDOM % 300))
+          echo "Waiting $DELAY seconds before pinging Render backend..."
+          sleep $DELAY
+
+      - name: Ping Health Endpoint
+        run: |
+          # Replace URL with your actual deployed Render backend domain if different
+          curl -s -i https://your-backend-name.onrender.com/api/health || true

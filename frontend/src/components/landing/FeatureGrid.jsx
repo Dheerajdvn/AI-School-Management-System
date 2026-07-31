@@ -19,17 +19,17 @@ export default function FeatureGrid() {
     : features.filter(f => f.category === activeCategory)
 
   return (
-    <section className="landing-section py-5 border-top" style={{ borderColor: 'var(--border)' }}>
+    <section className="landing-section" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
       <div className="container" style={{ maxWidth: '1080px' }}>
-        <div className="text-center mb-4">
-          <h2 className="fw-bold mb-2" style={{ color: 'var(--text)' }}>Built for Complete Academic Operations</h2>
-          <p className="text-muted mx-auto" style={{ maxWidth: '600px' }}>
+        <div className="text-center mb-3">
+          <h2 className="fw-bold mb-2" style={{ color: 'var(--text)', fontSize: '1.9rem' }}>Built for Complete Academic Operations</h2>
+          <p className="text-muted mx-auto mb-3" style={{ maxWidth: '600px', fontSize: '0.95rem', lineHeight: 1.5 }}>
             A modular feature set designed for administrators, teachers, and students.
           </p>
         </div>
 
         {/* Category Filter Pills */}
-        <div className="d-flex justify-content-center flex-wrap gap-2 mb-4">
+        <div className="d-flex justify-content-center flex-wrap gap-2 mb-3.5" style={{ marginBottom: '20px' }}>
           {[
             { key: 'all', label: 'All Capabilities' },
             { key: 'admin', label: 'Administration' },
@@ -41,7 +41,8 @@ export default function FeatureGrid() {
             <button
               key={cat.key}
               onClick={() => setActiveCategory(cat.key)}
-              className={`btn btn-sm rounded-pill px-3 ${activeCategory === cat.key ? 'btn-primary' : 'btn-secondary'}`}
+              className={`btn btn-sm rounded-pill px-3.5 ${activeCategory === cat.key ? 'btn-primary' : 'btn-secondary'}`}
+              style={{ height: '34px', borderRadius: '10px', fontSize: '0.82rem' }}
             >
               {cat.label}
             </button>
@@ -49,21 +50,20 @@ export default function FeatureGrid() {
         </div>
 
         {/* Grid */}
-        <div className="row g-3">
+        <div className="row g-4">
           {filtered.map(f => (
             <div key={f.id} className="col-12 col-md-6 col-lg-4 animate-fade-up">
-              <div className="p-4 rounded-3 border h-100 d-flex flex-column justify-content-between landing-card" 
-                   style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+              <div className="p-4 rounded-4 h-100 d-flex flex-column justify-content-between landing-card">
                 <div>
                   <div className="d-flex align-items-center justify-content-between mb-3">
                     <div className="d-flex align-items-center justify-content-center rounded-3 bg-primary-subtle text-primary" 
                          style={{ width: '40px', height: '40px', fontSize: '1.2rem' }}>
                       <i className={`bi ${f.icon}`}></i>
                     </div>
-                    <span className="badge bg-secondary-subtle text-secondary border">{f.tag}</span>
+                    <span className="badge bg-secondary-subtle text-secondary">{f.tag}</span>
                   </div>
-                  <h5 className="fw-semibold mb-2" style={{ color: 'var(--text)' }}>{f.title}</h5>
-                  <p className="small text-muted mb-0" style={{ lineHeight: 1.5 }}>{f.desc}</p>
+                  <h5 className="fw-semibold mb-2" style={{ color: '#FAFAF9' }}>{f.title}</h5>
+                  <p className="small text-muted mb-0" style={{ color: '#A8A29E', lineHeight: 1.5 }}>{f.desc}</p>
                 </div>
               </div>
             </div>
