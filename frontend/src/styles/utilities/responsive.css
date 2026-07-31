@@ -5,21 +5,21 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   cursor: pointer;
   color: var(--text);
-  transition: all 0.15s;
+  transition: all 0.15s ease;
 }
 
 .hamburger:hover {
-  background: var(--hover, rgba(79, 70, 229, 0.1));
+  background: var(--hover, rgba(109, 124, 255, 0.1));
   border-color: var(--primary);
   color: var(--primary);
 }
 
 .sidebar {
-  transition: transform 0.25s ease;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @media (min-width: 992px) {
@@ -36,7 +36,11 @@
 
 @media (max-width: 991.98px) {
   .sidebar {
+    width: 270px !important;
+    max-width: 85vw !important;
     transform: translateX(-100%);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    z-index: 1040 !important;
   }
   .sidebar.open {
     transform: translateX(0);
@@ -50,9 +54,10 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(4px);
-    z-index: 1025;
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1035 !important;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.25s ease, visibility 0.25s ease;
@@ -63,22 +68,22 @@
   }
 }
 
-/* Custom Mobile Drawer Styles for Landing Page */
+/* Mobile Navigation Drawer for Landing Page */
 .mobile-nav-drawer {
   position: fixed;
   top: 0;
   right: 0;
   bottom: 0;
-  width: 290px;
-  max-width: calc(100vw - 32px);
+  width: 280px;
+  max-width: calc(100vw - 24px);
   background-color: var(--surface);
   color: var(--text);
   border-left: 1px solid var(--border);
   z-index: 1050;
-  padding: 2rem 1.5rem;
+  padding: 1.5rem 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
   transform: translateX(100%);
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: var(--shadow-lg);
@@ -96,6 +101,7 @@
   bottom: 0;
   background-color: rgba(8, 9, 12, 0.7);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   z-index: 1045;
   opacity: 0;
   visibility: hidden;
@@ -107,81 +113,117 @@
   visibility: visible;
 }
 
-/* Touch-friendly interactive buttons */
-.btn, .sidebar-nav-link, .nav-link, .hero-btn-primary, .hero-btn-secondary, button {
-  min-height: 44px;
+/* Touch-friendly Minimum Target Height */
+.btn, .sidebar-nav-link, .nav-link, button {
+  min-height: 34px;
 }
 
-/* Global Responsive Refinements */
-@media (max-width: 1024px) {
-  .apple-section {
-    padding-top: 80px !important;
-    padding-bottom: 80px !important;
-  }
-}
+/* Comprehensive Responsive Device Adapters */
 
-@media (max-width: 767.98px) {
-  /* Landing page adaptations */
-  .apple-section {
-    padding-top: 50px !important;
-    padding-bottom: 50px !important;
-  }
-  
-  .apple-heading {
-    font-size: 2.2rem !important;
-  }
-  
-  .hero-cta-wrapper {
-    flex-direction: column;
-    width: 100%;
-    align-items: stretch;
-    gap: 12px;
-  }
-  
-  .hero-btn-primary, .hero-btn-secondary {
-    width: 100%;
-    height: 52px;
-  }
-  
-  /* Footer responsive layout */
-  footer .row {
-    flex-direction: column;
-    text-align: center;
-    gap: 2rem;
-  }
-  
-  footer .text-end {
-    text-align: center !important;
-    margin-top: 1rem;
+/* Mobile Phones (320px - 575px) */
+@media (max-width: 575.98px) {
+  .content {
+    padding: 0.85rem 0.75rem !important;
   }
 
-  /* Table styling enhancements on mobile */
+  .page-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .page-header h1,
+  .page-header h2 {
+    font-size: 1.3rem !important;
+  }
+
+  .filter-bar, .search-bar, .toolbar-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  .card, .panel, .dashboard-card, .profile-card, .feature-card {
+    padding: 14px !important;
+    border-radius: 12px !important;
+  }
+
+  .stat-card {
+    padding: 12px 14px !important;
+    gap: 0.65rem !important;
+    min-height: 50px !important;
+  }
+
+  .stat-card .icon {
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 0.95rem !important;
+  }
+
+  .stat-card .value {
+    font-size: 1.1rem !important;
+  }
+
+  /* Table overflow handling */
+  .table-responsive {
+    border-radius: 10px !important;
+    margin-bottom: 12px !important;
+  }
+
   .table {
-    font-size: 11px;
+    font-size: 13px !important;
   }
-  
-  /* Form adjustments */
-  .form-control, .form-select {
-    min-height: 44px;
+
+  .table thead th {
+    font-size: 11px !important;
+    padding: 8px 12px !important;
   }
-  
-  /* Modal responsive sizing */
+
+  .table tbody td {
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+  }
+
+  /* Modal Dialog Adaptations */
   .modal-dialog {
-    margin: 0.5rem;
-    max-width: calc(100% - 1rem);
+    margin: 0.5rem !important;
+    max-width: calc(100vw - 1rem) !important;
   }
-  
-  .modal-content {
-    border-radius: 12px;
+
+  .modal-header {
+    padding: 12px 16px !important;
+  }
+
+  .modal-body {
+    padding: 14px 16px !important;
+  }
+
+  .modal-footer {
+    padding: 10px 16px !important;
+    flex-direction: column-reverse !important;
+    gap: 8px !important;
+  }
+
+  .modal-footer .btn {
+    width: 100% !important;
   }
 }
 
-@media (max-width: 480px) {
-  .apple-heading {
-    font-size: 1.8rem !important;
+/* Tablets (576px - 767px) */
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .content {
+    padding: 1rem 1.25rem !important;
   }
-  
-  .card {
-    padding: 1.25rem !important;
+
+  .card, .panel, .dashboard-card {
+    padding: 16px !important;
+  }
+}
+
+/* Laptops / Desktops (768px - 1199px) */
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  .content {
+    padding: 1.25rem 1.5rem !important;
   }
 }
