@@ -18,5 +18,4 @@ jobs:
 
       - name: Ping Health Endpoint
         run: |
-          # Replace URL with your actual deployed Render backend domain if different
-          curl -s -i https://your-backend-name.onrender.com/api/health || true
+          curl -s -i https://ai-school-management-system-l0a0.onrender.com/api/health || true
