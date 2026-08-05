@@ -49,4 +49,4 @@ app:
 management:
   endpoint:
     health:
-      show-details: when-authorized
+      show-details: always

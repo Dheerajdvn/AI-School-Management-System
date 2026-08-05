@@ -18,7 +18,9 @@ const SystemStatus = () => {
   const checkStatus = async () => {
     setLoading(true)
     try {
-      const response = await fetch(window.location.origin + '/api/actuator/health')
+      const token = localStorage.getItem('token')
+      const headers = token ? { Authorization: `Bearer ${token}` } : {}
+      const response = await fetch(window.location.origin + '/api/actuator/health', { headers })
       const data = await response.json().catch(() => ({}))
       
       const isApiAlive = response.status === 200 || data.components !== undefined
