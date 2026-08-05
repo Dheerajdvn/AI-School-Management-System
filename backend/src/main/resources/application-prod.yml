@@ -25,8 +25,8 @@ spring:
 
 ai:
   ollama:
-    base-url: ${OLLAMA_BASE_URL}
-    model: ${OLLAMA_MODEL}
+    base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+    model: ${OLLAMA_MODEL:llama3}
     temperature: 0.2
     timeout: 120
     max-tokens: 2048
@@ -35,7 +35,7 @@ ai:
     provider: ${EMBEDDING_PROVIDER:ollama}
     model: ${EMBEDDING_MODEL:nomic-embed-text}
     timeout: 30s
-    base-url: ${OLLAMA_BASE_URL}
+    base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
 
   vector:
     provider: qdrant
