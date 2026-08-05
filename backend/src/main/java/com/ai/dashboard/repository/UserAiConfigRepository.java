@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface UserAiConfigRepository extends JpaRepository<UserAiConfig, Long> {
     Optional<UserAiConfig> findByUserId(Long userId);
     Optional<UserAiConfig> findByUserUsername(String username);
+    Optional<UserAiConfig> findByUserUsernameOrUserEmail(String username, String email);
 }

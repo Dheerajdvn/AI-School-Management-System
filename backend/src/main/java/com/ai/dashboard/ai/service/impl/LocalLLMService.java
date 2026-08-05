@@ -50,7 +50,7 @@ public class LocalLLMService implements AIService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
             String username = auth.getName();
-            var configOpt = configRepository.findByUserUsername(username);
+            var configOpt = configRepository.findByUserUsernameOrUserEmail(username, username);
             if (configOpt.isPresent()) {
                 UserAiConfig config = configOpt.get();
                 String providerName = config.getProvider();

@@ -36,11 +36,14 @@ public class UserAiConfigServiceImpl implements UserAiConfigService {
     @Override
     @Transactional(readOnly = true)
     public UserAiConfigDto getUserConfig(String username) {
-        if (username != null && !userRepository.existsByUsername(username)) {
-            throw new IllegalArgumentException("User not found: " + username);
+        User user = userRepository.findByUsername(username)
+                .orElseGet(() -> userRepository.findByEmail(username).orElse(null));
+
+        if (user == null) {
+            return defaultConfigDto();
         }
 
-        return configRepository.findByUserUsername(username)
+        return configRepository.findByUserId(user.getId())
                 .map(this::toDto)
                 .orElseGet(this::defaultConfigDto);
     }
@@ -48,7 +51,8 @@ public class UserAiConfigServiceImpl implements UserAiConfigService {
     @Override
     public UserAiConfigDto saveConfig(String username, UserAiConfigDto dto) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
+                .orElseGet(() -> userRepository.findByEmail(username)
+                        .orElseThrow(() -> new IllegalArgumentException("User not found: " + username)));
 
         UserAiConfig config = configRepository.findByUserId(user.getId())
                 .orElse(UserAiConfig.builder().user(user).build());
@@ -126,7 +130,8 @@ public class UserAiConfigServiceImpl implements UserAiConfigService {
     @Override
     public UserAiConfigDto resetToDefault(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
+                .orElseGet(() -> userRepository.findByEmail(username)
+                        .orElseThrow(() -> new IllegalArgumentException("User not found: " + username)));
 
         UserAiConfig config = configRepository.findByUserId(user.getId())
                 .orElse(UserAiConfig.builder().user(user).build());
@@ -153,27 +158,6 @@ public class UserAiConfigServiceImpl implements UserAiConfigService {
     }
 
     // ------------------------------------------------------------------
-
-    private UserAiConfig findOrCreate(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
-
-        return configRepository.findByUserId(user.getId())
-                .orElseGet(() -> {
-                    UserAiConfig config = UserAiConfig.builder()
-                            .user(user)
-                            .provider("Ollama")
-                            .baseUrl("http://localhost:11434")
-                            .model("qwen2.5-coder:3b")
-                            .temperature(0.2)
-                            .maxTokens(2048)
-                            .streamingEnabled(true)
-                            .aiSuggestionsEnabled(true)
-                            .connected(false)
-                            .build();
-                    return configRepository.save(config);
-                });
-    }
 
     private UserAiConfigDto defaultConfigDto() {
         return UserAiConfigDto.builder()
