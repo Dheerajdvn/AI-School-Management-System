@@ -1,189 +1,122 @@
-# Architecture Documentation
+# 🏗️ Architecture Documentation
 
 ## System Architecture
 
 ```mermaid
 graph TB
-    subgraph Frontend
-        A[React App] --> B[AuthContext]
+    subgraph Frontend [React SPA - Vercel]
+        A[React App] --> B[AuthContext & ThemeContext]
         A --> C[Role-based Layouts]
-        A --> D[Pages]
+        A --> D[Portals]
         D --> E[Student Portal]
         D --> F[Teacher Portal]
-        D --> G[Admin Portals]
+        D --> G[Admin & School Admin Portals]
     end
 
-    subgraph Backend
-        H[Spring Boot] --> I[Controllers]
-        H --> J[Services]
-        H --> K[Repositories]
-        I --> L[Security Filter]
-        J --> M[AI Services]
+    subgraph Backend [Spring Boot API Gateway - Render]
+        H[Spring Boot 3.5] --> I[REST Controllers]
+        H --> L[Security & Rate Limiting Filter]
+        H --> J[Service Layer]
+        J --> ProviderRegistry[ProviderRegistry & 9 LLM Strategies]
+        J --> K[Spring Data JPA Repositories]
+        J --> VectorStore[VectorStoreService]
     end
 
-    subgraph External
-        N[(PostgreSQL)]
-        O[(Redis)]
-        P[(Qdrant)]
-        Q[Ollama LLM]
+    subgraph ExternalServices [Cloud & Dedicated Infrastructure]
+        N[(Neon PostgreSQL Cloud)]
+        O[(Upstash Redis Cloud Cache)]
+        P[(Qdrant Cloud Vector DB)]
+        Q["Cloud LLMs (Groq / OpenAI / Gemini / Anthropic)"]
+        R[Local Ollama Engine]
     end
 
-    A <--> H
+    A <-->|HTTPS / REST / JWT| H
     H <--> N
     H <--> O
-    H <--> P
-    M <--> Q
+    VectorStore <--> P
+    ProviderRegistry <--> Q
+    ProviderRegistry <--> R
 ```
 
-## Frontend Architecture
+---
 
-### Component Structure
-```
-frontend/src/
-├── pages/
-│   ├── student/       # Student dashboard, courses, assignments, grades
-│   ├── teacher/       # Teacher dashboard, course management, grading
-│   ├── admin/         # Admin portals and management
-│   └── exam/          # Examination module
-├── components/        # Reusable UI components
-│   └── Sidebar.jsx    # Navigation sidebar
-└── context/           # React contexts
-    └── AuthContext.js # Authentication context
-```
+## Backend Package Structure
 
-### State Management
-- React Context API for authentication
-- Local component state for page-specific data
-- No global state management (Redux/Zustand)
-
-## Backend Architecture
-
-### Package Structure
-```
+```text
 backend/src/main/java/com/ai/dashboard/
 ├── AiStudentDashboardApplication.java  # Main entry point
-├── ai/                                # AI/RAG components
-│   ├── prompt/                        # Prompt templates
-│   │   ├── TutorPromptTemplate.java
-│   │   ├── HomeworkPromptTemplate.java
-│   │   ├── QuizPromptTemplate.java
-│   │   ├── LessonPlannerPromptTemplate.java
-│   │   └── DocumentQAPromptTemplate.java
-│   ├── rag/                           # RAG pipeline
-│   ├── embedding/                     # Embedding services
-│   └── vector/                        # Vector store
-├── config/                            # Configuration classes
-│   ├── WebSocketConfig.java
+├── ai/                                # AI & RAG components
+│   ├── controller/                    # ChatController, AiConfigController
+│   ├── model/                         # OllamaProvider model wrapper
+│   ├── prompt/                        # Prompt templates (Tutor, Homework, Quiz, LessonPlanner, DocumentQA)
+│   ├── provider/                      # Multi-provider LLM strategy layer
+│   │   ├── LlmProviderStrategy.java   # Strategy interface
+│   │   ├── ProviderRegistry.java      # Registry mapping 9 providers
+│   │   └── impl/                      # Groq, OpenAI, Gemini, Anthropic, OpenRouter, Azure, DeepSeek, Mistral, Ollama
+│   ├── rag/                           # RAG pipeline & RagServiceImpl
+│   ├── embedding/                     # EmbeddingServiceImpl (nomic-embed-text)
+│   └── vector/                        # QdrantProvider & VectorStoreProperties
+├── config/                            # Spring configurations
+│   ├── health/                        # OllamaHealthIndicator, RedisHealthIndicator, QdrantHealthIndicator
+│   ├── SecurityConfig.java
 │   ├── RedisConfig.java
-│   ├── MetricsConfig.java
-│   ├── OllamaProperties.java
-│   └── LoggingFilter.java             # Request logging
-├── controller/                        # REST controllers
-├── document/                          # Document management
-├── entity/                            # JPA entities
-├── repository/                        # Spring Data repositories
-├── security/                          # JWT security
-└── service/                           # Business services
+│   └── RateLimitingFilter.java        # Upstash Redis rate limiting
+├── controller/                        # REST controllers (Auth, School, Student, Course, Dashboard)
+├── document/                          # Document management & file storage
+├── entity/                            # JPA entities (User, UserAiConfig, Course, Enrollment, etc.)
+├── repository/                        # Spring Data JPA repositories
+├── security/                          # JwtAuthenticationFilter & CustomUserDetailsService
+├── service/                           # Business logic services
+└── util/                              # AesEncryptionConverter (AES-128 API key encryption)
 ```
 
-## Security Flow
+---
+
+## Security & Encryption Flow
 
 ```mermaid
 sequenceDiagram
     participant Client
     participant AuthController
     participant CustomUserDetailsService
-    participant JWTTokenProvider
-    participant ProtectedEndpoint
+    participant JwtTokenProvider
+    participant AesEncryptionConverter
+    participant PostgreSQL
 
-    Client->>AuthController: POST /api/auth/login (username, password)
-    AuthController->>CustomUserDetailsService: loadUserByUsername
+    Client->>AuthController: POST /api/auth/login (username/email, password)
+    AuthController->>CustomUserDetailsService: loadUserByUsername / findByEmail
     CustomUserDetailsService-->>AuthController: UserDetails
-    AuthController->>JWTTokenProvider: generateToken
-    JWTTokenProvider-->>AuthController: JWT token
-    AuthController-->>Client: {token, refreshToken}
-    Client->>ProtectedEndpoint: GET /api/protected (Authorization: Bearer token)
-    ProtectedEndpoint-->>Client: Protected data
+    AuthController->>JwtTokenProvider: generateToken (24h validity)
+    AuthController-->>Client: {accessToken, refreshToken}
+    Client->>AiConfigController: POST /api/ai/config (Provider, API Key)
+    AiConfigController->>AesEncryptionConverter: convertToDatabaseColumn (API Key)
+    AesEncryptionConverter->>PostgreSQL: Store 128-bit AES Encrypted Key
 ```
 
-## Authentication Flow
+---
 
-1. User provides credentials to `/api/auth/login`
-2. `CustomUserDetailsService` validates credentials
-3. `JWTTokenProvider` generates access and refresh tokens
-4. Tokens are returned to client
-5. Client includes `Authorization: Bearer <token>` header
-6. `JWTAuthenticationFilter` validates token on each request
-
-## AI Request Flow
+## Dynamic AI Request Flow
 
 ```mermaid
 flowchart LR
     A[User Question] --> B[RagService]
     B --> C[EmbeddingService]
-    C --> D[Generate Embedding]
+    C --> D[Generate Vector 768-dim]
     B --> E[VectorStoreService]
-    E --> F[Search Similar]
-    E --> G[Get Chunk Content]
-    B --> H[AIService]
-    H --> I[Ollama LLM]
-    H --> J[Generate Response]
-    B --> K[Return Answer + Sources]
+    E --> F[Qdrant Similarity Search]
+    B --> G[LocalLLMService]
+    G --> H[UserAiConfig Repository]
+    H --> I{Provider Choice}
+    I -->|Groq / Cloud| J[Groq / Cloud LLM API]
+    I -->|Ollama / Fallback| K[Local Ollama Engine]
+    J --> L[Return Answer + Sources]
+    K --> L[Return Answer + Sources]
 ```
-
-## RAG Pipeline
-
-1. **Question Embedding**: User question is converted to vector via Ollama embeddings
-2. **Vector Search**: Similar document chunks are retrieved from Qdrant
-3. **Context Retrieval**: Full chunk content is retrieved from database
-4. **Prompt Building**: Context + question is formatted using prompt templates
-5. **LLM Generation**: Ollama generates response based on context
-6. **Response**: Answer with source citations is returned
-
-## Conversation Memory
-
-```mermaid
-erDiagram
-    ConversationSession ||--o{ ChatMessage : contains
-    ConversationSession {
-        Long id
-        String sessionId
-        Long userId
-        String title
-        LocalDateTime createdAt
-        LocalDateTime updatedAt
-        Integer messageCount
-        Integer totalTokens
-    }
-    ChatMessage {
-        Long id
-        Role role
-        String content
-        Integer tokenCount
-        String contextUsed
-        LocalDateTime createdAt
-    }
-```
-
-## Caching Strategy
-
-- **Redis**: Used for session storage and caching
-- **Spring Cache**: @Cacheable, @CacheEvict annotations on services
-- **Cache Regions**: `courses`, `assignments` (configurable)
-
-## Database Design
-
-### Key Entities
-- `User` - Authentication and profile
-- `Course` - Course offerings
-- `Enrollment` - Student-course relationships
-- `Assignment` - Course assignments
-- `Submission` - Student submissions
-- `Document` - File storage
-- `DocumentChunk` - Text chunks for RAG
-- `ConversationSession` - Chat sessions (new)
-- `ChatMessage` - Individual messages (new)
 
 ---
 
-See `Database.md` for detailed entity relationships.
+## Caching & Rate Limiting Strategy
+
+- **Upstash Redis**: Stores 30-minute analytics caches (`entryTtl: 30 minutes`).
+- **Rate Limiting**: `RateLimitingFilter` tracks IP/user request buckets in Redis.
+- **TLS Encryption**: `SPRING_REDIS_SSL=true` for secure cloud connectivity.

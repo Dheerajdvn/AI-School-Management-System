@@ -1,190 +1,72 @@
-# Troubleshooting Guide
+# 🔧 Troubleshooting Guide
 
-## Common Issues
+## Common Issues & Solutions
 
-### JWT Problems
+---
 
-**Error: Invalid token received**
-- Ensure `JWT_SECRET` is set and consistent across restarts
-- Check token expiration time in `JWT_EXPIRATION` property
-- Verify token format: `Authorization: Bearer <token>`
+### 🤖 Ollama or Local LLM Not Running
 
-**Error: Token expired**
-- Default token expires in 1 hour (3600000ms)
-- Use refresh endpoint `/api/auth/refresh` to get new token
-- Check system time if tokens expire immediately
+**Symptom**: `Connection refused to Ollama (http://localhost:11434)` or Ollama shows `Degraded` in Admin Dashboard.
 
-### Redis Connection
+> [!TIP]
+> **Recommended Quick Fix (No Ollama Needed)**:
+> You do **not** need Ollama installed to use the AI features!
+> 1. Open **AI Settings** (`/settings`).
+> 2. Select **Groq** *(Free & Ultra-Fast Cloud AI)* or another provider like OpenAI, Gemini, or Anthropic.
+> 3. Enter your API key, click **Verify Connection**, and click **Save Settings**.
+> The system will immediately use your chosen cloud provider for all AI responses!
 
-**Error: Cannot connect to Redis**
+**Local Ollama Troubleshooting**:
 ```bash
-# Check if Redis is running
-docker ps | grep redis
-
-# Test connection
-redis-cli ping
-
-# Check Redis logs
-docker logs <redis-container-id>
-```
-
-**Solution:**
-- Ensure `SPRING_REDIS_HOST` and `SPRING_REDIS_PORT` are correct
-- Verify Redis container is accessible
-- Check firewall rules
-
-### PostgreSQL Connection
-
-**Error: Connection refused**
-```bash
-# Check PostgreSQL status
-docker ps | grep postgres
-
-# Test connection
-psql -h localhost -U postgres -d schooldb
-
-# Check logs
-docker logs <postgres-container-id>
-```
-
-**Solution:**
-- Verify `SPRING_DATASOURCE_URL`, `USERNAME`, `PASSWORD` in [`application.yml`](backend/src/main/resources/application.yml:1)
-- Ensure PostgreSQL is running on correct port (default: 5432)
-- Check if database exists
-
-### Ollama Not Running
-
-**Error: Connection refused to Ollama**
-```bash
-# Check if Ollama is running
+# Check if Ollama is running locally
 curl http://localhost:11434/api/tags
 
 # Start Ollama
 ollama serve
 
-# Pull model
-ollama pull qwen2.5:7b
+# Pull target models
+ollama pull qwen2.5-coder:3b
+ollama pull nomic-embed-text
 ```
 
-**Solution:**
-- Verify `AI_OLLAMA_BASE_URL` configuration
-- Ensure model is downloaded
-- Check system resources (Ollama needs significant RAM)
+---
 
-### Qdrant Connection
+### 💥 Render Container Crashes with `Exited with status 137`
 
-**Error: Cannot connect to Qdrant**
-```bash
-# Check Qdrant
-curl http://localhost:6333/health
+**Cause**: Out-Of-Memory (OOM) killed by Linux kernel on Render's 512 MB Free Tier.
 
-# Check logs
-docker logs <qdrant-container-id>
+**Solution**:
+Add `JAVA_OPTS` in **Render Dashboard** -> **Environment**:
+```text
+JAVA_OPTS = -Xmx320m -Xms256m -XX:+UseG1GC -XX:+ExitOnOutOfMemoryError
 ```
+This caps Java heap at 320 MB, keeping total RAM safely under Render's 512 MB limit.
 
-**Solution:**
-- Verify `QDRANT_HOST` and `QDRANT_PORT` settings
-- Ensure Qdrant is accessible
-- Check if collection exists
+---
 
-### Embedding Failures
+### 🔑 AES Encryption Key Length Error
 
-**Error: Embedding generation failed**
-- Check Ollama logs for memory issues
-- Reduce batch size in `AI_OLLAMA_EMBEDDING_BATCH_SIZE`
-- Verify input text is not empty
+**Error**: `InvalidAESKeyException: Invalid AES key length: X bytes`
 
-**Error: All chunks showing PENDING**
-- Check embedding service status
-- Verify Qdrant connection
-- Review document processing logs
+**Solution**:
+Set `APP_ENCRYPTION_KEY` in environment variables to an exact 16-byte string (e.g. `1234567890123456`).
 
-### WebSocket Issues
+---
 
-**Error: WebSocket connection failed**
-- Check `/actuator/health` for WebSocket status
-- Verify STOMP endpoint configuration
-- Check firewall/proxy for WebSocket upgrade
+### 🔐 JWT Authentication Problems
 
-**Error: Messages not delivered**
-- Check subscription mappings in `WebSocketConfig`
-- Verify message broker configuration
-- Review broker relay logs
+- **Token Expiration**: Access tokens are valid for **24 Hours** (`86400000ms`).
+- **Format**: Requests must include header `Authorization: Bearer <token>`.
+- **Refresh**: Use `POST /api/auth/refresh` to get a fresh token before expiration.
 
-### Build Errors
+---
 
-**Error: Maven compilation failed**
-```bash
-# Clean and rebuild
-./mvnw clean compile
-
-# Skip tests for quick build
-./mvnw install -DskipTests
-```
-
-**Error: Lombok annotation not working**
-- Ensure Lombok plugin is installed in IDE
-- Check `@Builder.Default` is added for primitive defaults
-- Verify Lombok dependency is present
-
-**Error: JaCoCo coverage check failed**
-- Current threshold: 40% instruction coverage
-- Add more tests to increase coverage
-- Or lower threshold in pom.xml configuration
-
-## Health Check Endpoints
+### 📊 Health Check Endpoints
 
 | Endpoint | Purpose | Expected Response |
-|----------|---------|-----------------|
-| `/actuator/health` | Overall health | `{"status":"UP"}` |
-| `/actuator/health/redis` | Redis health | `{"status":"UP"}` |
-| `/actuator/health/ollama` | Ollama health | `{"status":"UP"}` |
-| `/actuator/metrics` | Application metrics | JSON metrics |
-| `/actuator/prometheus` | Prometheus format | Text metrics |
-
-## Log Analysis
-
-### Check Backend Logs
-```bash
-# Docker
-docker logs -f <backend-container>
-
-# Direct
-tail -f backend/logs/application.log
-```
-
-### Key Log Patterns
-- `ERROR` - Critical issues requiring attention
-- `WARN` - Non-critical issues
-- `RAG pipeline failed` - AI processing errors
-- `Connection refused` - Service connectivity issues
-
-## Performance Issues
-
-### Slow API Responses
-- Check `/actuator/metrics` for slow endpoints
-- Verify Redis caching is enabled
-- Check database query performance
-- Review embedding/vector search times
-
-### High Memory Usage
-- Monitor JVM heap via `/actuator/metrics/jvm.memory.used`
-- Check Redis memory: `redis-cli info memory`
-- Limit Ollama model size or use quantized version
-
-## Development Tips
-
-### Quick Setup
-```bash
-# Reset all containers
-docker-compose down -v
-docker-compose up -d
-
-# Recreate database
-./mvnw spring-boot:run
-```
-
-### Debug Mode
-```bash
-./mvnw spring-boot:run -Dspring-boot.run.profiles=local -Dspring-boot.run.jvmArguments="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
-```
+| :--- | :--- | :--- |
+| `/api/actuator/health` | System Actuator aggregated health | `{"status": "UP", "components": {...}}` |
+| `/api/actuator/health/db` | Neon PostgreSQL status | `{"status": "UP"}` |
+| `/api/actuator/health/redis` | Upstash Redis status | `{"status": "UP"}` |
+| `/api/actuator/health/qdrant` | Qdrant Cloud status | `{"status": "UP"}` |
+| `/api/actuator/health/ollama` | Ollama local engine status | `{"status": "OFFLINE"}` *(Clean 200 OK status)* |

@@ -1,153 +1,90 @@
-# Deployment Guide
+# 🚀 Deployment Guide
 
-## Backend Deployment
+## Production Architecture Overview
 
-### Production Configuration
+The AI School Management System is deployed across cloud infrastructure:
 
-Create [`application-prod.yml`](backend/src/main/resources/application.yml:1):
+- **Frontend**: [Vercel](https://vercel.com) (`https://aischoolsystem.vercel.app`)
+- **Backend API Gateway**: [Render](https://render.com) (`https://ai-school-management-system-l0a0.onrender.com`)
+- **Database**: [Neon PostgreSQL Cloud](https://neon.tech)
+- **Redis Cache & Rate Limiting**: [Upstash Redis Cloud](https://upstash.com)
+- **Vector Database**: [Qdrant Cloud](https://qdrant.tech)
+
+---
+
+## Backend Deployment (Render)
+
+### Production `application-prod.yml`
 ```yaml
 spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: validate
-  redis:
-    host: ${SPRING_REDIS_HOST}
-    port: ${SPRING_REDIS_PORT}
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:none}
+    open-in-view: false
 
-server:
-  port: 8080
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST}
+      port: ${SPRING_REDIS_PORT}
+      password: ${SPRING_REDIS_PASSWORD:}
+      ssl:
+        enabled: ${SPRING_REDIS_SSL:true}
 
-logging:
-  level:
-    com.ai.dashboard: INFO
+ai:
+  vector:
+    provider: qdrant
+    host: ${QDRANT_HOST}
+    port: ${QDRANT_PORT}
+    api-key: ${QDRANT_API_KEY:}
 
 management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics,prometheus,caches,beans,threaddump
+  endpoint:
+    health:
+      show-details: always
 ```
 
-### Docker Deployment
+---
 
-```bash
-# Build JAR
-./mvnw clean package -DskipTests
+## Required Production Environment Variables
 
-# Run with Docker
-docker build -t ai-dashboard:latest .
-docker run -d -p 8080:8080 \
-  -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/schooldb \
-  -e SPRING_REDIS_HOST=redis \
-  ai-dashboard:latest
-```
+Configure these environment variables in your **Render Web Service**:
 
-## Frontend Deployment
+| Variable | Description | Example Value |
+| :--- | :--- | :--- |
+| `SPRING_PROFILES_ACTIVE` | Active Spring Profile | `prod` |
+| `SPRING_DATASOURCE_URL` | Neon PostgreSQL JDBC URL | `jdbc:postgresql://ep-flat-union-...tech/neondb?sslmode=require` |
+| `SPRING_DATASOURCE_USERNAME` | Database username | `neondb_owner` |
+| `SPRING_DATASOURCE_PASSWORD` | Database password | `your-neon-password` |
+| `SPRING_REDIS_HOST` | Upstash Redis Host | `popular-tahr-164365.upstash.io` |
+| `SPRING_REDIS_PORT` | Upstash Redis Port | `6379` |
+| `SPRING_REDIS_PASSWORD` | Upstash Redis Password | `your-upstash-token` |
+| `SPRING_REDIS_SSL` | Enable Redis TLS | `true` |
+| `QDRANT_HOST` | Qdrant Cloud Endpoint | `85d77988-d01f-4e95-8771-...cloud.qdrant.io` |
+| `QDRANT_PORT` | Qdrant Port | `6333` |
+| `QDRANT_API_KEY` | Qdrant Cloud API Key | `your-qdrant-api-key` |
+| `CORS_ALLOWED_ORIGINS` | Allowed Frontend Origin | `https://aischoolsystem.vercel.app` |
+| `JWT_SECRET` | JWT Secret Key | `your-secure-jwt-secret-key` |
+| `JWT_EXPIRATION` | Token Expiry (ms) | `86400000` (24 Hours) |
+| `APP_ENCRYPTION_KEY` | 16-byte AES Field Key | `1234567890123456` |
+| `JAVA_OPTS` | **Render Memory Heap Limit** | `-Xmx320m -Xms256m -XX:+UseG1GC -XX:+ExitOnOutOfMemoryError` |
 
-### Production Build
-```bash
-cd frontend
-npm run build
-```
+> [!IMPORTANT]
+> **Preventing Render Exit Code 137 (OOM)**:
+> Setting `JAVA_OPTS` to `-Xmx320m -Xms256m -XX:+UseG1GC -XX:+ExitOnOutOfMemoryError` caps the Java heap at 320 MB, leaving 192 MB for off-heap and native memory. This guarantees your backend will **never** crash with Out-Of-Memory (Exit 137) on Render's 512 MB Free Tier!
 
-### Serving Static Files
-```bash
-# Using Nginx
-server {
-    listen 80;
-    server_name localhost;
-    root /usr/share/nginx/html;
-    index index.html;
-    
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-    
-    location /api {
-        proxy_pass http://backend:8080;
-    }
-}
-```
+---
 
-## Environment Variables
+## Frontend Deployment (Vercel)
 
-### Backend Required
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `SPRING_DATASOURCE_URL` | PostgreSQL JDBC URL | - |
-| `SPRING_DATASOURCE_USERNAME` | DB username | - |
-| `SPRING_DATASOURCE_PASSWORD` | DB password | - |
-| `SPRING_REDIS_HOST` | Redis host | localhost |
-| `SPRING_REDIS_PORT` | Redis port | 6379 |
-| `JWT_SECRET` | JWT signing key | - |
-| `JWT_EXPIRATION` | JWT expiry ms | 3600000 |
-| `AI_OLLAMA_BASE_URL` | Ollama URL | http://localhost:11434 |
-| `QDRANT_HOST` | Qdrant host | localhost |
-
-### Frontend Required
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `VITE_API_URL` | Backend API URL | http://localhost:8080 |
-
-## Service Configuration
-
-### PostgreSQL
-```bash
-# docker-compose.yml
-postgres:
-  image: postgres:15-alpine
-  environment:
-    POSTGRES_DB: schooldb
-    POSTGRES_USER: postgres
-    POSTGRES_PASSWORD: postgres
-  volumes:
-    - db-data:/var/lib/postgresql/data
-  ports:
-    - "5432:5432"
-```
-
-### Redis
-```bash
-# docker-compose.yml
-redis:
-  image: redis:7-alpine
-  ports:
-    - "6379:6379"
-```
-
-### Ollama
-```bash
-# Install and run
-curl -fsSL https://ollama.com/install.sh | sh
-ollama serve
-ollama pull qwen2.5:7b
-```
-
-### Qdrant
-```bash
-# docker-compose.yml
-qdrant:
-  image: qdrant/qdrant:v1.10.1
-  ports:
-    - "6333:6333"
-    - "6334:6334"
-  volumes:
-    - qdrant_data:/qdrant/storage
-```
-
-## Production Checklist
-
-- [ ] Set strong JWT secrets in [`application.yml`](backend/src/main/resources/application.yml:1)
-- [ ] Configure HTTPS/TLS via Nginx / reverse proxy
-- [ ] Enable database SSL
-- [ ] Set up proper logging aggregation
-- [ ] Configure backup for MariaDB
-- [ ] Monitor Redis memory usage
-- [ ] Secure Qdrant API endpoints
-- [ ] Configure rate limiting
-- [ ] Set up Prometheus monitoring
-- [ ] Configure health check endpoints
+1. Push your code to GitHub.
+2. Import repository into [Vercel](https://vercel.com).
+3. Set **Framework Preset**: `Vite`.
+4. Set **Build Command**: `npm run build`.
+5. Deploy. Vercel automatically proxies API calls using `vercel.json` rewrites to Render.

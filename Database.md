@@ -1,58 +1,66 @@
-# Database Documentation
+# 🗄️ Database Documentation
 
 ## Entity Descriptions
 
-### User
-- Represents users with role-based access
-- Fields: id, username, email, password, roles, enabled flags, version
-- Indexed: enabled, email
+### User (`users`)
+- Represents system users across all roles (`ROLE_ADMIN`, `ROLE_SCHOOL_ADMIN`, `ROLE_PRINCIPAL`, `ROLE_TEACHER`, `ROLE_STUDENT`).
+- Fields: `id`, `username`, `email`, `password`, `roles`, `enabled`, `school_id`, `created_at`, `updated_at`.
+- Indexed: `enabled`, `email`, `username`.
 
-### Course
-- Course offerings with teacher assignment
-- Fields: id, courseCode, title, description, teacher, status
-- Indexed: teacher_id, status
+### UserAiConfig (`user_ai_configs`)
+- Stores per-user AI provider preferences and API credentials.
+- Fields: `id`, `user_id`, `provider` (Groq, OpenAI, Gemini, etc.), `api_key` *(AES-128 Encrypted)*, `base_url`, `model`, `temperature`, `max_tokens`, `streaming_enabled`, `ai_suggestions_enabled`, `is_connected`, `last_verified_at`.
+- Indexed: `user_id`.
 
-### Enrollment
-- Student enrollment in courses
-- Fields: id, student, course, enrollmentDate, status, progress
-- Unique constraint: (student_id, course_id)
-- Indexed: status, student_id, course_id
+### Course (`courses`)
+- Academic course offerings with teacher assignments.
+- Fields: `id`, `courseCode`, `title`, `description`, `teacher_id`, `school_id`, `status`.
+- Indexed: `teacher_id`, `status`, `school_id`.
 
-### Assignment
-- Course assignments/exams
-- Fields: id, title, description, instructions, dueDate, maxMarks, status, teacher, course
-- Indexed: course_id, teacher_id, status, due_date
+### Enrollment (`enrollments`)
+- Student enrollment in courses.
+- Fields: `id`, `student_id`, `course_id`, `enrollmentDate`, `status`, `progress`.
+- Unique Constraint: `(student_id, course_id)`.
+- Indexed: `status`, `student_id`, `course_id`.
 
-### Submission
-- Student assignment submissions
-- Fields: id, assignment, student, status, submissionText, attachmentUrl, obtainedMarks, feedback
-- Unique constraint: (student_id, assignment_id)
-- Indexed: student_id, assignment_id, status, submitted_at
+### Assignment (`assignments`)
+- Course homework, tasks, and examinations.
+- Fields: `id`, `title`, `description`, `instructions`, `dueDate`, `maxMarks`, `status`, `teacher_id`, `course_id`.
+- Indexed: `course_id`, `teacher_id`, `status`, `due_date`.
 
-### Document
-- File storage for RAG processing
-- Fields: id, filename, originalFilename, contentType, fileSize, uploadedBy, uploadTime, documentType, course, storagePath, processingStatus
-- Indexed: uploaded_by, course_id, document_type, processing_status
+### Submission (`submissions`)
+- Student assignment submissions and AI/Teacher evaluations.
+- Fields: `id`, `assignment_id`, `student_id`, `status`, `submissionText`, `attachmentUrl`, `obtainedMarks`, `feedback`.
+- Unique Constraint: `(student_id, assignment_id)`.
+- Indexed: `student_id`, `assignment_id`, `status`, `submitted_at`.
 
-### DocumentChunk
-- Text chunks for vector search
-- Fields: id, documentId, chunkIndex, content, tokenCount, embeddingGenerated, createdAt
-- Indexed: document_id, embedding_generated
+### Document (`documents`)
+- Academic file storage for RAG vector processing.
+- Fields: `id`, `filename`, `originalFilename`, `contentType`, `fileSize`, `uploadedBy`, `uploadTime`, `documentType`, `course_id`, `storagePath`, `processingStatus`.
+- Indexed: `uploaded_by`, `course_id`, `document_type`, `processing_status`.
 
-### ConversationSession (New)
-- Chat conversation sessions
-- Fields: id, sessionId, userId, title, messageCount, totalTokens, createdAt, updatedAt
-- Indexed: user_id, session_id
+### DocumentChunk (`document_chunks`)
+- Text chunks for vector search.
+- Fields: `id`, `documentId`, `chunkIndex`, `content`, `tokenCount`, `embeddingGenerated`, `createdAt`.
+- Indexed: `document_id`, `embedding_generated`.
 
-### ChatMessage (New)
-- Individual chat messages
-- Fields: id, session, role, content, tokenCount, contextUsed, createdAt
-- Indexed: session_id, created_at, role
+### ConversationSession (`conversation_sessions`)
+- Chat conversation sessions.
+- Fields: `id`, `sessionId`, `userId`, `title`, `messageCount`, `totalTokens`, `createdAt`, `updatedAt`.
+- Indexed: `user_id`, `session_id`.
+
+### ChatMessage (`chat_messages`)
+- Individual AI and user chat messages.
+- Fields: `id`, `session_id`, `role`, `content`, `tokenCount`, `contextUsed`, `createdAt`.
+- Indexed: `session_id`, `created_at`, `role`.
+
+---
 
 ## Entity Relationships
 
 ```mermaid
 erDiagram
+    User ||--o| UserAiConfig : "configures"
     User ||--o{ Course : "teaches"
     User ||--o{ Enrollment : "enrolled"
     User ||--o{ Assignment : "creates"
@@ -65,38 +73,21 @@ erDiagram
     Course ||--o{ Document : "has"
     
     Assignment ||--o{ Submission : "receives"
-    Assignment ||--o{ DocumentChunk : "referenced in"
-    
     Document ||--o{ DocumentChunk : "split into"
-    
     ConversationSession ||--o{ ChatMessage : "contains"
 ```
 
-## Indexes Added
+---
+
+## Database Indexes Summary
 
 | Table | Column | Purpose |
-|-------|--------|---------|
-| assignments | course_id | Query assignments by course |
-| assignments | teacher_id | Query assignments by teacher |
-| assignments | status | Filter by assignment status |
-| assignments | due_date | Sort by due date |
-| courses | teacher_id | Query courses by teacher |
-| courses | status | Filter active courses |
-| users | enabled | Query active users |
-| users | email | Email lookups |
-| submissions | student_id | Query submissions by student |
-| submissions | assignment_id | Query by assignment |
-| submissions | status | Filter by status |
-| submissions | submitted_at | Sort by date |
-| enrollments | student_id | Query enrollments |
-| enrollments | course_id | Query by course |
-| enrollments | status | Filter by status |
-| documents | uploaded_by | Query by uploader |
-| documents | course_id | Filter by course |
-| documents | document_type | Filter by type |
-| documents | processing_status | Track processing |
-| document_chunks | document_id | Query by document |
-| document_chunks | embedding_generated | Track embedding status |
-| conversation_sessions | user_id | Query by user |
-| conversation_sessions | session_id | Session lookup |
-| chat_messages | session_id | Query by session |
+| :--- | :--- | :--- |
+| `users` | `email`, `username`, `enabled` | User authentication & email lookups |
+| `user_ai_configs` | `user_id` | Quick retrieval of user AI settings |
+| `assignments` | `course_id`, `teacher_id`, `status`, `due_date` | Assignment filtering and sorting |
+| `courses` | `teacher_id`, `status`, `school_id` | Course management queries |
+| `submissions` | `student_id`, `assignment_id`, `status` | Submission grade tracking |
+| `enrollments` | `student_id`, `course_id`, `status` | Student enrollment validation |
+| `documents` | `uploaded_by`, `course_id`, `processing_status` | RAG document pipeline tracking |
+| `conversation_sessions`| `user_id`, `session_id` | AI chat session lookups |

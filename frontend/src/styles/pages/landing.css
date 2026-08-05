@@ -96,6 +96,14 @@ body.light-mode .home-page {
   overflow: hidden;
 }
 
+@media (max-width: 576px) {
+  .landing-hero-section {
+    min-height: auto !important;
+    padding-top: 24px !important;
+    padding-bottom: 20px !important;
+  }
+}
+
 .landing-hero-content {
   position: relative;
   z-index: 2;

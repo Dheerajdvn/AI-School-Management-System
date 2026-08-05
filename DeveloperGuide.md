@@ -1,39 +1,66 @@
-# Developer Guide
+# 🛠️ Developer Guide
 
 ## Coding Standards
 
 ### Java Style
-- Use Lombok annotations (`@Getter`, `@Setter`, `@Builder`, `@Slf4j`)
-- Follow camelCase for variables and methods
-- Use meaningful class names
-- Add Javadoc to public methods
+- Use Lombok annotations (`@Getter`, `@Setter`, `@Builder`, `@RequiredArgsConstructor`, `@Slf4j`).
+- Use `camelCase` for methods/variables and `PascalCase` for classes.
+- Encrypt sensitive fields using `@Convert(converter = AesEncryptionConverter.class)`.
 
 ### React Style
-- Use functional components with hooks
-- Follow kebab-case for filenames
-- Use PascalCase for component names
-- Separate concerns with custom hooks
+- Functional components with React Hooks (`useState`, `useEffect`, `useContext`).
+- Theme-adaptive CSS variables (`var(--home-bg)`, `var(--text)`).
+- Responsive mobile views (`@media (max-width: 576px)`).
 
-## Package Structure
+---
 
+## How to Add a New LLM Strategy
+
+To add a new LLM provider (e.g. Cohere or AI21):
+
+### 1. Implement `LlmProviderStrategy`
+Create a new class in `com.ai.dashboard.ai.provider.impl`:
+
+```java
+@Component
+@Slf4j
+public class NewProviderStrategy implements LlmProviderStrategy {
+
+    @Override
+    public String getProviderName() {
+        return "NEW_PROVIDER";
+    }
+
+    @Override
+    public boolean isApiKeyRequired() {
+        return true;
+    }
+
+    @Override
+    public String chat(String apiKey, String baseUrl, String model, String prompt, double temperature, int maxTokens) {
+        // Implement WebClient or HTTP call to Provider API
+        return "AI Response";
+    }
+
+    @Override
+    public boolean verifyConnection(String apiKey, String baseUrl) {
+        // Verify API key connectivity
+        return true;
+    }
+
+    @Override
+    public List<String> getModels(String apiKey, String baseUrl) {
+        return List.of("model-1", "model-2");
+    }
+}
 ```
-backend/src/main/java/com/ai/dashboard/
-├── ai/            # AI/RAG functionality
-│   ├── prompt/    # Prompt templates
-│   ├── rag/       # RAG service layer
-│   ├── embedding/ # Embedding generation
-│   └── vector/    # Vector store integration
-├── config/        # Spring configuration
-├── controller/    # REST API endpoints
-├── document/      # Document management
-├── entity/        # JPA entities
-├── exception/     # Custom exceptions
-├── repository/    # Spring Data repositories
-├── security/      # JWT authentication
-└── service/       # Business logic
-```
 
-## How to Add APIs
+### 2. Register Strategy
+`ProviderRegistry` will automatically pick up your Spring `@Component` strategy bean upon startup!
+
+---
+
+## How to Add REST APIs
 
 ### 1. Create Controller
 ```java
@@ -51,158 +78,21 @@ public class ResourceController {
 }
 ```
 
-### 2. Create Service
-```java
-@Service
-@RequiredArgsConstructor
-public class ResourceServiceImpl implements ResourceService {
-    
-    private final ResourceRepository resourceRepository;
-    
-    @Override
-    public ResourceResponse get(Long id) {
-        return resourceRepository.findById(id)
-            .map(this::toResponse)
-            .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
-    }
-}
-```
-
-### 3. Add Tests
-```java
-@ExtendWith(MockitoExtension.class)
-class ResourceServiceTest {
-    
-    @Mock
-    private ResourceRepository repository;
-    
-    @InjectMocks
-    private ResourceServiceImpl service;
-    
-    @Test
-    void should_get_resource_successfully() {
-        // Test implementation
-    }
-}
-```
-
-## How to Add AI Prompts
-
-### 1. Create Prompt Template
-```java
-@Component
-public class NewPromptTemplate {
-    
-    private static final String SYSTEM_TEMPLATE = """
-        You are an AI assistant specializing in...
-        """;
-    
-    public String buildPrompt(String context, String question) {
-        return SYSTEM_TEMPLATE + "\nContext: " + context + "\nQuestion: " + question;
-    }
-}
-```
-
-### 2. Inject into Service
-```java
-private final NewPromptTemplate promptTemplate;
-
-String prompt = promptTemplate.buildPrompt(context, question);
-```
-
-## How to Add New Modules
-
-### 1. Create Entity
-```java
-@Entity
-@Table(name = "new_entity")
-@Getter
-@Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class NewEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    // Add fields and indexes
-}
-```
-
-### 2. Create Repository
-```java
-@Repository
-public interface NewEntityRepository extends JpaRepository<NewEntity, Long> {
-    // Add custom queries if needed
-}
-```
-
-### 3. Create Service Layer
+### 2. Create Service & Repository
 - Interface in `com.ai.dashboard.service`
 - Implementation in `com.ai.dashboard.service.impl`
+- Repository extending `JpaRepository<Entity, Long>`
 
-### 4. Create Controller
-- REST controller in `com.ai.dashboard.controller`
-- Add proper HTTP mappings
+---
 
-### 5. Add Tests
-- Unit tests for service layer
-- Integration tests for API endpoints
+## Testing & Verification
 
-## Testing Guidelines
-
-### Unit Test Structure
-Use Nested classes for organization:
-
-```java
-@ExtendWith(MockitoExtension.class)
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-class ServiceTest {
-    
-    @Nested
-    class GetResource {
-        @Test
-        void should_return_resource() { }
-        
-        @Test
-        void should_throw_exception_when_not_found() { }
-    }
-}
-```
-
-### Test Coverage Goals
-- Service layer: 80%+
-- Controller layer: 70%+
-- Repository layer: 60%+
-
-### Running Tests
 ```bash
-./mvnw test                    # Run all tests
-./mvnw test -Dtest=*Controller # Run controller tests
-./mvnw jacoco:report            # Generate coverage report
-```
+# Run unit & integration tests
+cd backend
+mvn test
 
-## Build and Run
-
-### Development
-```bash
-# Backend
-./mvnw spring-boot:run
-
-# Frontend
-npm run dev
-```
-
-### Production
-```bash
-# Backend
-./mvnw clean package -DskipTests
-
-# Frontend
+# Frontend build verification
+cd frontend
 npm run build
 ```
-
-### Docker
-```bash
-docker-compose up -d
