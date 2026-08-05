@@ -19,41 +19,30 @@ const SystemStatus = () => {
     setLoading(true)
     try {
       const response = await fetch(window.location.origin + '/api/actuator/health')
-      const data = await response.json()
+      const data = await response.json().catch(() => ({}))
       
-      const apiStatus = data.status === 'UP' ? 'healthy' : 'degraded'
+      const isApiAlive = response.status === 200 || data.components !== undefined
+      const apiStatus = isApiAlive ? 'healthy' : 'degraded'
       const dbStatus = data.components?.db?.status === 'UP' ? 'healthy' : 'degraded'
       const redisStatus = data.components?.redis?.status === 'UP' ? 'healthy' : 'degraded'
       const ollamaStatus = data.components?.ollama?.status === 'UP' ? 'healthy' : 'degraded'
+      const qdrantStatus = (data.components?.qdrant?.status === 'UP' || data.components?.qdrant?.status === undefined) && isApiAlive ? 'healthy' : 'degraded'
       
       setStatus({
         api: apiStatus,
         database: dbStatus,
         redis: redisStatus,
         ollama: ollamaStatus,
-        qdrant: apiStatus === 'healthy' ? 'healthy' : 'degraded'
+        qdrant: qdrantStatus
       })
     } catch (e) {
-      // Actuator might return 503 status code when down, try to parse JSON if response is available
-      try {
-        const response = await fetch(window.location.origin + '/api/actuator/health')
-        const data = await response.json()
-        setStatus({
-          api: data.status === 'UP' ? 'healthy' : 'degraded',
-          database: data.components?.db?.status === 'UP' ? 'healthy' : 'degraded',
-          redis: data.components?.redis?.status === 'UP' ? 'healthy' : 'degraded',
-          ollama: data.components?.ollama?.status === 'UP' ? 'healthy' : 'degraded',
-          qdrant: data.status === 'UP' ? 'healthy' : 'degraded'
-        })
-      } catch (err) {
-        setStatus({
-          api: 'degraded',
-          database: 'degraded',
-          redis: 'degraded',
-          ollama: 'degraded',
-          qdrant: 'degraded'
-        })
-      }
+      setStatus({
+        api: 'degraded',
+        database: 'degraded',
+        redis: 'degraded',
+        ollama: 'degraded',
+        qdrant: 'degraded'
+      })
     } finally {
       setLoading(false)
     }

@@ -46,7 +46,7 @@ public class OllamaHealthIndicator implements HealthIndicator {
                         .build();
             }
         } catch (Exception e) {
-            log.error("Ollama health check failed", e);
+            log.warn("Ollama health check failed: {}", e.getMessage());
             return Health.down()
                     .withDetail("component", "ollama")
                     .withDetail("error", e.getMessage())
