@@ -40,14 +40,14 @@ public class OllamaHealthIndicator implements HealthIndicator {
                         .withDetail("model", properties.getModel())
                         .build();
             } else {
-                return Health.down()
+                return Health.status("OFFLINE")
                         .withDetail("component", "ollama")
                         .withDetail("error", "Unexpected response code: " + responseCode)
                         .build();
             }
         } catch (Exception e) {
             log.warn("Ollama health check failed: {}", e.getMessage());
-            return Health.down()
+            return Health.status("OFFLINE")
                     .withDetail("component", "ollama")
                     .withDetail("error", e.getMessage())
                     .build();
