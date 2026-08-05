@@ -49,6 +49,9 @@ ai:
     context-history-limit: 3
 
   vector:
+    host: ${QDRANT_HOST:localhost}
+    port: ${QDRANT_PORT:6333}
+    api-key: ${QDRANT_API_KEY:}
     collection: course_documents
     dimension: 768
     timeout: 30s

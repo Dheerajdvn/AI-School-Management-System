@@ -25,6 +25,9 @@ public class VectorStoreProperties {
     /** Qdrant server port. */
     private int port = 6333;
 
+    /** Optional API key for Qdrant Cloud. */
+    private String apiKey;
+
     /** Collection name for storing document embeddings. */
     private String collection = "course_documents";
 
