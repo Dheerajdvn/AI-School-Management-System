@@ -62,7 +62,7 @@ public class QdrantProvider implements VectorStoreProvider {
                     .bodyValue(body)
                     .retrieve()
                     .bodyToMono(String.class)
-                    .timeout(properties.getTimeout())
+                    .timeout(Duration.ofSeconds(5))
                     .block();
 
             long elapsed = Duration.between(start, Instant.now()).toMillis();

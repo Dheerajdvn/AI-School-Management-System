@@ -26,8 +26,14 @@ public class VectorStoreServiceImpl implements VectorStoreService {
 
     @PostConstruct
     public void init() {
-        log.info("Initializing vector store collection");
-        createCollection();
+        log.info("Initializing vector store collection asynchronously");
+        java.util.concurrent.CompletableFuture.runAsync(() -> {
+            try {
+                createCollection();
+            } catch (Exception e) {
+                log.warn("Async vector store collection initialization failed: {}", e.getMessage());
+            }
+        });
     }
 
     @Override
