@@ -14,7 +14,6 @@ import { useAuth } from '../../context/AuthContext'
 export default function ProtectedRoute({ children, redirectTo = '/login' }) {
   const { isAuthenticated, loading } = useAuth()
 
-  // Show loading spinner while checking authentication status
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
@@ -25,11 +24,9 @@ export default function ProtectedRoute({ children, redirectTo = '/login' }) {
     )
   }
 
-  // Redirect to login if not authenticated
   if (!isAuthenticated) {
     return <Navigate to={redirectTo} replace />
   }
 
-  // Render children if authenticated
   return children
 }

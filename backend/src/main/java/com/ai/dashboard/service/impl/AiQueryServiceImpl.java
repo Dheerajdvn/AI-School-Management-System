@@ -99,7 +99,6 @@ public class AiQueryServiceImpl implements AiQueryService {
         return llmProvider.isAvailable();
     }
 
-    // ------------------------------------------------------------------
 
     private void verifyUserAuthorization() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

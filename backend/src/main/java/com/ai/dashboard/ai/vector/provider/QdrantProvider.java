@@ -150,9 +150,6 @@ public class QdrantProvider implements VectorStoreProvider {
         }
     }
 
-    // ------------------------------------------------------------------
-    // Internal Qdrant API calls
-    // ------------------------------------------------------------------
 
     private void doUpsert(String collection, StoredDocument doc) {
         String pointId = doc.getPointId() != null ? doc.getPointId() : UUID.randomUUID().toString();
@@ -275,9 +272,6 @@ public class QdrantProvider implements VectorStoreProvider {
         return results;
     }
 
-    // ------------------------------------------------------------------
-    // Retry helper
-    // ------------------------------------------------------------------
 
     private <T> T callWithRetry(SupplierWithException<T> supplier) {
         int retries = 0;

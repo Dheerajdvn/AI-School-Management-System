@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { useTheme } from '../context/ThemeContext'
 
 const SEARCH_ITEMS = [
-  // General Dashboard/Navigation links
   { name: 'Dashboard', to: '/dashboard', category: 'Navigation', icon: 'bi-grid-1x2-fill' },
   { name: 'Profile Settings', to: '/profile', category: 'Navigation', icon: 'bi-person-fill' },
   { name: 'Platform Settings', to: '/settings', category: 'Navigation', icon: 'bi-gear-fill' },
@@ -17,7 +16,6 @@ const SEARCH_ITEMS = [
   { name: 'AI Lesson Planner', to: '/teacher/lesson-planner', category: 'AI Tools', icon: 'bi-calendar-event' },
   { name: 'AI Quiz Generator', to: '/teacher/quiz-generator', category: 'AI Tools', icon: 'bi-question-circle' },
 
-  // School OS resources
   { name: 'Manage Schools', to: '/admin/schools', category: 'School OS', icon: 'bi-building' },
   { name: 'Courses Directory', to: '/admin/courses', category: 'School OS', icon: 'bi-book' },
   { name: 'Documents & RAG Upload', to: '/documents', category: 'Knowledge Base', icon: 'bi-file-earmark-arrow-up' },
@@ -25,7 +23,6 @@ const SEARCH_ITEMS = [
   { name: 'Active Processing Queue', to: '/knowledge/queue', category: 'Knowledge Base', icon: 'bi-cpu' },
   { name: 'Audit Logs', to: '/admin/audit-logs', category: 'Security', icon: 'bi-shield-check' },
 
-  // Actions
   { name: 'Toggle Light/Dark Theme', action: 'toggle-theme', category: 'Actions', icon: 'bi-palette' }
 ]
 
@@ -39,7 +36,6 @@ export default function QuickSearchModal() {
   const inputRef = useRef(null)
   const overlayRef = useRef(null)
 
-  // Keyboard shortcut: Cmd+K or Ctrl+K
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
@@ -51,14 +47,12 @@ export default function QuickSearchModal() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  // Listen to custom open events from other components
   useEffect(() => {
     const handleOpenEvent = () => setIsOpen(true)
     window.addEventListener('open-quick-search', handleOpenEvent)
     return () => window.removeEventListener('open-quick-search', handleOpenEvent)
   }, [])
 
-  // Auto focus input when opened
   useEffect(() => {
     if (isOpen) {
       setQuery('')
@@ -67,13 +61,11 @@ export default function QuickSearchModal() {
     }
   }, [isOpen])
 
-  // Filter items
   const filtered = SEARCH_ITEMS.filter((item) =>
     item.name.toLowerCase().includes(query.toLowerCase()) ||
     item.category.toLowerCase().includes(query.toLowerCase())
   )
 
-  // Handle navigate/action trigger
   const handleTrigger = (item) => {
     setIsOpen(false)
     if (item.action === 'toggle-theme') {
@@ -83,7 +75,6 @@ export default function QuickSearchModal() {
     }
   }
 
-  // Handle arrows and enter inside modal
   const handleModalKeyDown = (e) => {
     if (e.key === 'Escape') {
       setIsOpen(false)
@@ -101,7 +92,6 @@ export default function QuickSearchModal() {
     }
   }
 
-  // Group by category helper
   const grouped = filtered.reduce((groups, item, idx) => {
     const originalIndex = idx
     if (!groups[item.category]) {

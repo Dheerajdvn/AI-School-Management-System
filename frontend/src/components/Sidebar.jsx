@@ -3,14 +3,12 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
 
-// Role constants
 const ROLE_ADMIN = 'ROLE_ADMIN'
 const ROLE_PRINCIPAL = 'ROLE_PRINCIPAL'
 const ROLE_SCHOOL_ADMIN = 'ROLE_SCHOOL_ADMIN'
 const ROLE_TEACHER = 'ROLE_TEACHER'
 const ROLE_STUDENT = 'ROLE_STUDENT'
 
-// Navigation links for each role
 const ROLE_LINKS = {
   [ROLE_ADMIN]: [
     { to: '/admin', icon: 'bi-grid-1x2', label: 'Dashboard' },

@@ -153,7 +153,6 @@ export const AuthProvider = ({ children }) => {
         // Also verify by calling /auth/me (less frequently)
         // This is already covered by API interceptor
       } catch {
-        // Ignore errors in background check
       }
     }, TOKEN_EXPIRY_CHECK_INTERVAL)
 

@@ -150,7 +150,6 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         return toResponse(saved);
     }
 
-    // ------------------------------------------------------------------
 
     private void validateEnrollmentPermission(Long studentId, Long currentUserId, String currentUserRole, Course course) {
         if ("ROLE_STUDENT".equals(currentUserRole)) {

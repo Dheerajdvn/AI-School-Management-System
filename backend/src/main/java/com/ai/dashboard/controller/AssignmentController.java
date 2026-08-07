@@ -174,7 +174,6 @@ public class AssignmentController {
                 assignmentService.closeAssignment(id, currentUserId, currentUserRole));
     }
 
-    // ------------------------------------------------------------------
 
     private Long extractUserId(Authentication authentication) {
         if (authentication == null) {

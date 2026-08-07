@@ -31,7 +31,6 @@ const AssignmentForm = ({ show = true, assignment = null, courses = [], onClose,
     try {
       const res = await DocumentApi.upload(file, courseId || null, null, getUserId(), (p) => setProgress(p))
       const doc = res?.data || res
-      // set attachmentUrl to download path
       setAttachmentUrl(`/api/documents/${doc.id}/download`)
     } catch (err) {
       console.error('Upload failed', err)

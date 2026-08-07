@@ -100,19 +100,16 @@ public class RagServiceImpl implements RagService {
                 question.length(), courseId, userId, sessionId);
 
         try {
-            // 1. Session resolution & User message persistence
             if (sessionId == null || sessionId.isBlank()) {
                 String title = question.length() > 30 ? question.substring(0, 30) + "..." : question;
                 sessionId = conversationService.createSession(userId != null ? userId : 1L, title);
             }
             conversationService.addMessage(sessionId, ChatMessage.Role.USER, question, null);
 
-            // 2. Vector search & deduplication
             List<Float> questionEmbedding = embeddingService.generateEmbedding(question);
             List<SearchResult> searchResults = vectorStoreService.searchSimilar(questionEmbedding, TOP_K, courseId);
             log.info("Vector search completed: retrieved {} matching chunks", searchResults.size());
 
-            // Deduplicate chunks
             List<SearchResult> deduplicated = new ArrayList<>();
             Set<String> seen = new HashSet<>();
             for (SearchResult r : searchResults) {
@@ -140,7 +137,6 @@ public class RagServiceImpl implements RagService {
                 return;
             }
 
-            // 3. Batch retrieve chunk text
             List<Long> docIds = deduplicated.stream().map(SearchResult::getDocumentId).distinct().toList();
             List<DocumentChunk> allChunks = docIds.isEmpty() ? Collections.emptyList() : documentChunkRepository.findByDocumentIdIn(docIds);
 
@@ -166,10 +162,8 @@ public class RagServiceImpl implements RagService {
                         .build());
             }
 
-            // Send sources metadata event via SSE
             emitter.send(SseEmitter.event().name("sources").data(sources));
 
-            // 4. Construct Prompt
             List<ChatMessage> history = conversationService.getSessionHistory(sessionId);
             String historyText = history.stream()
                     .limit(6)
@@ -185,7 +179,6 @@ public class RagServiceImpl implements RagService {
 
             log.info("Prompt constructed for SSE stream (size={} chars)", prompt.length());
 
-            // 5. Stream Tokens
             StringBuilder fullAnswer = new StringBuilder();
             ChatRequest chatReq = new ChatRequest();
             chatReq.setMessage(prompt);
@@ -223,7 +216,6 @@ public class RagServiceImpl implements RagService {
                 emitter.send(SseEmitter.event().name("error").data("RAG SSE Pipeline Error: " + e.getMessage()));
                 emitter.completeWithError(e);
             } catch (Exception inner) {
-                // ignore
             }
         }
     }
@@ -240,7 +232,6 @@ public class RagServiceImpl implements RagService {
             List<SearchResult> searchResults = vectorStoreService.searchSimilar(questionEmbedding, TOP_K, courseId);
             log.info("Vector search returned {} results", searchResults.size());
 
-            // Deduplicate chunks preserving similarity score order
             List<SearchResult> deduplicated = new ArrayList<>();
             Set<String> seen = new HashSet<>();
             for (SearchResult r : searchResults) {
@@ -368,9 +359,6 @@ public class RagServiceImpl implements RagService {
         log.info("Background reindex-all completed successfully");
     }
 
-    // ------------------------------------------------------------------
-    // Chunking
-    // ------------------------------------------------------------------
 
     private List<String> chunkText(String text) {
         List<String> chunks = new ArrayList<>();
@@ -409,9 +397,6 @@ public class RagServiceImpl implements RagService {
         return text.split("\\s+").length;
     }
 
-    // ------------------------------------------------------------------
-    // Embedding and storage
-    // ------------------------------------------------------------------
 
     private void embedAndStoreChunks(Long documentId, Document document) {
         List<DocumentChunk> chunks = documentChunkRepository.findByDocumentId(documentId);
@@ -448,9 +433,6 @@ public class RagServiceImpl implements RagService {
         log.info("Batch embedded and stored {} chunks for document {}", storedDocuments.size(), documentId);
     }
 
-    // ------------------------------------------------------------------
-    // Prompt building
-    // ------------------------------------------------------------------
 
     private String getChunkText(Long documentId, int chunkIndex) {
         return documentChunkRepository.findByDocumentIdAndChunkIndex(documentId, chunkIndex)

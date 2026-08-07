@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
-// Role constants
 const ROLE_ADMIN = 'ROLE_ADMIN'
 const ROLE_PRINCIPAL = 'ROLE_PRINCIPAL'
 const ROLE_SCHOOL_ADMIN = 'ROLE_SCHOOL_ADMIN'

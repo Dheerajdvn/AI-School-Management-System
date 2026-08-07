@@ -241,9 +241,7 @@ public class DocumentServiceImpl implements DocumentService {
         log.info("Document deleted successfully: {}", id);
     }
 
-    // ------------------------------------------------------------------
     // Helper methods
-    // ------------------------------------------------------------------
 
     private void validateFile(MultipartFile file) {
         String extension = getExtension(file.getOriginalFilename()).toLowerCase();

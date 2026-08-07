@@ -18,7 +18,6 @@ export default function CourseForm({ course, onClose, onSave }) {
 
   useEffect(() => {
     if (course) setPayload({ ...course })
-    // load teachers
     UserApi.list({ role: 'ROLE_TEACHER', size: 100 })
       .then(r => {
         const pageData = r?.data?.data || r?.data || r

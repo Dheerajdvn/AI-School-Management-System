@@ -356,9 +356,7 @@ public class DashboardServiceImpl implements DashboardService {
         return response;
     }
 
-    // ------------------------------------------------------------------
     // Helper methods
-    // ------------------------------------------------------------------
 
     private Double calculateGpa(Double averagePercentage) {
         if (averagePercentage == null) {

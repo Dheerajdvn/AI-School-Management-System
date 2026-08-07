@@ -138,7 +138,6 @@ public class GlobalExceptionHandler {
                 "An unexpected error occurred", req, null);
     }
 
-    // ------------------------------------------------------------------
 
     private ResponseEntity<ErrorDetail> build(HttpStatus status, String message,
                                               HttpServletRequest req, Map<String, String> fields) {

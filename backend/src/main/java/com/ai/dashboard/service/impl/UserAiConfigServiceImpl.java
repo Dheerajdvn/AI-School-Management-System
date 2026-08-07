@@ -157,7 +157,6 @@ public class UserAiConfigServiceImpl implements UserAiConfigService {
         return providerRegistry.getSupportedProviders();
     }
 
-    // ------------------------------------------------------------------
 
     private UserAiConfigDto defaultConfigDto() {
         return UserAiConfigDto.builder()

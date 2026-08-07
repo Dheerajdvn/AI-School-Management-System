@@ -141,7 +141,6 @@ public class CourseController {
                 currentUserRole, currentUserId));
     }
 
-    // ------------------------------------------------------------------
 
     private Long extractUserId(Authentication authentication) {
         // Get from JwtAuthenticationFilter or SecurityContext

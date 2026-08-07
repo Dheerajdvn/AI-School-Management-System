@@ -35,7 +35,6 @@ public class AdminUserInitializer {
         return args -> {
             log.info("Checking default ADMIN user initialization...");
             
-            // 1. Ensure ROLE_ADMIN exists
             Role adminRole = roleRepository.findByName("ROLE_ADMIN")
                     .orElseGet(() -> {
                         Role role = Role.builder().name("ROLE_ADMIN").build();

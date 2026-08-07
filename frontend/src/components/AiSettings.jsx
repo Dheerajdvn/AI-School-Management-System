@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { AiConfigApi } from '../services/api'
 
-// Provider metadata for display
 const PROVIDER_INFO = {
   Ollama: { icon: 'bi-hdd-network', requiresKey: false, defaultBaseUrl: 'http://localhost:11434' },
   OpenAI: { icon: 'bi-translate', requiresKey: true, defaultBaseUrl: 'https://api.openai.com' },
@@ -36,7 +35,6 @@ const AiSettings = () => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
-  // Load config and providers on mount
   useEffect(() => {
     loadData()
   }, [])

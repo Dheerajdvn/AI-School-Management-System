@@ -10,7 +10,6 @@ export default function CourseDetails({ course, onClose, onEdit }) {
   const [totalStudents, setTotalStudents] = useState(0)
 
   useEffect(() => {
-    // fetch latest course details (in case changed)
     CourseApi.get(course.id).then(r => { if (r) setDetails(r) }).catch(() => {})
     fetchStudents()
     // eslint-disable-next-line react-hooks/exhaustive-deps

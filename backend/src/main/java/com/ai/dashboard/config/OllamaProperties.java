@@ -32,9 +32,6 @@ public class OllamaProperties {
     /** Maximum retry attempts for failed requests. */
     private int maxRetries = 3;
 
-    // ------------------------------------------------------------------
-    // RAG Configuration
-    // ------------------------------------------------------------------
 
     /** Top K retrieval for vector search */
     private int topK = 5;
@@ -60,9 +57,6 @@ public class OllamaProperties {
     /** Maximum conversation turns to retain */
     private int maxConversationTurns = 20;
 
-    // ------------------------------------------------------------------
-    // Streaming Configuration
-    // ------------------------------------------------------------------
 
     /** Enable streaming responses */
     private boolean streamingEnabled = true;

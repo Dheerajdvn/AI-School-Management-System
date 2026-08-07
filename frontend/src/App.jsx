@@ -40,7 +40,6 @@ const LoginPage = lazy(() => import('./pages/LoginPage'))
 const UnauthorizedPage = lazy(() => import('./pages/UnauthorizedPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
-// Main Admin Module pages
 const MainAdminDashboard = lazy(() => import('./pages/MainAdminDashboard'))
 const SchoolsPage = lazy(() => import('./pages/SchoolsPage'))
 const SchoolDetailsPage = lazy(() => import('./pages/SchoolDetailsPage'))
@@ -54,10 +53,8 @@ const SubscriptionsPage = lazy(() => import('./pages/SubscriptionsPage'))
 const AdminAnalyticsPage = lazy(() => import('./pages/AdminAnalyticsPage'))
 const AuditLogsPage = lazy(() => import('./pages/AuditLogsPage'))
 
-// School Admin Module pages
 const SchoolDashboard = lazy(() => import('./pages/school/SchoolDashboard'))
 
-// Examination & Assessment Module pages
 const ExamDashboard = lazy(() => import('./pages/exam/ExamDashboard'))
 const CreateExam = lazy(() => import('./pages/exam/CreateExam'))
 const ManageExams = lazy(() => import('./pages/exam/ManageExams'))
@@ -67,7 +64,6 @@ const UpcomingExams = lazy(() => import('./pages/exam/UpcomingExams'))
 const MyResults = lazy(() => import('./pages/exam/MyResults'))
 const PracticeTests = lazy(() => import('./pages/exam/PracticeTests'))
 
-// AI Knowledge Center Module pages
 const KnowledgeDashboard = lazy(() => import('./pages/knowledge/KnowledgeDashboard'))
 const UploadDocuments = lazy(() => import('./pages/knowledge/UploadDocuments'))
 const KnowledgeLibrary = lazy(() => import('./pages/knowledge/KnowledgeLibrary'))
@@ -77,7 +73,6 @@ const Collections = lazy(() => import('./pages/knowledge/Collections'))
 const ProcessingQueue = lazy(() => import('./pages/knowledge/ProcessingQueue'))
 const AIChat = lazy(() => import('./pages/knowledge/AIChat'))
 
-// Student Portal pages
 const StudentPortalDashboard = lazy(() => import('./pages/student/StudentDashboard'))
 const MyCoursesPage = lazy(() => import('./pages/student/MyCoursesPage'))
 const StudentAssignmentsPage = lazy(() => import('./pages/student/StudentAssignmentsPage'))
@@ -94,7 +89,6 @@ const StudentNotificationsPage = lazy(() => import('./pages/student/StudentNotif
 const StudentProfilePage = lazy(() => import('./pages/student/StudentProfilePage'))
 const StudentSettingsPage = lazy(() => import('./pages/student/StudentSettingsPage'))
 
-// Teacher Portal pages
 const TeacherPortalDashboard = lazy(() => import('./pages/teacher/TeacherPortalDashboard'))
 const MyClassesPage = lazy(() => import('./pages/teacher/MyClassesPage'))
 const AttendancePage = lazy(() => import('./pages/teacher/AttendancePage'))
@@ -118,7 +112,6 @@ const TimetablePage = lazy(() => import('./pages/school/TimetablePage'))
 const AnnouncementsPage = lazy(() => import('./pages/school/AnnouncementsPage'))
 const SchoolSettingsPage = lazy(() => import('./pages/school/SchoolSettingsPage'))
 
-// Role constants
 const ROLE_SUPER_ADMIN = 'ROLE_SUPER_ADMIN'
 const ROLE_ADMIN = 'ROLE_ADMIN'
 const ROLE_PRINCIPAL = 'ROLE_PRINCIPAL'
@@ -141,7 +134,6 @@ function RoleBasedTopbar({ onMenu }) {
   const { user } = useAuth()
   const { pathname } = useLocation()
   
-  // Route titles based on path
   const TITLES = {
     '/admin': 'Admin Dashboard',
     '/admin/analytics': 'AI Analytics',
@@ -311,7 +303,6 @@ function AppRoutes() {
   const { isAuthenticated, loading } = useAuth()
   const location = useLocation()
 
-  // Show loading spinner while checking authentication status
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>

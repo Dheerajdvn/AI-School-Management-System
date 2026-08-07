@@ -48,7 +48,6 @@ public class RefreshTokenService {
                 }
             }
         } catch (Exception e) {
-            // ignore
         }
         return memoryStore.get(refreshToken);
     }
@@ -66,7 +65,6 @@ public class RefreshTokenService {
                 }
             }
         } catch (Exception e) {
-            // ignore
         }
     }
 
@@ -83,7 +81,6 @@ public class RefreshTokenService {
                 redisTemplate.delete(userTokensKey);
             }
         } catch (Exception e) {
-            // ignore
         }
     }
 

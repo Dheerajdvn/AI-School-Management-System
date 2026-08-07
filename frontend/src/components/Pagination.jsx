@@ -12,7 +12,6 @@ export default function Pagination({
   const pages = []
   const maxVisiblePages = 5
 
-  // Calculate visible page range
   let startPage = Math.max(0, currentPage - Math.floor(maxVisiblePages / 2))
   let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1)
   

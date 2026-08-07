@@ -72,7 +72,6 @@ export default function FloatingAIAssistant() {
     try {
       localStorage.removeItem('floating_ai_assistant_pos')
     } catch {
-      // Ignore legacy storage cleanup failures.
     }
   }, [])
 

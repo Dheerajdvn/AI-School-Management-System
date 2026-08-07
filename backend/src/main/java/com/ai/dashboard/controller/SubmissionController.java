@@ -178,7 +178,6 @@ public class SubmissionController {
                 currentUserId, currentUserRole));
     }
 
-    // ------------------------------------------------------------------
 
     private Long extractUserId(Authentication authentication) {
         if (authentication == null) {

@@ -140,7 +140,6 @@ public class EnrollmentController {
                 enrollmentService.completeCourse(id, currentUserId, currentUserRole));
     }
 
-    // ------------------------------------------------------------------
 
     private Long extractUserId(Authentication authentication) {
         if (authentication.getDetails() instanceof Long) {

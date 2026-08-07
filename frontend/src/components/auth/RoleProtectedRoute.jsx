@@ -19,7 +19,6 @@ export default function RoleProtectedRoute({
 }) {
   const { user, loading } = useAuth()
 
-  // Show loading spinner while checking authentication status
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
@@ -35,25 +34,19 @@ export default function RoleProtectedRoute({
     return <Navigate to="/login" replace />
   }
 
-  // If no specific roles required, render children
   if (!requiredRoles) {
     return children
   }
 
-  // Normalize required roles to array
   const required = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles]
   
-  // Get user roles
   const userRoles = user.roles || []
   
-  // Check if user has any of the required roles
   const hasRequiredRole = required.some(role => userRoles.includes(role))
 
-  // Redirect to unauthorized page if user doesn't have required role
   if (!hasRequiredRole) {
     return <Navigate to={redirectTo} replace />
   }
 
-  // Render children if user has required role
   return children
 }

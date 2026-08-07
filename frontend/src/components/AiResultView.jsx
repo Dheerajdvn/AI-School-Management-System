@@ -14,7 +14,6 @@ export default function AiResultView({ response }) {
     return <div className="text-muted">No rows returned.</div>
   }
 
-  // Metric: single row, single column
   if (chartType === 'metric' && rows.length === 1 && columns.length === 1) {
     const label = columns[0]
     const raw = rows[0][label]
@@ -31,7 +30,6 @@ export default function AiResultView({ response }) {
     )
   }
 
-  // Two-column result -> chart
   if (columns.length === 2) {
     const labels = rows.map((r) => String(r[columns[0]]))
     const values = rows.map((r) => Number(r[columns[1]]) || 0)
@@ -39,7 +37,6 @@ export default function AiResultView({ response }) {
     return <Chart type={type} title={prettyLabel(columns[1])} labels={labels} values={values} />
   }
 
-  // Fallback: render a table
   return (
     <div className="table-responsive">
       <table className="table table-sm table-hover align-middle">

@@ -15,7 +15,6 @@ const AssignmentDetails = ({ id }) => {
       setAssignment(d)
     }).catch(console.error).finally(() => setLoading(false))
 
-    // load submissions count
     SubmissionApi.getByAssignment(id, { page: 0, size: 1 }).then(r => {
       const d = r?.data || r
       setSubmissionsCount(d?.totalElements || 0)

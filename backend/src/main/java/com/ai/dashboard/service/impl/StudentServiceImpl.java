@@ -127,7 +127,6 @@ public class StudentServiceImpl implements StudentService {
         return studentRepository.count();
     }
 
-    // ------------------------------------------------------------------
 
     private Pageable buildPageable(int page, int size, String sortBy, String direction) {
         int p = normalisePage(page);

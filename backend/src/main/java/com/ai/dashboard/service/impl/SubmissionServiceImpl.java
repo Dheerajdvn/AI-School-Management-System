@@ -208,7 +208,6 @@ public class SubmissionServiceImpl implements SubmissionService {
         return toPaged(result);
     }
 
-    // ------------------------------------------------------------------
 
     private void validateStudentRole(String currentUserRole) {
         if (!"ROLE_STUDENT".equals(currentUserRole) && !"ROLE_ADMIN".equals(currentUserRole)) {

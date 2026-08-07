@@ -213,7 +213,6 @@ public class AssignmentServiceImpl implements AssignmentService {
         return toPaged(result);
     }
 
-    // ------------------------------------------------------------------
 
     private void validateStudentRole(String currentUserRole) {
         if ("ROLE_STUDENT".equals(currentUserRole)) {

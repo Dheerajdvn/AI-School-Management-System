@@ -14,7 +14,6 @@ export default function DocumentPreview({ document, content, onClose }) {
 
   const isPdf = document.contentType === 'application/pdf' || document.originalFilename?.toLowerCase().endsWith('.pdf')
   
-  // Default to 'pdf' view for PDFs if available, otherwise 'text'
   const [activeTab, setActiveTab] = useState(isPdf ? 'pdf' : 'text')
 
   useEffect(() => {

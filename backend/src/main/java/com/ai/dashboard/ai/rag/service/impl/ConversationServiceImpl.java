@@ -55,7 +55,6 @@ public class ConversationServiceImpl implements ConversationService {
                 .build();
         messageRepository.save(message);
 
-        // Update session stats
         session.setMessageCount(session.getMessageCount() + 1);
         session.setTotalTokens(session.getTotalTokens() + message.getTokenCount());
         sessionRepository.save(session);

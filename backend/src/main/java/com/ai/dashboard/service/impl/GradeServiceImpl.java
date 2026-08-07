@@ -254,7 +254,6 @@ public class GradeServiceImpl implements GradeService {
                 .build();
     }
 
-    // ------------------------------------------------------------------
 
     private void validateTeacherOrAdminRole(String currentUserRole) {
         if ("ROLE_STUDENT".equals(currentUserRole)) {

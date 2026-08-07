@@ -154,7 +154,6 @@ public class CourseServiceImpl implements CourseService {
         return toPaged(result);
     }
 
-    // ------------------------------------------------------------------
 
     private boolean isAdmin(String role) {
         return "ROLE_ADMIN".equals(role) || "ROLE_SUPER_ADMIN".equals(role);
