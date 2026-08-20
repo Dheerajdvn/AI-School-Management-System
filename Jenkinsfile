@@ -58,14 +58,21 @@ pipeline {
                         withCredentials([string(credentialsId: 'RENDER_DEPLOY_HOOK', variable: 'RENDER_HOOK')]) {
                             renderCredentialsBound = true
                             echo '===> Triggering Render Backend Deployment...'
-                            sh 'curl -s -f -X POST "$RENDER_HOOK"'
+                            def response = sh(script: 'curl -s -w "\\n%{http_code}" -X POST "$RENDER_HOOK"', returnStdout: true).trim().split('\n')
+                            def responseCode = response[-1].trim()
+                            def responseBody = response[0..-2].join('\n')
+                            echo "Render Deploy Hook HTTP Status: ${responseCode}"
+                            echo "Render Deploy Hook Response: ${responseBody}"
+                            if (responseCode.toInteger() < 200 || responseCode.toInteger() >= 300) {
+                                error("Render deploy hook failed with status ${responseCode}: ${responseBody}")
+                            }
                             echo '===> Render deployment triggered successfully!'
                         }
                     } catch (Exception e) {
                         if (!renderCredentialsBound) {
                             echo 'ℹ️ RENDER_DEPLOY_HOOK not found in Jenkins Credentials. Skipping Render deployment.'
                         } else {
-                            echo "❌ Render deployment command failed: ${e.message}"
+                            echo "❌ Render deployment failed: ${e.message}"
                             currentBuild.result = 'FAILURE'
                             error("Render deployment failed: ${e.message}")
                         }
@@ -94,7 +101,14 @@ pipeline {
                                 withCredentials([string(credentialsId: 'VERCEL_DEPLOY_HOOK', variable: 'VERCEL_HOOK')]) {
                                     vercelHookBound = true
                                     echo '===> Triggering Vercel Frontend Deployment via Deploy Hook...'
-                                    sh 'curl -s -f -X POST "$VERCEL_HOOK"'
+                                    def response = sh(script: 'curl -s -w "\\n%{http_code}" -X POST "$VERCEL_HOOK"', returnStdout: true).trim().split('\n')
+                                    def responseCode = response[-1].trim()
+                                    def responseBody = response[0..-2].join('\n')
+                                    echo "Vercel Deploy Hook HTTP Status: ${responseCode}"
+                                    echo "Vercel Deploy Hook Response: ${responseBody}"
+                                    if (responseCode.toInteger() < 200 || responseCode.toInteger() >= 300) {
+                                        error("Vercel deploy hook failed with status ${responseCode}: ${responseBody}")
+                                    }
                                     echo '===> Vercel deploy hook triggered!'
                                 }
                             } catch (Exception e2) {

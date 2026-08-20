@@ -88,3 +88,41 @@ Configure these environment variables in your **Render Web Service**:
 3. Set **Framework Preset**: `Vite`.
 4. Set **Build Command**: `npm run build`.
 5. Deploy. Vercel automatically proxies API calls using `vercel.json` rewrites to Render.
+
+---
+
+## 🤖 Automated CI/CD Deployment via Jenkins
+
+The repository contains a [`Jenkinsfile`](file:///f:/ZCodeProject/Jenkinsfile) configured to automatically compile, build, test, and deploy the application to Render (Backend) and Vercel (Frontend) when changes are pushed to the `main` branch.
+
+To enable the deployment triggers in Jenkins, you must configure the following credentials in Jenkins:
+
+### 1. Backend Deployment (Render)
+Render uses a unique deploy hook URL to trigger a redeploy of your service.
+1. Go to your **Render Dashboard** and select your **Web Service**.
+2. Scroll down to the **Deploy Hook** section and copy the URL (looks like `https://api.render.com/deploy/srv-...`).
+3. Open your **Jenkins Server** -> **Manage Jenkins** -> **Credentials** -> **System** -> **Global credentials**.
+4. Click **Add Credentials**:
+   * **Kind**: `Secret text`
+   * **Secret**: *Paste your Render Deploy Hook URL*
+   * **ID**: `RENDER_DEPLOY_HOOK`
+   * **Description**: `Render deploy hook URL for backend service`
+
+### 2. Frontend Deployment (Vercel)
+You can deploy to Vercel via **Deploy Hooks** (recommended for simplicity) or **Vercel API Token** (for direct CLI deployments).
+
+#### Option A: Vercel Deploy Hook (Recommended)
+1. Go to your **Vercel Dashboard** -> Select your project -> **Settings** -> **Git**.
+2. Scroll down to **Deploy Hooks**, enter a name (e.g., `jenkins-deploy`), select your branch (`main`), and click **Create**.
+3. Copy the generated webhook URL.
+4. In **Jenkins** -> **Credentials** -> **Global credentials**, click **Add Credentials**:
+   * **Kind**: `Secret text`
+   * **Secret**: *Paste your Vercel Deploy Hook URL*
+   * **ID**: `VERCEL_DEPLOY_HOOK`
+   * **Description**: `Vercel deploy hook URL for frontend project`
+
+#### Option B: Vercel CLI & API Token
+If you want Jenkins to deploy using the Vercel CLI directly, add the following credential in Jenkins:
+1. **`VERCEL_TOKEN`**: Go to your Vercel Account Settings -> **Tokens** -> Create a token.
+2. In **Jenkins**, add the token as a `Secret text` credential with the ID `VERCEL_TOKEN`.
+
