@@ -5,11 +5,6 @@ pipeline {
         maven 'Maven-3.9'
     }
 
-    environment {
-        RENDER_HOOK = credentials('RENDER_DEPLOY_HOOK')
-        VERCEL_HOOK = credentials('VERCEL_DEPLOY_HOOK')
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -45,33 +40,39 @@ pipeline {
                 branch 'main'
             }
             steps {
-                echo '===> CI checks passed successfully! Triggering production deployments...'
+                echo '===> CI checks passed successfully! Checking for deployment hooks...'
                 script {
-                    if (env.RENDER_HOOK) {
-                        echo '===> Triggering Render Backend Deployment...'
-                        sh 'curl -s -X POST "$RENDER_HOOK"'
-                    } else {
-                        echo '===> RENDER_DEPLOY_HOOK not configured in Jenkins Credentials, skipping Render trigger.'
+                    // Trigger Render deploy hook if credential exists
+                    try {
+                        withCredentials([string(credentialsId: 'RENDER_DEPLOY_HOOK', variable: 'RENDER_HOOK')]) {
+                            echo '===> Triggering Render Backend Deployment...'
+                            sh 'curl -s -X POST "$RENDER_HOOK"'
+                        }
+                    } catch (Exception e) {
+                        echo 'ℹ️ RENDER_DEPLOY_HOOK not configured in Jenkins Credentials. Skipping Render deployment.'
                     }
 
-                    if (env.VERCEL_HOOK) {
-                        echo '===> Triggering Vercel Frontend Deployment...'
-                        sh 'curl -s -X POST "$VERCEL_HOOK"'
-                    } else {
-                        echo '===> VERCEL_DEPLOY_HOOK not configured in Jenkins Credentials, skipping Vercel trigger.'
+                    // Trigger Vercel deploy hook if credential exists
+                    try {
+                        withCredentials([string(credentialsId: 'VERCEL_DEPLOY_HOOK', variable: 'VERCEL_HOOK')]) {
+                            echo '===> Triggering Vercel Frontend Deployment...'
+                            sh 'curl -s -X POST "$VERCEL_HOOK"'
+                        }
+                    } catch (Exception e) {
+                        echo 'ℹ️ VERCEL_DEPLOY_HOOK not configured in Jenkins Credentials. Skipping Vercel deployment.'
                     }
                 }
-                echo '===> Deployment phase completed!'
+                echo '===> Deployment stage completed!'
             }
         }
     }
 
     post {
         success {
-            echo '🎉 Pipeline completed successfully! Application tested and deployed.'
+            echo '🎉 Pipeline completed successfully! Application tested and ready.'
         }
         failure {
-            echo '❌ Pipeline failed! Deployment was aborted to protect production.'
+            echo '❌ Pipeline failed! Deployment was aborted.'
         }
     }
 }
