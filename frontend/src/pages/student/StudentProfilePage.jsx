@@ -1,116 +1,275 @@
 import React, { useState, useEffect } from 'react'
+import { useToast } from '../../hooks/useToast'
+import LoadingIndicator from '../../components/LoadingIndicator'
 
 export default function StudentProfilePage() {
+  const { success, error } = useToast()
   const [loading, setLoading] = useState(true)
   const [profile, setProfile] = useState(null)
 
   useEffect(() => {
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setProfile({
-        firstName: 'Rahul', lastName: 'Sharma', rollNumber: 'R-1001', admissionNumber: 'ADM-2024-001',
-        gender: 'Male', dob: '2008-05-15', email: 'rahul.sharma@school.edu', phone: '+91 98765 43210',
-        className: 'Class 10-A', section: 'A', parentName: 'Mr. Rajesh Sharma',
-        parentPhone: '+91 98765 43211', emergencyContact: 'Mrs. Sunita Sharma', emergencyPhone: '+91 98765 43212'
+        firstName: 'Rahul', 
+        lastName: 'Sharma', 
+        rollNumber: 'R-1001', 
+        admissionNumber: 'ADM-2024-001',
+        gender: 'Male', 
+        dob: '2008-05-15', 
+        email: 'rahul.sharma@school.edu', 
+        phone: '+91 98765 43210',
+        className: 'Class 10-A', 
+        section: 'A', 
+        parentName: 'Mr. Rajesh Sharma',
+        parentPhone: '+91 98765 43211', 
+        emergencyContact: 'Mrs. Sunita Sharma', 
+        emergencyPhone: '+91 98765 43212'
       })
       setLoading(false)
-    }, 600)
+    }, 400)
+    return () => clearTimeout(timer)
   }, [])
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [passwordForm, setPasswordForm] = useState({ current: '', new: '', confirm: '' })
 
+  const handlePasswordSubmit = (e) => {
+    e.preventDefault()
+    if (!passwordForm.current) {
+      error('Please enter your current password')
+      return
+    }
+    if (passwordForm.new.length < 6) {
+      error('New password must be at least 6 characters')
+      return
+    }
+    if (passwordForm.new !== passwordForm.confirm) {
+      error('Passwords do not match')
+      return
+    }
+    success('Password updated successfully!')
+    setShowPasswordModal(false)
+    setPasswordForm({ current: '', new: '', confirm: '' })
+  }
+
   if (loading) {
-    return (
-      <div className="splp-page">
-        <div className="skeleton-row" />
-        <style>{splpStyles}</style>
-      </div>
-    )
+    return <LoadingIndicator message="Loading profile details..." />
   }
 
   return (
-    <div className="splp-page">
-      <h4 className="mb-3"><i className="bi bi-person me-2" />My Profile</h4>
-
-      <div className="glass-card mb-3">
-        <div className="card-header-custom"><h5>Personal Details</h5></div>
-        <div className="card-body">
-          <div className="row g-3">
-            <div className="col-md-6"><label className="form-label">First Name</label><input type="text" className="form-control" defaultValue={profile.firstName} readOnly /></div>
-            <div className="col-md-6"><label className="form-label">Last Name</label><input type="text" className="form-control" defaultValue={profile.lastName} readOnly /></div>
-            <div className="col-md-6"><label className="form-label">Roll Number</label><input type="text" className="form-control" defaultValue={profile.rollNumber} readOnly /></div>
-            <div className="col-md-6"><label className="form-label">Admission Number</label><input type="text" className="form-control" defaultValue={profile.admissionNumber} readOnly /></div>
-            <div className="col-md-6"><label className="form-label">Gender</label><input type="text" className="form-control" defaultValue={profile.gender} readOnly /></div>
-            <div className="col-md-6"><label className="form-label">Date of Birth</label><input type="text" className="form-control" defaultValue={profile.dob} readOnly /></div>
-            <div className="col-md-6"><label className="form-label">Email</label><input type="email" className="form-control" defaultValue={profile.email} readOnly /></div>
-            <div className="col-md-6"><label className="form-label">Phone</label><input type="tel" className="form-control" defaultValue={profile.phone} readOnly /></div>
-          </div>
-        </div>
-      </div>
-
-      <div className="glass-card mb-3">
-        <div className="card-header-custom"><h5>Parent/Guardian Details</h5></div>
-        <div className="card-body">
-          <div className="row g-3">
-            <div className="col-md-6"><label className="form-label">Parent Name</label><input type="text" className="form-control" defaultValue={profile.parentName} readOnly /></div>
-            <div className="col-md-6"><label className="form-label">Parent Phone</label><input type="tel" className="form-control" defaultValue={profile.parentPhone} readOnly /></div>
-          </div>
-        </div>
-      </div>
-
-      <div className="glass-card mb-3">
-        <div className="card-header-custom"><h5>Emergency Contact</h5></div>
-        <div className="card-body">
-          <div className="row g-3">
-            <div className="col-md-6"><label className="form-label">Contact Name</label><input type="text" className="form-control" defaultValue={profile.emergencyContact} readOnly /></div>
-            <div className="col-md-6"><label className="form-label">Contact Phone</label><input type="tel" className="form-control" defaultValue={profile.emergencyPhone} readOnly /></div>
-          </div>
-        </div>
-      </div>
-
-      <div className="glass-card">
-        <div className="card-header-custom"><h5>Security</h5></div>
-        <div className="card-body">
-          <button className="btn btn-outline-primary" onClick={() => setShowPasswordModal(true)}><i className="bi bi-key me-1" />Change Password</button>
-        </div>
-      </div>
-
-      {showPasswordModal && (
-        <div className="modal-overlay" onClick={() => setShowPasswordModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header-custom"><h5>Change Password</h5><button className="btn-close btn-close-white" onClick={() => setShowPasswordModal(false)} /></div>
-            <div className="modal-body">
-              <div className="mb-3"><label className="form-label">Current Password</label><input type="password" className="form-control" value={passwordForm.current} onChange={e => setPasswordForm({ ...passwordForm, current: e.target.value })} /></div>
-              <div className="mb-3"><label className="form-label">New Password</label><input type="password" className="form-control" value={passwordForm.new} onChange={e => setPasswordForm({ ...passwordForm, new: e.target.value })} /></div>
-              <div className="mb-3"><label className="form-label">Confirm New Password</label><input type="password" className="form-control" value={passwordForm.confirm} onChange={e => setPasswordForm({ ...passwordForm, confirm: e.target.value })} /></div>
+    <div className="container-fluid p-0 animate-fade">
+      {/* Profile Header Card */}
+      <div className="card mb-4 border shadow-xs bg-card overflow-hidden" style={{ borderRadius: '16px' }}>
+        <div className="card-body p-4">
+          <div className="d-flex flex-column flex-sm-row align-items-center gap-4">
+            <div 
+              className="rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-xs"
+              style={{
+                width: '84px',
+                height: '84px',
+                fontSize: '2rem',
+                backgroundColor: 'var(--primary)',
+                color: '#ffffff',
+                border: '3px solid var(--border)'
+              }}
+            >
+              {profile.firstName.charAt(0)}
             </div>
-            <div className="modal-footer-custom"><button className="btn btn-secondary" onClick={() => setShowPasswordModal(false)}>Cancel</button><button className="btn btn-primary" onClick={() => { alert('Password updated!'); setShowPasswordModal(false); }}>Update Password</button></div>
+            <div className="text-center text-sm-start flex-grow-1">
+              <div className="d-flex align-items-center justify-content-center justify-content-sm-start gap-2 mb-1">
+                <h3 className="fw-bold mb-0" style={{ color: 'var(--text)' }}>
+                  {profile.firstName} {profile.lastName}
+                </h3>
+                <span className="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1 small">
+                  {profile.className}
+                </span>
+              </div>
+              <p className="text-muted small mb-2 d-flex align-items-center justify-content-center justify-content-sm-start gap-3 flex-wrap">
+                <span><i className="bi bi-person-badge me-1 text-primary" />Roll: {profile.rollNumber}</span>
+                <span><i className="bi bi-card-text me-1 text-primary" />Adm: {profile.admissionNumber}</span>
+                <span><i className="bi bi-envelope me-1 text-primary" />{profile.email}</span>
+              </p>
+            </div>
+            <button 
+              type="button"
+              className="btn btn-secondary btn-sm rounded-3 d-flex align-items-center gap-2"
+              onClick={() => setShowPasswordModal(true)}
+            >
+              <i className="bi bi-key" />
+              <span>Change Password</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Grid of Profile Details */}
+      <div className="row g-4 mb-4">
+        {/* Personal Details */}
+        <div className="col-lg-6">
+          <div className="card border shadow-xs bg-card h-100" style={{ borderRadius: '16px' }}>
+            <div className="card-header border-bottom py-3 bg-card">
+              <h5 className="mb-0 fw-bold" style={{ color: 'var(--text)', fontSize: '15px' }}>
+                <i className="bi bi-person-lines-fill me-2 text-primary" />
+                Personal Details
+              </h5>
+            </div>
+            <div className="card-body p-4">
+              <div className="row g-3">
+                <div className="col-sm-6">
+                  <label className="form-label text-muted small fw-semibold">First Name</label>
+                  <input type="text" className="form-control bg-surface border" value={profile.firstName} readOnly />
+                </div>
+                <div className="col-sm-6">
+                  <label className="form-label text-muted small fw-semibold">Last Name</label>
+                  <input type="text" className="form-control bg-surface border" value={profile.lastName} readOnly />
+                </div>
+                <div className="col-sm-6">
+                  <label className="form-label text-muted small fw-semibold">Gender</label>
+                  <input type="text" className="form-control bg-surface border" value={profile.gender} readOnly />
+                </div>
+                <div className="col-sm-6">
+                  <label className="form-label text-muted small fw-semibold">Date of Birth</label>
+                  <input type="text" className="form-control bg-surface border" value={profile.dob} readOnly />
+                </div>
+                <div className="col-sm-6">
+                  <label className="form-label text-muted small fw-semibold">Email Address</label>
+                  <input type="email" className="form-control bg-surface border" value={profile.email} readOnly />
+                </div>
+                <div className="col-sm-6">
+                  <label className="form-label text-muted small fw-semibold">Phone Number</label>
+                  <input type="tel" className="form-control bg-surface border" value={profile.phone} readOnly />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Parent & Emergency Details */}
+        <div className="col-lg-6">
+          <div className="d-flex flex-column gap-4 h-100">
+            {/* Parent Details */}
+            <div className="card border shadow-xs bg-card flex-grow-1" style={{ borderRadius: '16px' }}>
+              <div className="card-header border-bottom py-3 bg-card">
+                <h5 className="mb-0 fw-bold" style={{ color: 'var(--text)', fontSize: '15px' }}>
+                  <i className="bi bi-people me-2 text-primary" />
+                  Parent / Guardian
+                </h5>
+              </div>
+              <div className="card-body p-4">
+                <div className="row g-3">
+                  <div className="col-sm-6">
+                    <label className="form-label text-muted small fw-semibold">Guardian Name</label>
+                    <input type="text" className="form-control bg-surface border" value={profile.parentName} readOnly />
+                  </div>
+                  <div className="col-sm-6">
+                    <label className="form-label text-muted small fw-semibold">Guardian Contact</label>
+                    <input type="tel" className="form-control bg-surface border" value={profile.parentPhone} readOnly />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Emergency Contact */}
+            <div className="card border shadow-xs bg-card flex-grow-1" style={{ borderRadius: '16px' }}>
+              <div className="card-header border-bottom py-3 bg-card">
+                <h5 className="mb-0 fw-bold" style={{ color: 'var(--text)', fontSize: '15px' }}>
+                  <i className="bi bi-telephone-plus me-2 text-danger" />
+                  Emergency Contact
+                </h5>
+              </div>
+              <div className="card-body p-4">
+                <div className="row g-3">
+                  <div className="col-sm-6">
+                    <label className="form-label text-muted small fw-semibold">Contact Person</label>
+                    <input type="text" className="form-control bg-surface border" value={profile.emergencyContact} readOnly />
+                  </div>
+                  <div className="col-sm-6">
+                    <label className="form-label text-muted small fw-semibold">Emergency Number</label>
+                    <input type="tel" className="form-control bg-surface border" value={profile.emergencyPhone} readOnly />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Password Modal */}
+      {showPasswordModal && (
+        <div 
+          className="modal fade show d-block" 
+          tabIndex="-1" 
+          style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', zIndex: 1050 }}
+        >
+          <div className="modal-dialog modal-dialog-centered" style={{ maxWidth: '440px' }}>
+            <div className="modal-content border shadow-2xl bg-card" style={{ borderRadius: '16px' }}>
+              <div className="modal-header border-bottom py-3">
+                <h5 className="modal-title fw-bold" style={{ color: 'var(--text)', fontSize: '15px' }}>
+                  <i className="bi bi-shield-lock me-2 text-primary" />
+                  Change Password
+                </h5>
+                <button 
+                  type="button" 
+                  className="btn-close" 
+                  onClick={() => setShowPasswordModal(false)} 
+                />
+              </div>
+              <form onSubmit={handlePasswordSubmit}>
+                <div className="modal-body p-4">
+                  <div className="mb-3">
+                    <label className="form-label text-muted small fw-semibold">Current Password</label>
+                    <input 
+                      type="password" 
+                      className="form-control" 
+                      value={passwordForm.current} 
+                      onChange={e => setPasswordForm({ ...passwordForm, current: e.target.value })} 
+                      placeholder="••••••••"
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label text-muted small fw-semibold">New Password</label>
+                    <input 
+                      type="password" 
+                      className="form-control" 
+                      value={passwordForm.new} 
+                      onChange={e => setPasswordForm({ ...passwordForm, new: e.target.value })} 
+                      placeholder="At least 6 characters"
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label text-muted small fw-semibold">Confirm New Password</label>
+                    <input 
+                      type="password" 
+                      className="form-control" 
+                      value={passwordForm.confirm} 
+                      onChange={e => setPasswordForm({ ...passwordForm, confirm: e.target.value })} 
+                      placeholder="Repeat new password"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="modal-footer border-top py-3">
+                  <button 
+                    type="button" 
+                    className="btn btn-secondary btn-sm" 
+                    onClick={() => setShowPasswordModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="btn btn-primary btn-sm"
+                  >
+                    Update Password
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
-
-      <style>{splpStyles}</style>
     </div>
   )
 }
-
-const splpStyles = `
-.splp-page h4 { margin: 0; font-weight: 700; }
-.splp-page .glass-card { background: rgba(255,255,255,0.06); backdrop-filter: blur(12px); border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; }
-.splp-page .card-header-custom { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
-.splp-page .card-header-custom h5 { margin: 0; font-weight: 600; }
-.splp-page .card-body { padding: 1.25rem; }
-.splp-page .form-control, .splp-page .form-select { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: inherit; border-radius: 10px; }
-.splp-page .form-control:focus, .splp-page .form-select:focus { background: rgba(255,255,255,0.1); border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
-.splp-page .btn-primary { background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; border-radius: 10px; font-weight: 600; }
-.splp-page .btn-outline-primary { border-color: #3b82f6; color: #60a5fa; }
-.splp-page .btn-outline-primary:hover { background: rgba(59,130,246,0.1); }
-.splp-page .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1050; padding: 1rem; }
-.splp-page .modal-content { background: #1e293b; border-radius: 16px; border: 1px solid rgba(255,255,255,0.15); max-width: 520px; width: 100%; max-height: 90vh; overflow-y: auto; }
-.splp-page .modal-header-custom { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
-.splp-page .modal-header-custom h5 { margin: 0; }
-.splp-page .modal-body { padding: 1.25rem; }
-.splp-page .modal-footer-custom { display: flex; justify-content: flex-end; gap: 0.5rem; padding: 1rem 1.25rem; border-top: 1px solid rgba(255,255,255,0.1); }
-.splp-page .skeleton-row { height: 300px; border-radius: 16px; background: rgba(255,255,255,0.06); animation: pulse 1.5s infinite; }
-@keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.7; } }
-`

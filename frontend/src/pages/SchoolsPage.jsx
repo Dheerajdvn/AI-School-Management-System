@@ -166,18 +166,18 @@ export default function SchoolsPage() {
                     </td>
                     <td>
                       <div className="d-flex gap-1">
-                        <Link to={`/admin/schools/${school.id}`} className="btn btn-sm btn-outline-primary" title="View Details">
-                          <i className="bi bi-eye"></i>
+                        <Link to={`/admin/schools/${school.id}`} className="btn btn-action-view" title="View Details">
+                          <i className="bi bi-eye" />
                         </Link>
-                        <Link to={`/admin/schools/${school.id}/edit`} className="btn btn-sm btn-outline-secondary" title="Edit School">
-                          <i className="bi bi-pencil"></i>
+                        <Link to={`/admin/schools/${school.id}/edit`} className="btn btn-outline-secondary" title="Edit School">
+                          <i className="bi bi-pencil" />
                         </Link>
                         <button
-                          className="btn btn-sm btn-outline-danger"
+                          className="btn btn-outline-danger"
                           onClick={() => handleDelete(school.id)}
                           title="Delete School"
                         >
-                          <i className="bi bi-trash"></i>
+                          <i className="bi bi-trash" />
                         </button>
                         <button
                           className={`btn btn-sm ${school.status === 'ACTIVE' ? 'btn-outline-warning' : 'btn-outline-success'}`}

@@ -64,7 +64,7 @@ export default function AIQuizPracticePage() {
 
         <div className="glass-card shadow-sm max-w-lg mx-auto">
           <div className="card-header-custom p-3 border-bottom">
-            <h5 className="fw-bold mb-0 text-white" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>Quiz Settings</h5>
+            <h5 className="fw-bold mb-0" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>Quiz Settings</h5>
           </div>
           <div className="card-body p-4">
             <div className="row g-3 mb-3.5">
@@ -130,7 +130,7 @@ export default function AIQuizPracticePage() {
         <div className="glass-card shadow-sm text-center py-5 max-w-lg mx-auto">
           <div className="card-body">
             <i className="bi bi-trophy-fill text-warning mb-3 d-block" style={{ fontSize: '4.5rem' }} />
-            <h3 className="fw-bold text-white mb-2" style={{ color: 'var(--text)' }}>Your Score: {score} / {questions.length}</h3>
+            <h3 className="fw-bold mb-2" style={{ color: 'var(--text)' }}>Your Score: {score} / {questions.length}</h3>
             <p className="text-muted font-semibold mb-4">{percentage}% Correct Answer Ratio</p>
             <button className="btn btn-primary rounded-3 px-4 py-2 fw-semibold" onClick={resetQuiz}>Try Another Session</button>
           </div>
@@ -155,7 +155,7 @@ export default function AIQuizPracticePage() {
 
       <div className="glass-card shadow-sm mb-4 max-w-lg mx-auto">
         <div className="card-body p-4">
-          <h5 className="fw-bold text-white mb-4" style={{ color: 'var(--text)', lineHeight: '1.4' }}>{q.question}</h5>
+          <h5 className="fw-bold mb-4" style={{ color: 'var(--text)', lineHeight: '1.4' }}>{q.question}</h5>
           <div className="options-list d-flex flex-column gap-2.5">
             {q.options.map((opt, i) => {
               const hasAnswered = selectedAnswers[q.id] !== undefined

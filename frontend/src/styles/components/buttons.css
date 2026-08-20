@@ -3,9 +3,9 @@
   font-weight: 500;
   font-size: 0.85rem;
   padding: 0 14px !important;
-  height: 34px !important;
+  height: 36px !important;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  display: inline-flex !alignment;
+  display: inline-flex !important;
   align-items: center;
   justify-content: center;
   gap: 8px !important;
@@ -23,28 +23,28 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #6D7CFF, #8B7CFF) !important;
+  background: linear-gradient(135deg, #6366F1, #8B5CF6) !important;
   border: none !important;
   color: #fff !important;
-  box-shadow: 0 2px 8px rgba(109, 124, 255, 0.25);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #7C8CFF, #9B8CFF) !important;
-  box-shadow: 0 0 20px rgba(109, 124, 255, 0.35) !important;
+  background: linear-gradient(135deg, #4F46E5, #7C3AED) !important;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.35) !important;
   color: #fff !important;
   transform: translateY(-1px);
 }
 
 .btn-secondary {
-  background: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
   color: var(--text) !important;
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.05) !important;
-  border-color: rgba(255, 255, 255, 0.20) !important;
+  background: var(--hover) !important;
+  border-color: var(--border-hover, var(--primary)) !important;
   color: var(--text) !important;
   transform: translateY(-1px);
 }
@@ -85,11 +85,75 @@
   transform: translateY(-1px);
 }
 
+.btn-outline-secondary {
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+  background: transparent !important;
+}
+
+.btn-outline-secondary:hover {
+  background: var(--hover) !important;
+  color: var(--text) !important;
+  border-color: var(--border-hover, var(--primary)) !important;
+  transform: translateY(-1px);
+}
+
+.btn-outline-info {
+  color: var(--primary) !important;
+  border-color: var(--border) !important;
+  background: var(--surface) !important;
+}
+
+.btn-outline-info:hover {
+  background: var(--hover) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px);
+}
+
+.btn-outline-danger {
+  color: #ef4444 !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  background: transparent !important;
+}
+
+.btn-outline-danger:hover {
+  background: #ef4444 !important;
+  border-color: #ef4444 !important;
+  color: #fff !important;
+  transform: translateY(-1px);
+}
+
+/* Universal Action Buttons across all tables and cards */
+.btn-action-view, .btn-view {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--primary) !important;
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+  height: 30px !important;
+  padding: 0 10px !important;
+  border-radius: 8px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  transition: all 0.2s ease !important;
+  text-decoration: none !important;
+}
+
+.btn-action-view:hover, .btn-view:hover {
+  background: var(--hover) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.15) !important;
+}
+
 .btn-icon {
-  width: 34px !important;
-  height: 34px !important;
+  width: 32px !important;
+  height: 30px !important;
   padding: 0 !important;
-  border-radius: 10px !important;
+  border-radius: 8px !important;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -100,7 +164,7 @@
 }
 
 .btn-icon i, .btn-icon .bi {
-  font-size: 16px !important;
+  font-size: 14px !important;
 }
 
 .avatar-circle {
@@ -117,8 +181,8 @@
 
 .btn-icon:hover {
   background: var(--hover) !important;
-  border-color: rgba(255, 255, 255, 0.16) !important;
-  color: var(--text) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
 }
 
 .btn-sm, .btn-group-sm > .btn {

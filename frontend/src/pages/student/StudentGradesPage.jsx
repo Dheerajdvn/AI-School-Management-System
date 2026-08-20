@@ -51,10 +51,10 @@ export default function StudentGradesPage() {
       </div>
 
       <div className="row g-3 mb-4">
-        <div className="col-md-3 col-sm-6"><div className="stat-card gradient-card green"><div className="stat-icon"><i className="bi bi-trophy" /></div><div className="stat-content"><span className="stat-label">GPA</span><span className="stat-value">{gpa}</span></div></div></div>
-        <div className="col-md-3 col-sm-6"><div className="stat-card gradient-card blue"><div className="stat-icon"><i className="bi bi-bar-chart" /></div><div className="stat-content"><span className="stat-label">Average</span><span className="stat-value">{Math.round(grades.reduce((a, g) => a + g.average, 0) / grades.length)}%</span></div></div></div>
-        <div className="col-md-3 col-sm-6"><div className="stat-card gradient-card purple"><div className="stat-icon"><i className="bi bi-trophy-fill" /></div><div className="stat-content"><span className="stat-label">A+ Grades</span><span className="stat-value">{grades.filter(g => g.grade === 'A+').length}</span></div></div></div>
-        <div className="col-md-3 col-sm-6"><div className="stat-card gradient-card orange"><div className="stat-icon"><i className="bi bi-journal-text" /></div><div className="stat-content"><span className="stat-label">Subjects</span><span className="stat-value">{grades.length}</span></div></div></div>
+        <div className="col-md-3 col-sm-6"><div className="stat-card shadow-xs"><div className="stat-icon"><i className="bi bi-trophy text-primary" /></div><div className="stat-content"><span className="stat-label">GPA</span><span className="stat-value">{gpa}</span></div></div></div>
+        <div className="col-md-3 col-sm-6"><div className="stat-card shadow-xs"><div className="stat-icon"><i className="bi bi-bar-chart text-primary" /></div><div className="stat-content"><span className="stat-label">Average</span><span className="stat-value">{Math.round(grades.reduce((a, g) => a + g.average, 0) / grades.length)}%</span></div></div></div>
+        <div className="col-md-3 col-sm-6"><div className="stat-card shadow-xs"><div className="stat-icon"><i className="bi bi-trophy-fill text-primary" /></div><div className="stat-content"><span className="stat-label">A+ Grades</span><span className="stat-value">{grades.filter(g => g.grade === 'A+').length}</span></div></div></div>
+        <div className="col-md-3 col-sm-6"><div className="stat-card shadow-xs"><div className="stat-icon"><i className="bi bi-journal-text text-primary" /></div><div className="stat-content"><span className="stat-label">Subjects</span><span className="stat-value">{grades.length}</span></div></div></div>
       </div>
 
       <div className="glass-card">

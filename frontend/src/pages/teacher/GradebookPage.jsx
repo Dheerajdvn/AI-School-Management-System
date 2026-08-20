@@ -154,17 +154,17 @@ export default function GradebookPage() {
         </div>
         <div className="d-flex flex-wrap gap-2.5">
           <select 
-            className="form-select bg-dark border-secondary text-white rounded-3 py-1.5"
-            style={{ width: 'auto', minWidth: '150px' }} 
+            className="form-select bg-surface border rounded-3 py-1.5"
+            style={{ width: 'auto', minWidth: '150px', color: 'var(--text)', borderColor: 'var(--border)' }} 
             value={selectedClass} 
             onChange={e => setSelectedClass(e.target.value)}
           >
             {classes.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
-          <button className="btn btn-outline-secondary rounded-3 border-0 text-white" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }} onClick={() => handleExport('pdf')}>
+          <button className="btn btn-secondary rounded-3 d-flex align-items-center" onClick={() => handleExport('pdf')}>
             <i className="bi bi-file-earmark-pdf text-danger me-1.5" />PDF
           </button>
-          <button className="btn btn-outline-secondary rounded-3 border-0 text-white" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }} onClick={() => handleExport('excel')}>
+          <button className="btn btn-secondary rounded-3 d-flex align-items-center" onClick={() => handleExport('excel')}>
             <i className="bi bi-file-earmark-excel text-success me-1.5" />Excel
           </button>
           <button className="btn btn-primary rounded-3 px-3.5 fw-semibold d-flex align-items-center gap-2" onClick={handleSaveGradebook} disabled={saving}>
@@ -209,7 +209,7 @@ export default function GradebookPage() {
                 filtered.map(s => (
                   <tr key={s.id} className="border-bottom border-secondary border-opacity-10">
                     <td className="px-4"><code>{s.roll}</code></td>
-                    <td><strong className="text-white" style={{ color: 'var(--text)' }}>{s.name}</strong></td>
+                    <td><strong style={{ color: 'var(--text)' }}>{s.name}</strong></td>
                     {s.marks.map((m, i) => (
                       <td key={i} className="text-center">
                         <input 

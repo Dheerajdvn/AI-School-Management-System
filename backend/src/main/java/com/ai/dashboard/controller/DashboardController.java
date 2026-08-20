@@ -95,18 +95,34 @@ public class DashboardController {
 
     private Long extractUserId(Authentication authentication) {
         if (authentication == null) return null;
+        Object credentials = authentication.getCredentials();
+        if (credentials instanceof Long) {
+            return (Long) credentials;
+        }
         Object details = authentication.getDetails();
-        if (details instanceof Long longId) {
-            return longId;
+        if (details instanceof Long) {
+            return (Long) details;
         }
         return null;
     }
 
     private String getCurrentUserRole(Authentication authentication) {
         if (authentication == null) return "ROLE_STUDENT";
-        return authentication.getAuthorities().stream()
-                .findFirst()
+        var authorities = authentication.getAuthorities().stream()
                 .map(auth -> auth.getAuthority())
-                .orElse("ROLE_STUDENT");
+                .collect(java.util.stream.Collectors.toSet());
+        if (authorities.contains("ROLE_SUPER_ADMIN") || authorities.contains("ROLE_ADMIN")) {
+            return "ROLE_ADMIN";
+        }
+        if (authorities.contains("ROLE_PRINCIPAL")) {
+            return "ROLE_PRINCIPAL";
+        }
+        if (authorities.contains("ROLE_SCHOOL_ADMIN")) {
+            return "ROLE_SCHOOL_ADMIN";
+        }
+        if (authorities.contains("ROLE_TEACHER")) {
+            return "ROLE_TEACHER";
+        }
+        return "ROLE_STUDENT";
     }
 }

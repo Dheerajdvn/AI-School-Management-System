@@ -212,21 +212,21 @@ export default function AdminAnalyticsPage() {
 
           <button
             type="button"
-            className="btn btn-success btn-sm rounded-3 fw-semibold px-3 d-flex align-items-center gap-1 shadow-xs"
+            className="btn btn-secondary btn-sm rounded-3 px-3 d-flex align-items-center gap-1 shadow-xs"
             onClick={handleExportCsv}
             disabled={exportingCsv}
           >
-            {exportingCsv ? <span className="spinner-border spinner-border-sm" /> : <i className="bi bi-file-earmark-spreadsheet" />}
+            {exportingCsv ? <span className="spinner-border spinner-border-sm" /> : <i className="bi bi-file-earmark-spreadsheet text-primary" />}
             <span>Export CSV</span>
           </button>
 
           <button
             type="button"
-            className="btn btn-danger btn-sm rounded-3 fw-semibold px-3 d-flex align-items-center gap-1 shadow-xs"
+            className="btn btn-secondary btn-sm rounded-3 px-3 d-flex align-items-center gap-1 shadow-xs"
             onClick={handleExportPdf}
             disabled={exportingPdf}
           >
-            {exportingPdf ? <span className="spinner-border spinner-border-sm" /> : <i className="bi bi-file-earmark-pdf" />}
+            {exportingPdf ? <span className="spinner-border spinner-border-sm" /> : <i className="bi bi-file-earmark-pdf text-primary" />}
             <span>Export PDF</span>
           </button>
         </div>
@@ -349,7 +349,7 @@ export default function AdminAnalyticsPage() {
                   </td>
                   <td className="small text-muted font-monospace">{school.code}</td>
                   <td>
-                    <span className={`badge ${school.plan === 'Enterprise' ? 'bg-primary' : school.plan === 'Premium' ? 'bg-info text-dark' : 'bg-secondary'} bg-opacity-20 text-body border px-2.5 py-1 rounded-pill`}>
+                    <span className={`badge ${school.plan === 'Enterprise' ? 'bg-primary text-white' : school.plan === 'Premium' ? 'bg-info bg-opacity-15 text-info border border-info border-opacity-30' : 'bg-secondary bg-opacity-15 text-secondary border border-secondary border-opacity-30'} px-2.5 py-1 rounded-pill`}>
                       {school.plan}
                     </span>
                   </td>

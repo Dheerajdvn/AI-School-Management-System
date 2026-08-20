@@ -59,23 +59,23 @@ public class MarkdownParser implements DocumentParser {
         text = text.replaceAll("\\[([^\\]]*)\\]\\([^)]*\\)", "$1");
 
         // Remove heading markers (#)
-        text = text.replaceAll("^#{1,6}\\s+", "");
+        text = text.replaceAll("(?m)^#{1,6}\\s+", "");
 
         // Remove bold/italic markers
         text = text.replaceAll("\\*\\*|__", "");
         text = text.replaceAll("\\*|_", "");
 
         // Remove horizontal rules
-        text = text.replaceAll("^[-*_]{3,}\\s*$", "");
+        text = text.replaceAll("(?m)^[-*_]{3,}\\s*$", "");
 
         // Remove blockquote markers
-        text = text.replaceAll("^>\\s+", "");
+        text = text.replaceAll("(?m)^>\\s+", "");
 
         // Remove unordered list markers
-        text = text.replaceAll("^[\\s]*[-*+]\\s+", "");
+        text = text.replaceAll("(?m)^[\\s]*[-*+]\\s+", "");
 
         // Remove ordered list markers
-        text = text.replaceAll("^[\\s]*\\d+\\.\\s+", "");
+        text = text.replaceAll("(?m)^[\\s]*\\d+\\.\\s+", "");
 
         // Collapse multiple blank lines into one
         text = text.replaceAll("\\n{3,}", "\n\n");

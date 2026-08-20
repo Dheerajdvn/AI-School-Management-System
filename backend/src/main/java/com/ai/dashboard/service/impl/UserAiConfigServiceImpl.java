@@ -14,7 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Implementation of {@link UserAiConfigService}.
@@ -28,6 +30,10 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class UserAiConfigServiceImpl implements UserAiConfigService {
+
+    private static final Set<String> BLOCKED_HOSTS = Set.of(
+            "169.254.169.254", "metadata.google.internal", "instance-data"
+    );
 
     private final UserAiConfigRepository configRepository;
     private final UserRepository userRepository;
@@ -58,10 +64,17 @@ public class UserAiConfigServiceImpl implements UserAiConfigService {
                 .orElse(UserAiConfig.builder().user(user).build());
 
         // Validate provider
-        LlmProviderStrategy strategy = providerRegistry.get(dto.getProvider());
+        providerRegistry.get(dto.getProvider());
 
         config.setProvider(dto.getProvider());
-        config.setApiKey(dto.getApiKey());
+
+        // If client submitted masked key or null, retain existing key if present
+        String incomingKey = dto.getApiKey();
+        if (incomingKey != null && !incomingKey.isBlank() && !incomingKey.contains("...")) {
+            config.setApiKey(incomingKey);
+        }
+
+        validateBaseUrlSafety(dto.getBaseUrl(), dto.getProvider());
         config.setBaseUrl(dto.getBaseUrl());
         config.setModel(dto.getModel());
         config.setTemperature(dto.getTemperature() != null ? dto.getTemperature() : 0.2);
@@ -82,6 +95,28 @@ public class UserAiConfigServiceImpl implements UserAiConfigService {
 
         String apiKey = dto.getApiKey();
         String baseUrl = dto.getBaseUrl();
+
+        // If client submitted masked key, resolve original key from database
+        if (apiKey != null && apiKey.contains("...") && username != null) {
+            User user = userRepository.findByUsername(username)
+                    .orElseGet(() -> userRepository.findByEmail(username).orElse(null));
+            if (user != null) {
+                var existingOpt = configRepository.findByUserId(user.getId());
+                if (existingOpt.isPresent()) {
+                    apiKey = existingOpt.get().getApiKey();
+                }
+            }
+        }
+
+        try {
+            validateBaseUrlSafety(baseUrl, dto.getProvider());
+        } catch (IllegalArgumentException e) {
+            return VerifyConnectionResponseDto.builder()
+                    .connected(false)
+                    .message("Security check failed: " + e.getMessage())
+                    .models(List.of())
+                    .build();
+        }
 
         // If API key is required but not provided, fail early
         if (strategy.isApiKeyRequired() && (apiKey == null || apiKey.isBlank())) {
@@ -157,6 +192,29 @@ public class UserAiConfigServiceImpl implements UserAiConfigService {
         return providerRegistry.getSupportedProviders();
     }
 
+    private void validateBaseUrlSafety(String baseUrl, String provider) {
+        if (baseUrl == null || baseUrl.isBlank()) {
+            return;
+        }
+        try {
+            URI uri = URI.create(baseUrl.trim());
+            String scheme = uri.getScheme();
+            if (scheme == null || (!scheme.equalsIgnoreCase("http") && !scheme.equalsIgnoreCase("https"))) {
+                throw new IllegalArgumentException("Invalid URL scheme: only http and https are permitted");
+            }
+            String host = uri.getHost();
+            if (host != null) {
+                String lowerHost = host.toLowerCase();
+                if (BLOCKED_HOSTS.contains(lowerHost)) {
+                    throw new IllegalArgumentException("Access to cloud metadata endpoints is blocked");
+                }
+            }
+        } catch (IllegalArgumentException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Malformed baseUrl: " + e.getMessage());
+        }
+    }
 
     private UserAiConfigDto defaultConfigDto() {
         return UserAiConfigDto.builder()
@@ -175,7 +233,7 @@ public class UserAiConfigServiceImpl implements UserAiConfigService {
         return UserAiConfigDto.builder()
                 .id(config.getId())
                 .provider(config.getProvider())
-                .apiKey(config.getApiKey())
+                .apiKey(maskApiKey(config.getApiKey()))
                 .baseUrl(config.getBaseUrl())
                 .model(config.getModel())
                 .temperature(config.getTemperature())
@@ -185,4 +243,15 @@ public class UserAiConfigServiceImpl implements UserAiConfigService {
                 .isConnected(config.getConnected())
                 .build();
     }
+
+    private String maskApiKey(String apiKey) {
+        if (apiKey == null || apiKey.isBlank()) {
+            return null;
+        }
+        if (apiKey.length() <= 8) {
+            return "********";
+        }
+        return apiKey.substring(0, 4) + "..." + apiKey.substring(apiKey.length() - 4);
+    }
 }
+

@@ -179,20 +179,20 @@ export default function ProfilePage() {
 
   return (
     <div className="container-fluid p-0 animate-fade">
-      <div className="card mb-4 overflow-hidden border" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)', borderRadius: '16px' }}>
+      <div className="card mb-4 overflow-hidden border shadow-xs bg-card" style={{ borderRadius: '16px' }}>
         <div className="card-body p-4 position-relative">
           <div className="d-flex flex-column flex-md-row align-items-center gap-4">
             {/* Avatar & Photo Upload Trigger */}
             <div className="position-relative">
               <div
-                className="avatar-circle shadow-lg position-relative overflow-hidden"
+                className="avatar-circle shadow position-relative overflow-hidden"
                 style={{
-                  width: '96px',
-                  height: '96px',
-                  fontSize: '2.5rem',
+                  width: '92px',
+                  height: '92px',
+                  fontSize: '2.4rem',
                   background: 'var(--primary)',
                   color: '#fff',
-                  border: '3px solid rgba(255,255,255,0.2)'
+                  border: '3px solid var(--border)'
                 }}
               >
                 {avatarUrl ? (
@@ -205,12 +205,12 @@ export default function ProfilePage() {
               {/* Camera upload button */}
               <button
                 type="button"
-                className="btn btn-primary btn-sm rounded-circle position-absolute bottom-0 end-0 p-1 d-flex align-items-center justify-content-center shadow"
-                style={{ width: '32px', height: '32px', border: '2px solid #0f172a' }}
+                className="btn btn-primary btn-sm rounded-circle position-absolute bottom-0 end-0 p-1 d-flex align-items-center justify-content-center shadow-xs"
+                style={{ width: '30px', height: '30px', border: '2px solid var(--card)' }}
                 onClick={() => fileInputRef.current?.click()}
                 title="Upload or change profile picture"
               >
-                <i className="bi bi-camera-fill" style={{ fontSize: '14px' }} />
+                <i className="bi bi-camera-fill" style={{ fontSize: '13px' }} />
               </button>
 
               <input
@@ -222,22 +222,22 @@ export default function ProfilePage() {
               />
             </div>
 
-            <div className="text-center text-md-start text-white flex-grow-1">
+            <div className="text-center text-md-start flex-grow-1">
               <div className="d-flex align-items-center gap-2 justify-content-center justify-content-md-start mb-1">
-                <h3 className="fw-bold mb-0">{formData.fullName}</h3>
-                <span className="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25 px-3 py-1 rounded-pill small">
+                <h3 className="fw-bold mb-0" style={{ color: 'var(--text)' }}>{formData.fullName}</h3>
+                <span className="badge bg-primary-subtle text-primary border-0 px-2.5 py-1 rounded-pill small">
                   {formData.role}
                 </span>
               </div>
-              <p className="text-white-50 mb-2 small d-flex align-items-center justify-content-center justify-content-md-start gap-3 flex-wrap">
-                <span><i className="bi bi-envelope me-1" />{formData.email}</span>
-                <span><i className="bi bi-building me-1" />{formData.school}</span>
+              <p className="text-muted mb-2.5 small d-flex align-items-center justify-content-center justify-content-md-start gap-3 flex-wrap">
+                <span><i className="bi bi-envelope me-1 text-primary" />{formData.email}</span>
+                <span><i className="bi bi-building me-1 text-primary" />{formData.school}</span>
               </p>
 
               <button
                 type="button"
-                className="btn btn-outline-light btn-sm rounded-pill px-3 py-1 fw-semibold"
-                style={{ fontSize: '11px' }}
+                className="btn btn-secondary btn-sm rounded-pill px-3 py-1"
+                style={{ fontSize: '0.8rem' }}
                 onClick={() => fileInputRef.current?.click()}
               >
                 <i className="bi bi-image me-1" /> Change Profile Picture
@@ -584,7 +584,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="d-flex justify-content-end mt-4">
-                  <button type="submit" className="btn btn-info text-white px-4 rounded-3 fw-semibold d-flex align-items-center gap-2">
+                  <button type="submit" className="btn btn-primary px-4 rounded-3 fw-semibold d-flex align-items-center gap-2">
                     <i className="bi bi-save" /> Save Preferences
                   </button>
                 </div>

@@ -56,8 +56,8 @@ export default function StudentAnalyticsPage() {
           <p className="text-muted small mb-0 font-medium">Track performance standings, flag students needing support, and review class attendance curves.</p>
         </div>
         <select 
-          className="form-select bg-dark border-secondary text-white rounded-3 py-1.5" 
-          style={{ width: 'auto', minWidth: '160px' }} 
+          className="form-select bg-surface border rounded-3 py-1.5" 
+          style={{ width: 'auto', minWidth: '160px', color: 'var(--text)', borderColor: 'var(--border)' }} 
           value={selectedClass} 
           onChange={e => setSelectedClass(e.target.value)}
         >
@@ -69,7 +69,7 @@ export default function StudentAnalyticsPage() {
         <div className="col-md-4">
           <div className="glass-card shadow-sm h-100">
             <div className="card-header-custom p-3 border-bottom">
-              <h5 className="fw-bold mb-0 text-white" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>
+              <h5 className="fw-bold mb-0" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>
                 <i className="bi bi-trophy-fill text-warning me-2" />Top Performers
               </h5>
             </div>
@@ -79,7 +79,7 @@ export default function StudentAnalyticsPage() {
                   <div className="d-flex align-items-center gap-2.5">
                     <span className="rank-badge top">{i + 1}</span>
                     <div>
-                      <strong className="text-white" style={{ color: 'var(--text)' }}>{s.name}</strong>
+                      <strong style={{ color: 'var(--text)' }}>{s.name}</strong>
                       <span className="small text-muted d-block" style={{ fontSize: '11px' }}>{s.roll}</span>
                     </div>
                   </div>
@@ -95,7 +95,7 @@ export default function StudentAnalyticsPage() {
         <div className="col-md-4">
           <div className="glass-card shadow-sm h-100">
             <div className="card-header-custom p-3 border-bottom">
-              <h5 className="fw-bold mb-0 text-white" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>
+              <h5 className="fw-bold mb-0" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>
                 <i className="bi bi-exclamation-triangle-fill text-danger me-2" />Needs Support
               </h5>
             </div>
@@ -105,7 +105,7 @@ export default function StudentAnalyticsPage() {
                   <div className="d-flex align-items-center gap-2.5">
                     <span className="rank-badge weak">{i + 1}</span>
                     <div>
-                      <strong className="text-white" style={{ color: 'var(--text)' }}>{s.name}</strong>
+                      <strong style={{ color: 'var(--text)' }}>{s.name}</strong>
                       <span className="small text-muted d-block" style={{ fontSize: '11px' }}>{s.roll}</span>
                     </div>
                   </div>
@@ -121,7 +121,7 @@ export default function StudentAnalyticsPage() {
         <div className="col-md-4">
           <div className="glass-card shadow-sm h-100">
             <div className="card-header-custom p-3 border-bottom">
-              <h5 className="fw-bold mb-0 text-white" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>
+              <h5 className="fw-bold mb-0" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>
                 <i className="bi bi-cpu text-info me-2" />AI Guidance Insights
               </h5>
             </div>
@@ -143,7 +143,7 @@ export default function StudentAnalyticsPage() {
         <div className="col-md-6">
           <div className="glass-card shadow-sm">
             <div className="card-header-custom p-3 border-bottom">
-              <h5 className="fw-bold mb-0 text-white" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>
+              <h5 className="fw-bold mb-0" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>
                 <i className="bi bi-calendar-check-fill text-success me-2" />Attendance Trend
               </h5>
             </div>
@@ -167,7 +167,7 @@ export default function StudentAnalyticsPage() {
         <div className="col-md-6">
           <div className="glass-card shadow-sm">
             <div className="card-header-custom p-3 border-bottom">
-              <h5 className="fw-bold mb-0 text-white" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>
+              <h5 className="fw-bold mb-0" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>
                 <i className="bi bi-file-earmark-check-fill text-primary me-2" />Assignment Completion
               </h5>
             </div>

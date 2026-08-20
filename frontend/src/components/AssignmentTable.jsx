@@ -42,15 +42,15 @@ const AssignmentTable = ({ assignments = [], onView, onEdit, onDelete, onRefresh
                 <td>
                   <div className="btn-group btn-group-sm" role="group">
                     {onView && (
-                      <button className="btn btn-outline-info" onClick={() => onView(a)}>
-                        <i className="bi bi-eye me-1" />View
+                      <button className="btn btn-action-view" onClick={() => onView(a)}>
+                        <i className="bi bi-eye" /> View
                       </button>
                     )}
                     <button className="btn btn-outline-secondary" onClick={() => onEdit && onEdit(a)}>
-                      <i className="bi bi-pencil me-1" />Edit
+                      <i className="bi bi-pencil" /> Edit
                     </button>
                     <button className="btn btn-outline-danger" onClick={() => handleDelete(a.id)}>
-                      <i className="bi bi-trash me-1" />Delete
+                      <i className="bi bi-trash" /> Delete
                     </button>
                   </div>
                 </td>

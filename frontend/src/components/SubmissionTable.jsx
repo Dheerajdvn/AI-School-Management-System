@@ -74,10 +74,10 @@ const SubmissionTable = ({
                   </td>
                   <td className="pe-3 text-end">
                     <button 
-                      className="btn btn-sm btn-outline-primary rounded-3 px-3 py-1 fw-semibold"
+                      className="btn btn-action-view"
                       onClick={() => onViewDetails && onViewDetails(s)}
                     >
-                      <i className="bi bi-eye me-1" /> View & Grade
+                      <i className="bi bi-eye" /> View & Grade
                     </button>
                   </td>
                 </tr>

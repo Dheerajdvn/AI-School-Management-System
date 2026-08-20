@@ -29,44 +29,93 @@ export default function LoginPage() {
     }
   }, [searchParams])
 
-  // Interactive Background Canvas Particles
+  // Clean Ambient Aurora Canvas Background
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     let animationFrameId
 
+    let w = 0
+    let h = 0
+    const dpr = window.devicePixelRatio || 1
+
     const resize = () => {
-      if (!canvas || !canvas.parentElement) return
-      canvas.width = canvas.parentElement.clientWidth
-      canvas.height = canvas.parentElement.clientHeight
+      w = window.innerWidth
+      h = window.innerHeight
+      canvas.width = w * dpr
+      canvas.height = h * dpr
+      canvas.style.width = `${w}px`
+      canvas.style.height = `${h}px`
+      ctx.scale(dpr, dpr)
     }
     resize()
     window.addEventListener('resize', resize)
 
-    const particleCount = Math.min(45, Math.floor((canvas.width || 800) / 25))
+    const particleCount = Math.min(45, Math.floor((w || 800) / 25))
     const particles = Array.from({ length: particleCount }, () => ({
-      x: Math.random() * (canvas.width || 800),
-      y: Math.random() * (canvas.height || 600),
-      vx: (Math.random() - 0.5) * 0.18,
-      vy: (Math.random() - 0.5) * 0.18,
-      radius: Math.random() * 1 + 1,
-      alpha: Math.random() * 0.15 + 0.15
+      x: Math.random() * (w || 1000),
+      y: Math.random() * (h || 700),
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: (Math.random() - 0.5) * 0.25,
+      radius: Math.random() * 1.5 + 0.8,
+      alpha: Math.random() * 0.25 + 0.15,
+      pulsePhase: Math.random() * Math.PI * 2
     }))
 
     const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      ctx.clearRect(0, 0, w, h)
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light' || document.body.classList.contains('light-mode')
 
-      particles.forEach(p => {
+      // Ambient radial aurora glow behind card
+      if (w > 0 && h > 0) {
+        const grad = ctx.createRadialGradient(w * 0.5, h * 0.45, 40, w * 0.5, h * 0.45, Math.max(w, h) * 0.5)
+        if (isLight) {
+          grad.addColorStop(0, 'rgba(99, 102, 241, 0.08)')
+          grad.addColorStop(0.5, 'rgba(236, 72, 153, 0.03)')
+          grad.addColorStop(1, 'rgba(255, 255, 255, 0)')
+        } else {
+          grad.addColorStop(0, 'rgba(99, 102, 241, 0.12)')
+          grad.addColorStop(0.5, 'rgba(139, 92, 246, 0.05)')
+          grad.addColorStop(1, 'rgba(0, 0, 0, 0)')
+        }
+        ctx.fillStyle = grad
+        ctx.fillRect(0, 0, w, h)
+      }
+
+      // Constellation particles
+      particles.forEach((p, idx) => {
         p.x += p.vx
         p.y += p.vy
+        p.pulsePhase += 0.015
 
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1
+        if (p.x < 0) p.x = w
+        if (p.x > w) p.x = 0
+        if (p.y < 0) p.y = h
+        if (p.y > h) p.y = 0
+
+        const finalAlpha = p.alpha + Math.sin(p.pulsePhase) * 0.06
+        const color = isLight ? '99, 102, 241' : '165, 180, 252'
+
+        // Draw proximity lines
+        for (let j = idx + 1; j < particles.length; j++) {
+          const p2 = particles[j]
+          const dx = p.x - p2.x
+          const dy = p.y - p2.y
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          if (dist < 100) {
+            ctx.beginPath()
+            ctx.moveTo(p.x, p.y)
+            ctx.lineTo(p2.x, p2.y)
+            ctx.strokeStyle = `rgba(${color}, ${(1 - dist / 100) * 0.12})`
+            ctx.lineWidth = 0.7
+            ctx.stroke()
+          }
+        }
 
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(148, 163, 184, ${p.alpha})`
+        ctx.fillStyle = `rgba(${color}, ${Math.max(0.08, finalAlpha)})`
         ctx.fill()
       })
 
@@ -115,15 +164,17 @@ export default function LoginPage() {
   return (
     <div className="login-page min-vh-100 position-relative d-flex align-items-center justify-content-center overflow-hidden animate-fade" style={{ backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
       {/* Background Neural Canvas */}
-      <div className="position-absolute top-0 start-0 w-100 h-100 pointer-events-none" style={{ zIndex: 0 }}>
-        <canvas ref={canvasRef} className="w-100 h-100" />
-      </div>
+      <canvas
+        ref={canvasRef}
+        className="position-fixed top-0 start-0 w-100 h-100 pointer-events-none"
+        style={{ zIndex: 0 }}
+      />
 
       {/* Top Floating Home Navigation Link */}
-      <div className="position-absolute top-0 start-0 p-4 z-2">
-        <Link to="/" className="btn btn-outline-secondary btn-sm rounded-pill border px-3 py-2 d-flex align-items-center gap-2 hover-glow-pill" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text)' }}>
+      <div className="position-absolute top-0 start-0 p-3.5 z-2">
+        <Link to="/" className="btn btn-secondary btn-sm rounded-pill px-3 py-2 d-flex align-items-center gap-2 shadow-xs">
           <i className="bi bi-arrow-left" />
-          <span className="small font-semibold">Back to Home</span>
+          <span className="small fw-semibold">Back to Home</span>
         </Link>
       </div>
 
@@ -159,6 +210,39 @@ export default function LoginPage() {
                 <p className="text-muted small mb-0">Sign in to access AI School OS Command Center</p>
               </div>
 
+              {/* Quick Demo Role Selector Chips */}
+              <div className="mb-4 p-2.5 rounded-3 border bg-surface">
+                <div className="d-flex align-items-center justify-content-between mb-2">
+                  <span className="text-muted small fw-semibold" style={{ fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Quick Demo Accounts</span>
+                  <span className="badge bg-primary-subtle text-primary" style={{ fontSize: '0.7rem' }}>1-Click Fill</span>
+                </div>
+                <div className="d-flex gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => fillDemoRole('admin', 'admin', 'password')}
+                    className={`btn btn-sm flex-fill rounded-2 border ${activeDemoRole === 'admin' ? 'btn-primary' : 'btn-secondary'}`}
+                    style={{ fontSize: '0.78rem', height: '32px' }}
+                  >
+                    <i className="bi bi-shield-lock me-1" /> Admin
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => fillDemoRole('teacher', 'teacher', 'password')}
+                    className={`btn btn-sm flex-fill rounded-2 border ${activeDemoRole === 'teacher' ? 'btn-primary' : 'btn-secondary'}`}
+                    style={{ fontSize: '0.78rem', height: '32px' }}
+                  >
+                    <i className="bi bi-person-workspace me-1" /> Teacher
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => fillDemoRole('student', 'student', 'password')}
+                    className={`btn btn-sm flex-fill rounded-2 border ${activeDemoRole === 'student' ? 'btn-primary' : 'btn-secondary'}`}
+                    style={{ fontSize: '0.78rem', height: '32px' }}
+                  >
+                    <i className="bi bi-mortarboard me-1" /> Student
+                  </button>
+                </div>
+              </div>
 
               {/* Error Alert */}
               {error && (

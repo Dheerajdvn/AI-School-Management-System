@@ -57,7 +57,9 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     @Operation(summary = "Register a new user")
-    public ResponseEntity<ApiResponse<LoginResponse>> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<ApiResponse<LoginResponse>> register(
+            @Valid @RequestBody RegisterRequest request,
+            jakarta.servlet.http.HttpServletRequest httpRequest) {
         if (userRepository.existsByUsername(request.getUsername())) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.badRequest("Username already exists"));
@@ -83,7 +85,8 @@ public class AuthenticationController {
                 .build();
 
         userRepository.save(user);
-        auditLogService.log(user.getUsername(), "CREATE", "User", "Registered new user: " + user.getUsername(), "127.0.0.1");
+        String clientIp = extractClientIp(httpRequest);
+        auditLogService.log(user.getUsername(), "CREATE", "User", "Registered new user: " + user.getUsername(), clientIp);
         log.info("User registered successfully: {}", user.getUsername());
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -94,6 +97,7 @@ public class AuthenticationController {
     @Operation(summary = "Authenticate user and return JWT token")
     public ResponseEntity<ApiResponse<LoginResponse>> login(
             @Valid @RequestBody LoginRequest request,
+            jakarta.servlet.http.HttpServletRequest httpRequest,
             jakarta.servlet.http.HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
@@ -103,7 +107,8 @@ public class AuthenticationController {
         User user = userRepository.findByUsername(request.getUsername()).orElse(null);
         String token = jwtService.generateToken(userDetails, user != null ? user.getId() : null);
 
-        auditLogService.log(request.getUsername(), "LOGIN", "Auth", "User logged in successfully", "127.0.0.1");
+        String clientIp = extractClientIp(httpRequest);
+        auditLogService.log(request.getUsername(), "LOGIN", "Auth", "User logged in successfully", clientIp);
         log.info("User logged in successfully: {}", request.getUsername());
 
         LoginResponse loginResponse = buildLoginResponse(userDetails, user != null ? user.getId() : null, token);
@@ -126,7 +131,16 @@ public class AuthenticationController {
     @Operation(summary = "Assign a role to a user (ADMIN/SUPER_ADMIN only)")
     public ApiResponse<LoginResponse> assignRole(
             @PathVariable Long userId,
-            @RequestBody RoleAssignmentRequest request) {
+            @RequestBody RoleAssignmentRequest request,
+            Authentication authentication) {
+        if ("ROLE_SUPER_ADMIN".equalsIgnoreCase(request.getRoleName())) {
+            boolean isSuperAdmin = authentication != null && authentication.getAuthorities().stream()
+                    .anyMatch(a -> "ROLE_SUPER_ADMIN".equals(a.getAuthority()));
+            if (!isSuperAdmin) {
+                throw new com.ai.dashboard.exception.AccessDeniedException("Only SUPER_ADMIN can assign the ROLE_SUPER_ADMIN role");
+            }
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
@@ -141,6 +155,19 @@ public class AuthenticationController {
         log.info("Assigned role {} to user {}", request.getRoleName(), user.getUsername());
 
         return ApiResponse.success("Role assigned", buildLoginResponse(user));
+    }
+
+    private String extractClientIp(jakarta.servlet.http.HttpServletRequest request) {
+        if (request == null) return "127.0.0.1";
+        String xf = request.getHeader("X-Forwarded-For");
+        if (xf != null && !xf.isBlank()) {
+            return xf.split(",")[0].trim();
+        }
+        String cf = request.getHeader("CF-Connecting-IP");
+        if (cf != null && !cf.isBlank()) {
+            return cf.trim();
+        }
+        return request.getRemoteAddr();
     }
 
     private LoginResponse buildLoginResponse(User user) {

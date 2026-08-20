@@ -89,10 +89,10 @@ export default function StudentStudyMaterialsPage() {
                   <p className="mb-0 small opacity-75">{mat.subject} - {mat.class}</p>
                   <span className="small opacity-75">{mat.size} • {mat.uploadedAt}</span>
                 </div>
-                <div className="material-actions">
-                  <button className="btn btn-sm btn-outline-primary" onClick={() => alert('Downloading...')}><i className="bi bi-download" /></button>
-                  <button className="btn btn-sm btn-outline-info" onClick={() => alert('Preview...')}><i className="bi bi-eye" /></button>
-                  <button className="btn btn-sm btn-outline-warning" onClick={() => alert('Bookmarked!')}><i className="bi bi-bookmark" /></button>
+                <div className="material-actions d-flex gap-1">
+                  <button className="btn btn-action-view" onClick={() => alert('Preview...')} title="Preview"><i className="bi bi-eye" /></button>
+                  <button className="btn btn-outline-secondary" onClick={() => alert('Downloading...')} title="Download"><i className="bi bi-download" /></button>
+                  <button className="btn btn-outline-secondary" onClick={() => alert('Bookmarked!')} title="Bookmark"><i className="bi bi-bookmark" /></button>
                 </div>
               </div>
             </div>

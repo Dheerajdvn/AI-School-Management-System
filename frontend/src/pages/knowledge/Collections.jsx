@@ -76,14 +76,14 @@ export default function Collections() {
                   {collection.description && (
                     <p className="card-text small text-muted mb-3">{collection.description}</p>
                   )}
-                  <div className="d-flex gap-2">
-                    <button className="btn btn-sm btn-outline-primary">
+                  <div className="d-flex gap-1">
+                    <button className="btn btn-action-view" title="View Collection">
                       <i className="bi bi-eye" />
                     </button>
-                    <button className="btn btn-sm btn-outline-success">
+                    <button className="btn btn-outline-secondary" title="Edit Collection">
                       <i className="bi bi-pencil" />
                     </button>
-                    <button className="btn btn-sm btn-outline-danger">
+                    <button className="btn btn-outline-danger" title="Delete Collection">
                       <i className="bi bi-trash" />
                     </button>
                   </div>

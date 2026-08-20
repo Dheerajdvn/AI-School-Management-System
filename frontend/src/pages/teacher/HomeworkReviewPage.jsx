@@ -111,7 +111,7 @@ export default function HomeworkReviewPage() {
         <div className="col-md-4">
           <div className="glass-card shadow-sm h-100">
             <div className="card-header-custom p-3 border-bottom d-flex align-items-center justify-content-between">
-              <h5 className="fw-bold mb-0 text-white" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>Submissions Inbox</h5>
+              <h5 className="fw-bold mb-0" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>Submissions Inbox</h5>
               <span className="badge rounded-pill bg-primary bg-opacity-20 text-primary border border-primary border-opacity-30">
                 {submissions.length - gradedIds.size} Pending
               </span>
@@ -132,7 +132,7 @@ export default function HomeworkReviewPage() {
                     }}
                   >
                     <div className="d-flex justify-content-between align-items-center w-100">
-                      <strong className="text-white" style={{ color: 'var(--text)', fontSize: '13px' }}>{sub.student}</strong>
+                      <strong style={{ color: 'var(--text)', fontSize: '13px' }}>{sub.student}</strong>
                       {isGraded ? (
                         <span className="badge bg-success bg-opacity-15 text-success border border-success border-opacity-25 rounded-pill x-small px-2 py-0.5">
                           <i className="bi bi-check-circle-fill me-1" />Graded
@@ -160,10 +160,10 @@ export default function HomeworkReviewPage() {
           {selected ? (
             <div className="glass-card shadow-sm">
               <div className="card-header-custom p-3 border-bottom d-flex align-items-center justify-content-between">
-                <h5 className="fw-bold mb-0 text-white" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>
+                <h5 className="fw-bold mb-0" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>
                   Workspace: {selected.student}
                 </h5>
-                <button className="btn btn-outline-secondary btn-sm rounded-pill text-white border-0" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }} onClick={() => aiSuggest(selected)}>
+                <button className="btn btn-secondary btn-sm rounded-pill" onClick={() => aiSuggest(selected)}>
                   <i className="bi bi-robot text-primary me-1.5" />AI Suggest Feedback
                 </button>
               </div>
@@ -177,7 +177,7 @@ export default function HomeworkReviewPage() {
                     <label className="form-label text-muted small fw-semibold">Submitted Attachment</label>
                     <div className="input-group">
                       <input type="text" className="form-control style-review-input" value={selected.file} readOnly />
-                      <button className="btn btn-outline-secondary border-secondary text-white px-3" onClick={() => handleDownload(selected.file)}>
+                      <button className="btn btn-secondary px-3" onClick={() => handleDownload(selected.file)}>
                         <i className="bi bi-download text-primary" />
                       </button>
                     </div>
@@ -215,7 +215,7 @@ export default function HomeworkReviewPage() {
           ) : (
             <div className="empty-state text-center py-5 rounded-4 border" style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}>
               <i className="bi bi-file-earmark-text text-muted display-4 mb-2 d-block" />
-              <h6 className="fw-bold text-white mb-1" style={{ color: 'var(--text)' }}>Select a submission to review</h6>
+              <h6 className="fw-bold mb-1" style={{ color: 'var(--text)' }}>Select a submission to review</h6>
               <p className="text-muted small mb-0">Choose a student from the inbox panel to start grading.</p>
             </div>
           )}

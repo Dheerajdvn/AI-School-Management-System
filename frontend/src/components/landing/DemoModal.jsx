@@ -9,7 +9,7 @@ export default function DemoModal({ isOpen, onClose }) {
   const accounts = [
     { role: 'School Admin', username: 'admin', desc: 'Full school administration, settings, and audit logs', badge: 'ROLE_ADMIN' },
     { role: 'Teacher', username: 'teacher', desc: 'Course creation, AI lesson plans, and assignment grading', badge: 'ROLE_TEACHER' },
-    { role: 'Student', username: 'student', desc: 'RAG AI tutor chat, study materials, and homework submission', badge: 'ROLE_STUDENT' }
+    { role: 'Student', username: 'student', desc: '24/7 AI tutor chat, course study materials, and homework submission', badge: 'ROLE_STUDENT' }
   ]
 
   useEffect(() => {

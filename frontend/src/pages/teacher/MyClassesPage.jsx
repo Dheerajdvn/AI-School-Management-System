@@ -64,7 +64,7 @@ export default function MyClassesPage() {
       {filtered.length === 0 ? (
         <div className="empty-state text-center py-5 rounded-4 border" style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}>
           <i className="bi bi-calendar-x text-muted display-4 mb-2 d-block" />
-          <h6 className="fw-bold text-white mb-1" style={{ color: 'var(--text)' }}>
+          <h6 className="fw-bold mb-1" style={{ color: 'var(--text)' }}>
             {search ? 'No matching classes found' : 'No classes assigned'}
           </h6>
           <p className="text-muted small mb-0">Try checking back with school admin registrations.</p>
@@ -79,7 +79,7 @@ export default function MyClassesPage() {
                     <i className="bi bi-book-half" />
                   </div>
                   <div>
-                    <h5 className="fw-bold text-white mb-0" style={{ color: 'var(--text)' }}>{cls.name}</h5>
+                    <h5 className="fw-bold mb-0" style={{ color: 'var(--text)' }}>{cls.name}</h5>
                     <span className="text-muted small font-medium">{cls.subject}</span>
                   </div>
                 </div>

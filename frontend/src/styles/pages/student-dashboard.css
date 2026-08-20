@@ -14,29 +14,18 @@
   box-shadow: var(--shadow-lg);
 }
 
-.sp-page .stat-card.gradient-card.blue {
-  border-color: rgba(59,130,246,0.3);
-  background: linear-gradient(135deg, rgba(59,130,246,0.1), transparent);
+.sp-page .stat-card.gradient-card,
+.tpd-page .stat-card.gradient-card,
+.stat-card.gradient-card {
+  border-color: var(--border) !important;
+  background: var(--card) !important;
 }
-.sp-page .stat-card.gradient-card.green {
-  border-color: rgba(16,185,129,0.3);
-  background: linear-gradient(135deg, rgba(16,185,129,0.1), transparent);
-}
-.sp-page .stat-card.gradient-card.orange {
-  border-color: rgba(245,158,11,0.3);
-  background: linear-gradient(135deg, rgba(245,158,11,0.1), transparent);
-}
-.sp-page .stat-card.gradient-card.purple {
-  border-color: rgba(139,92,246,0.3);
-  background: linear-gradient(135deg, rgba(139,92,246,0.1), transparent);
-}
-.sp-page .stat-card.gradient-card.red {
-  border-color: rgba(239,68,68,0.3);
-  background: linear-gradient(135deg, rgba(239,68,68,0.1), transparent);
-}
-.sp-page .stat-card.gradient-card.cyan {
-  border-color: rgba(6,182,212,0.3);
-  background: linear-gradient(135deg, rgba(6,182,212,0.1), transparent);
+
+.sp-page .stat-card.gradient-card:hover,
+.tpd-page .stat-card.gradient-card:hover,
+.stat-card.gradient-card:hover {
+  border-color: var(--primary) !important;
+  box-shadow: var(--shadow) !important;
 }
 
 .sp-page .stat-icon {

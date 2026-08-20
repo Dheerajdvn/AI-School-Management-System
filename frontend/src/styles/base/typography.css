@@ -44,9 +44,18 @@ h4, h5, h6 {
   color: var(--muted);
 }
 
-body, p, span, div, li, a {
+p, ul, ol {
   font-size: 13px;
-  color: var(--text);
+  color: inherit;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--primary-hover);
 }
 
 .btn, button {

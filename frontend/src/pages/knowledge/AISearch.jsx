@@ -130,9 +130,8 @@ export default function AISearch() {
                   <p className="text-muted small mb-2">Page {result.page || 'N/A'} &bull; Score: {result.similarity}</p>
                   <p className="mb-0">{result.chunk || result.content || result.snippet}</p>
                   <div className="mt-2">
-                    <Link to={`/knowledge/document/${result.id || result.docId}`} className="btn btn-sm btn-outline-primary">
-                      <i className="bi bi-eye me-1" />
-                      View Document
+                    <Link to={`/knowledge/document/${result.id || result.docId}`} className="btn btn-action-view">
+                      <i className="bi bi-eye" /> View Document
                     </Link>
                   </div>
                 </div>

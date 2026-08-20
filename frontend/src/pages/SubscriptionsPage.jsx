@@ -75,11 +75,11 @@ export default function SubscriptionsPage() {
                 <td>{sub.amount ? `$${sub.amount}` : '—'}</td>
                 <td>
                   <div className="d-flex gap-1">
-                    <Link to={`/admin/schools/${sub.id}`} className="btn btn-sm btn-outline-primary" title="View School Details">
-                      <i className="bi bi-eye"></i>
+                    <Link to={`/admin/schools/${sub.id}`} className="btn btn-action-view" title="View School Details">
+                      <i className="bi bi-eye" />
                     </Link>
-                    <Link to={`/admin/schools/${sub.id}/edit`} className="btn btn-sm btn-outline-secondary" title="Edit School / Subscription">
-                      <i className="bi bi-pencil"></i>
+                    <Link to={`/admin/schools/${sub.id}/edit`} className="btn btn-outline-secondary" title="Edit School / Subscription">
+                      <i className="bi bi-pencil" />
                     </Link>
                   </div>
                 </td>

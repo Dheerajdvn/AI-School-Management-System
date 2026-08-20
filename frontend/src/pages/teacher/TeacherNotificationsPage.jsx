@@ -48,8 +48,8 @@ export default function TeacherNotificationsPage() {
           <p className="text-muted small mb-0 font-medium">Keep track of school notices, assignment timelines, and system alerts.</p>
         </div>
         <select 
-          className="form-select bg-dark border-secondary text-white rounded-3 py-1.5" 
-          style={{ width: 'auto', minWidth: '160px' }} 
+          className="form-select bg-surface border rounded-3 py-1.5" 
+          style={{ width: 'auto', minWidth: '160px', color: 'var(--text)', borderColor: 'var(--border)' }} 
           value={filter} 
           onChange={e => setFilter(e.target.value)}
         >
@@ -64,7 +64,7 @@ export default function TeacherNotificationsPage() {
       {filtered.length === 0 ? (
         <div className="empty-state text-center py-5 rounded-4 border" style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}>
           <i className="bi bi-bell-slash text-muted display-4 mb-2 d-block" />
-          <h6 className="fw-bold text-white mb-1" style={{ color: 'var(--text)' }}>No notifications found</h6>
+          <h6 className="fw-bold mb-1" style={{ color: 'var(--text)' }}>No notifications found</h6>
           <p className="text-muted small mb-0">You're all caught up!</p>
         </div>
       ) : (

@@ -159,7 +159,7 @@ export default function StudyMaterialsPage() {
       {filtered.length === 0 ? (
         <div className="empty-state text-center py-5 rounded-4 border" style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}>
           <i className="bi bi-folder-x text-muted display-4 mb-2 d-block" />
-          <h6 className="fw-bold text-white mb-1" style={{ color: 'var(--text)' }}>No study materials found</h6>
+          <h6 className="fw-bold mb-1" style={{ color: 'var(--text)' }}>No study materials found</h6>
           <p className="text-muted small mb-0">Try adjusting your filters or search keywords.</p>
         </div>
       ) : (
@@ -172,7 +172,7 @@ export default function StudyMaterialsPage() {
                     <i className={`bi ${getTypeIcon(mat.type)}`} />
                   </div>
                   <div>
-                    <h6 className="fw-bold text-white mb-1" style={{ color: 'var(--text)' }}>{mat.title}</h6>
+                    <h6 className="fw-bold mb-1" style={{ color: 'var(--text)' }}>{mat.title}</h6>
                     <div className="d-flex flex-wrap gap-1.5 align-items-center mt-1">
                       <span className="badge rounded-pill x-small px-2 py-0.5" style={{ backgroundColor: 'var(--surface)', color: 'var(--text)', border: '1px solid var(--border)' }}>
                         {mat.type}
@@ -198,10 +198,10 @@ export default function StudyMaterialsPage() {
       {/* Upload Material Dialog Modal */}
       {showUploadModal && (
         <div className="modal-overlay-custom d-flex align-items-center justify-content-center">
-          <div className="modal-dialog-custom bg-card card border-0 shadow-2xl p-4" style={{ maxWidth: '480px', width: '100%', borderRadius: '16px', backgroundColor: '#17181B', borderColor: 'rgba(255,255,255,0.1)', borderStyle: 'solid', borderWidth: '1px' }}>
-            <div className="d-flex justify-content-between align-items-center pb-3 border-bottom mb-3" style={{ borderColor: 'rgba(255, 255, 255, 0.08)' }}>
-              <h5 className="fw-bold text-white mb-0"><i className="bi bi-upload text-primary me-2" />Upload Study Material</h5>
-              <button className="btn-close btn-close-white" onClick={() => setShowUploadModal(false)} />
+          <div className="modal-dialog-custom bg-card card border shadow-2xl p-4" style={{ maxWidth: '480px', width: '100%', borderRadius: '16px', borderColor: 'var(--border)' }}>
+            <div className="d-flex justify-content-between align-items-center pb-3 border-bottom mb-3" style={{ borderColor: 'var(--border)' }}>
+              <h5 className="fw-bold mb-0" style={{ color: 'var(--text)' }}><i className="bi bi-upload text-primary me-2" />Upload Study Material</h5>
+              <button className="btn-close" onClick={() => setShowUploadModal(false)} />
             </div>
 
             <form onSubmit={handleUploadSubmit}>

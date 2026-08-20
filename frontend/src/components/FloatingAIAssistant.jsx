@@ -18,27 +18,27 @@ const APP_SUGGESTIONS = ['Summarize Syllabus', 'Java OOP Help', 'Generate Quiz']
 const PUBLIC_INTENT_RESPONSES = [
   {
     keywords: ['solution', 'provide', 'offer', 'what do you do', 'services', 'platform'],
-    answer: 'AI School OS provides a full-stack school management and AI knowledge platform. The solution includes role-based dashboards, student and teacher workflows, assignments, document upload, RAG-powered course-material search, and an AI assistant for education operations.'
+    answer: 'AI School OS provides an all-in-one school management and AI learning platform. Features include role-based dashboards, academic workflows, assignments, course document library, instant concept search, and a 24/7 AI tutor.'
   },
   {
     keywords: ['client', 'clients', 'customer', 'customers', 'how many', 'schools using', 'users'],
-    answer: 'This website currently presents AI School OS as a product/demo platform. The visible dashboard numbers are sample preview metrics, not verified client counts. For real customer or deployment numbers, please use the demo/login flow or contact the team directly.'
+    answer: 'AI School OS is designed for K-12 schools, colleges, and multi-campus institutions. You can explore the platform immediately using the interactive demo accounts or sign in.'
   },
   {
     keywords: ['rag', 'document', 'search', 'qdrant', 'knowledge', 'citation', 'pdf'],
-    answer: 'The knowledge solution lets schools upload course documents, extract text, split it into overlapping chunks, create embeddings, store vectors in Qdrant, and retrieve relevant context for AI-generated answers.'
+    answer: 'The smart knowledge engine lets schools upload course documents and textbooks, automatically index key concepts, and deliver instant answers with verified textbook citations.'
   },
   {
     keywords: ['admin', 'teacher', 'student', 'principal', 'role', 'roles'],
-    answer: 'The platform supports role-specific experiences for administrators, principals, teachers, and students. Admins manage school operations, teachers manage coursework and AI-assisted teaching tasks, and students access learning materials, assignments, and AI study support.'
+    answer: 'The platform supports tailored experiences for administrators, principals, teachers, and students. Admins oversee operations, teachers manage curriculum and smart grading, and students access 24/7 AI tutoring.'
   },
   {
     keywords: ['security', 'auth', 'authentication', 'rbac', 'safe', 'privacy'],
-    answer: 'Security features include JWT-based authentication, role-based authorization, audit-log support, and encrypted storage for sensitive provider keys. Public visitors cannot access protected school data through this assistant.'
+    answer: 'Enterprise security includes encrypted institutional storage, role-based access control, and complete data privacy. School data is never shared publicly or used to train third-party public models.'
   },
   {
     keywords: ['demo', 'login', 'try', 'account', 'test'],
-    answer: 'You can use the demo accounts from the landing page to preview the authenticated dashboards. The demo flow shows role-specific views for admin, teacher, and student users.'
+    answer: 'You can use the 1-click demo accounts from the login page to preview the platform as an Administrator, Teacher, or Student.'
   }
 ]
 
@@ -50,7 +50,7 @@ const getPublicAssistantReply = (text) => {
 
   if (match) return match.answer
 
-  return 'I can help with essential information about AI School OS: what the platform provides, who it is for, its AI/RAG document-search solution, role-based dashboards, security basics, demo access, and client/demo status. For private school data or course-specific AI help, please sign in.'
+  return 'I can help with essential information about AI School OS: platform capabilities, role-based dashboards, instant course document search, security features, and demo access. For personalized coursework or institutional access, please sign in.'
 }
 
 export default function FloatingAIAssistant() {

@@ -5,14 +5,14 @@ const ProfileCard = ({ user, onEdit, onChangePassword, onUploadPicture, onRemove
   if (!user) return null
 
   const getRoleBadgeClass = () => {
-    if (!user.roles || user.roles.length === 0) return 'badge bg-secondary'
+    if (!user.roles || user.roles.length === 0) return 'badge bg-secondary-subtle text-secondary'
     
     const primaryRole = user.roles[0]
     switch (primaryRole) {
-      case 'ROLE_ADMIN': return 'badge bg-primary'
-      case 'ROLE_TEACHER': return 'badge bg-success'
-      case 'ROLE_STUDENT': return 'badge bg-info'
-      default: return 'badge bg-secondary'
+      case 'ROLE_ADMIN': return 'badge bg-primary-subtle text-primary'
+      case 'ROLE_TEACHER': return 'badge bg-success-subtle text-success'
+      case 'ROLE_STUDENT': return 'badge bg-info-subtle text-info'
+      default: return 'badge bg-secondary-subtle text-secondary'
     }
   }
 
@@ -27,41 +27,41 @@ const ProfileCard = ({ user, onEdit, onChangePassword, onUploadPicture, onRemove
   }
 
   return (
-    <div className="card">
-      <div className="card-body text-center">
+    <div className="card border shadow-xs bg-card overflow-hidden" style={{ borderRadius: '16px' }}>
+      <div className="card-body text-center p-4">
         <div className="mb-3 position-relative d-inline-block">
           {user.profilePictureUrl ? (
             <img 
               src={user.profilePictureUrl} 
               alt="Profile" 
-              className="rounded-circle" 
-              style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+              className="rounded-circle shadow-xs" 
+              style={{ width: '96px', height: '96px', objectFit: 'cover', border: '3px solid var(--border)' }}
             />
           ) : (
             <div 
-              className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto"
-              style={{ width: '100px', height: '100px', fontSize: '2.5rem' }}
+              className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto shadow-xs"
+              style={{ width: '96px', height: '96px', fontSize: '2.4rem', border: '3px solid var(--border)' }}
             >
               {(user.username || user.email || '?')[0].toUpperCase()}
             </div>
           )}
           {user.profilePictureUrl && onRemovePicture && (
             <button 
-              className="btn btn-sm btn-danger position-absolute bottom-0 start-0 rounded-circle"
-              style={{ width: '32px', height: '32px' }}
+              className="btn btn-sm btn-danger position-absolute bottom-0 start-0 rounded-circle p-1 d-flex align-items-center justify-content-center"
+              style={{ width: '28px', height: '28px', border: '2px solid var(--card)' }}
               title="Remove profile picture"
               onClick={onRemovePicture}
             >
-              <i className="bi bi-trash-fill" />
+              <i className="bi bi-trash-fill" style={{ fontSize: '11px' }} />
             </button>
           )}
           {onUploadPicture && (
             <label 
-              className="btn btn-sm btn-primary position-absolute bottom-0 end-0 rounded-circle"
-              style={{ width: '32px', height: '32px' }}
+              className="btn btn-sm btn-primary position-absolute bottom-0 end-0 rounded-circle p-1 d-flex align-items-center justify-content-center"
+              style={{ width: '28px', height: '28px', border: '2px solid var(--card)', cursor: 'pointer' }}
               title="Upload profile picture"
             >
-              <i className="bi bi-camera-fill" />
+              <i className="bi bi-camera-fill" style={{ fontSize: '11px' }} />
               <input 
                 type="file" 
                 className="d-none" 
@@ -72,41 +72,41 @@ const ProfileCard = ({ user, onEdit, onChangePassword, onUploadPicture, onRemove
           )}
         </div>
         
-        <h5 className="card-title mb-1" style={{ color: 'var(--text)' }}>
+        <h5 className="card-title mb-1 fw-bold" style={{ color: 'var(--text)' }}>
           {user.firstName || user.lastName ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : user.username}
         </h5>
         {(user.firstName || user.lastName) && (
           <p className="text-muted small mb-1">@{user.username}</p>
         )}
-        <span className={getRoleBadgeClass()}>{getRoleLabel()}</span>
+        <span className={`${getRoleBadgeClass()} px-2.5 py-1 rounded-pill small`}>{getRoleLabel()}</span>
         
-        <hr className="my-4" />
+        <hr className="my-3" style={{ borderColor: 'var(--border)' }} />
         
         <div className="text-start">
-          <div className="mb-3">
+          <div className="mb-2.5">
             <small className="text-muted d-block">Email</small>
-            <span style={{ color: 'var(--text)' }}>{user.email || '—'}</span>
+            <span className="small fw-medium" style={{ color: 'var(--text)' }}>{user.email || '—'}</span>
           </div>
           
-          <div className="mb-3">
+          <div className="mb-2.5">
             <small className="text-muted d-block">Phone</small>
-            <span style={{ color: 'var(--text)' }}>{user.phone || '—'}</span>
+            <span className="small fw-medium" style={{ color: 'var(--text)' }}>{user.phone || '—'}</span>
           </div>
           
-          <div className="mb-3">
+          <div className="mb-0">
             <small className="text-muted d-block">Last Login</small>
-            <span style={{ color: 'var(--text)' }}>{formatDate(user.lastLoginAt) || '—'}</span>
+            <span className="small fw-medium" style={{ color: 'var(--text)' }}>{formatDate(user.lastLoginAt) || '—'}</span>
           </div>
         </div>
         
         <div className="d-flex gap-2 mt-4">
-          <button className="btn btn-outline-primary flex-grow-1" onClick={onEdit}>
+          <button className="btn btn-secondary btn-sm flex-grow-1 rounded-3" onClick={onEdit}>
             <i className="bi bi-pencil me-1" />
             Edit Profile
           </button>
-          <button className="btn btn-outline-secondary flex-grow-1" onClick={onChangePassword}>
+          <button className="btn btn-secondary btn-sm flex-grow-1 rounded-3" onClick={onChangePassword}>
             <i className="bi bi-key me-1" />
-            Change Password
+            Password
           </button>
         </div>
       </div>

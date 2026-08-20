@@ -103,14 +103,14 @@ export default function AttendancePage() {
         <div className="d-flex flex-wrap gap-2">
           <input 
             type="date" 
-            className="form-control bg-dark border-secondary text-white rounded-3 py-1.5" 
+            className="form-control bg-surface border rounded-3 py-1.5" 
             value={date} 
             onChange={e => setDate(e.target.value)} 
-            style={{ width: 'auto' }} 
+            style={{ width: 'auto', color: 'var(--text)', borderColor: 'var(--border)' }} 
           />
           <select 
-            className="form-select bg-dark border-secondary text-white rounded-3 py-1.5" 
-            style={{ width: 'auto', minWidth: '150px' }} 
+            className="form-select bg-surface border rounded-3 py-1.5" 
+            style={{ width: 'auto', minWidth: '150px', color: 'var(--text)', borderColor: 'var(--border)' }} 
             value={selectedClass} 
             onChange={e => setSelectedClass(e.target.value)}
           >
@@ -130,7 +130,7 @@ export default function AttendancePage() {
             <i className="bi bi-check-circle-fill" />
             <div>
               <span className="count-label text-muted d-block uppercase tracking-wider">Present</span>
-              <strong className="count-value text-white" style={{ color: 'var(--text)' }}>{counts.present}</strong>
+              <strong className="count-value" style={{ color: 'var(--text)' }}>{counts.present}</strong>
             </div>
           </div>
         </div>
@@ -139,7 +139,7 @@ export default function AttendancePage() {
             <i className="bi bi-x-circle-fill" />
             <div>
               <span className="count-label text-muted d-block uppercase tracking-wider">Absent</span>
-              <strong className="count-value text-white" style={{ color: 'var(--text)' }}>{counts.absent}</strong>
+              <strong className="count-value" style={{ color: 'var(--text)' }}>{counts.absent}</strong>
             </div>
           </div>
         </div>
@@ -148,7 +148,7 @@ export default function AttendancePage() {
             <i className="bi bi-clock-fill" />
             <div>
               <span className="count-label text-muted d-block uppercase tracking-wider">Late</span>
-              <strong className="count-value text-white" style={{ color: 'var(--text)' }}>{counts.late}</strong>
+              <strong className="count-value" style={{ color: 'var(--text)' }}>{counts.late}</strong>
             </div>
           </div>
         </div>
@@ -157,7 +157,7 @@ export default function AttendancePage() {
             <i className="bi bi-calendar-x-fill" />
             <div>
               <span className="count-label text-muted d-block uppercase tracking-wider">On Leave</span>
-              <strong className="count-value text-white" style={{ color: 'var(--text)' }}>{counts.leave}</strong>
+              <strong className="count-value" style={{ color: 'var(--text)' }}>{counts.leave}</strong>
             </div>
           </div>
         </div>
@@ -168,13 +168,10 @@ export default function AttendancePage() {
         <div className="bulk-actions d-flex align-items-center gap-2">
           <span className="bulk-label text-muted small fw-semibold uppercase tracking-wider me-1">Bulk Actions:</span>
           <button className="btn btn-sm btn-outline-success rounded-pill px-3" onClick={() => bulkSet('present')}>
-            Mark All Present
+            All Present
           </button>
           <button className="btn btn-sm btn-outline-danger rounded-pill px-3" onClick={() => bulkSet('absent')}>
-            Mark All Absent
-          </button>
-          <button className="btn btn-sm btn-outline-warning rounded-pill px-3" onClick={() => bulkSet('late')}>
-            Mark All Late
+            All Absent
           </button>
         </div>
 
@@ -191,56 +188,57 @@ export default function AttendancePage() {
         </div>
       </div>
 
-      {/* Roster list */}
-      <div className="table-responsive shadow-sm">
-        <table className="table atp-table align-middle mb-0" style={{ color: 'inherit' }}>
-          <thead>
-            <tr className="border-bottom border-secondary border-opacity-10">
-              <th className="px-4 py-3 text-muted text-uppercase" style={{ fontSize: '11px' }}>Roll</th>
-              <th className="py-3 text-muted text-uppercase" style={{ fontSize: '11px' }}>Student Name</th>
-              <th className="px-4 py-3 text-muted text-uppercase text-end" style={{ fontSize: '11px' }}>Status Trigger</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.length === 0 ? (
-              <tr>
-                <td colSpan="3" className="text-center py-5 text-muted small">No students found matching your search.</td>
+      <div className="glass-card shadow-2xl">
+        <div className="table-responsive">
+          <table className="table atp-table align-middle mb-0" style={{ color: 'inherit' }}>
+            <thead>
+              <tr className="border-bottom border-secondary border-opacity-10">
+                <th className="px-4 py-3 text-muted text-uppercase" style={{ fontSize: '11px' }}>Roll Number</th>
+                <th className="py-3 text-muted text-uppercase" style={{ fontSize: '11px' }}>Student Name</th>
+                <th className="px-4 py-3 text-muted text-uppercase text-end" style={{ fontSize: '11px' }}>Attendance Status</th>
               </tr>
-            ) : (
-              filtered.map(s => (
-                <tr key={s.id} className="border-bottom border-secondary border-opacity-10">
-                  <td className="px-4"><code>{s.roll}</code></td>
-                  <td><strong className="text-white" style={{ color: 'var(--text)' }}>{s.name}</strong></td>
-                  <td className="px-4 text-end">
-                    <div className="btn-group rounded-3 overflow-hidden p-0.5 border" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--surface)' }}>
-                      {[
-                        { key: 'present', label: 'Present', color: 'success' },
-                        { key: 'absent', label: 'Absent', color: 'danger' },
-                        { key: 'late', label: 'Late', color: 'warning' },
-                        { key: 'leave', label: 'Leave', color: 'info' }
-                      ].map(option => {
-                        const isSelected = s.status === option.key
-                        return (
-                          <button 
-                            key={option.key} 
-                            className={`btn btn-sm px-3.5 py-1.5 border-0 font-medium transition ${isSelected ? 'btn-' + option.color : 'text-muted'}`}
-                            onClick={() => setStatus(s.id, option.key)}
-                            style={{
-                              fontSize: '11.5px',
-                              borderRadius: '6px'
-                            }}
-                          >
-                            {option.label}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </td>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan="3" className="text-center py-5 text-muted small">No students found matching your search.</td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                filtered.map(s => (
+                  <tr key={s.id} className="border-bottom border-secondary border-opacity-10">
+                    <td className="px-4"><code>{s.roll}</code></td>
+                    <td><strong style={{ color: 'var(--text)' }}>{s.name}</strong></td>
+                    <td className="px-4 text-end">
+                      <div className="btn-group rounded-3 overflow-hidden p-0.5 border" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--surface)' }}>
+                        {[
+                          { key: 'present', label: 'Present', color: 'success' },
+                          { key: 'absent', label: 'Absent', color: 'danger' },
+                          { key: 'late', label: 'Late', color: 'warning' },
+                          { key: 'leave', label: 'Leave', color: 'info' }
+                        ].map(option => {
+                          const isSelected = s.status === option.key
+                          return (
+                            <button 
+                              key={option.key} 
+                              className={`btn btn-sm px-3.5 py-1.5 border-0 font-medium transition ${isSelected ? 'btn-' + option.color : 'text-muted'}`}
+                              onClick={() => setStatus(s.id, option.key)}
+                              style={{
+                                fontSize: '11.5px',
+                                borderRadius: '6px'
+                              }}
+                            >
+                              {option.label}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <style>{atpStyles}</style>

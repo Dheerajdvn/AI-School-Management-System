@@ -67,9 +67,8 @@ export default function HomePage() {
           {/* Centered Desktop Navigation Links */}
           <div className="d-none d-md-flex align-items-center gap-3 mx-auto my-auto">
             <a href="#features" className="landing-nav-link">Features</a>
-            <a href="#rag-pipeline" className="landing-nav-link">RAG Pipeline</a>
+            <a href="#knowledge-engine" className="landing-nav-link">Knowledge Engine</a>
             <a href="#roles" className="landing-nav-link">Role Portals</a>
-            <a href="#documentation" className="landing-nav-link">Documentation</a>
             <a href="#faq" className="landing-nav-link">FAQ</a>
           </div>
 
@@ -147,7 +146,7 @@ export default function HomePage() {
         </div>
         <div className="d-flex flex-column gap-2 mb-3">
           <a href="#features" className="landing-nav-link text-start py-2" onClick={() => setMobileMenuOpen(false)}>Features</a>
-          <a href="#rag-pipeline" className="landing-nav-link text-start py-2" onClick={() => setMobileMenuOpen(false)}>RAG Pipeline</a>
+          <a href="#knowledge-engine" className="landing-nav-link text-start py-2" onClick={() => setMobileMenuOpen(false)}>Knowledge Engine</a>
           <a href="#roles" className="landing-nav-link text-start py-2" onClick={() => setMobileMenuOpen(false)}>Role Portals</a>
           <a href="#faq" className="landing-nav-link text-start py-2" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
         </div>
@@ -165,7 +164,7 @@ export default function HomePage() {
       <main className="flex-grow-1">
         <Hero onOpenDemo={openDemo} />
         <div id="features"><FeatureGrid /></div>
-        <div id="rag-pipeline"><RagPipelineShowcase /></div>
+        <div id="knowledge-engine"><RagPipelineShowcase /></div>
         <div id="roles"><RoleShowcase /></div>
         <div id="faq"><FAQ /></div>
       </main>

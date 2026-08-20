@@ -95,16 +95,17 @@ export function BarChart({ title, labels, values, onClick }) {
       labels,
       datasets: [
         {
-          label: title || 'Enrollment',
+          label: title || 'Data',
           data: values,
-          backgroundColor: labels.map((_, i) => hexToRgba(PALETTE[i % PALETTE.length], 0.85)),
+          backgroundColor: labels.map((_, i) => hexToRgba(PALETTE[i % PALETTE.length], isDark ? 0.45 : 0.65)),
           borderColor: labels.map((_, i) => PALETTE[i % PALETTE.length]),
           borderWidth: 1.5,
-          borderRadius: 8,
+          borderRadius: 6,
+          borderSkipped: false,
         },
       ],
     }),
-    [labels, values, title],
+    [labels, values, title, isDark],
   )
 
   return (
@@ -125,9 +126,10 @@ export function PieChart({ title, labels, values, onClick }) {
         {
           label: title || 'Distribution',
           data: values,
-          backgroundColor: labels.map((_, i) => PALETTE[i % PALETTE.length]),
+          backgroundColor: labels.map((_, i) => hexToRgba(PALETTE[i % PALETTE.length], isDark ? 0.75 : 0.85)),
           borderWidth: 2,
-          borderColor: isDark ? '#18181b' : '#ffffff',
+          borderColor: isDark ? '#141418' : '#ffffff',
+          hoverOffset: 4,
         },
       ],
     }),
@@ -137,15 +139,16 @@ export function PieChart({ title, labels, values, onClick }) {
   const options = {
     ...getBaseOptions(title, onClick, isDark),
     scales: {}, // Pie charts don't require x/y axis scales
+    cutout: '62%', // Modern Doughnut aesthetic
     plugins: {
       ...getBaseOptions(title, onClick, isDark).plugins,
       legend: {
         display: true,
         position: 'right',
         labels: {
-          color: isDark ? '#e2e8f0' : '#1e293b',
-          font: { size: 12, weight: '600' },
-          padding: 14,
+          color: isDark ? '#94a3b8' : '#475569',
+          font: { size: 11, weight: '500' },
+          padding: 12,
           usePointStyle: true,
           pointStyle: 'circle'
         }
@@ -171,17 +174,19 @@ export function LineChart({ title, labels, values, onClick }) {
         {
           label: title || 'Trend',
           data: values,
-          borderColor: '#4f46e5',
-          backgroundColor: 'rgba(79, 70, 229, 0.15)',
+          borderColor: '#6366f1',
+          backgroundColor: isDark ? 'rgba(99, 102, 241, 0.10)' : 'rgba(99, 102, 241, 0.08)',
           fill: true,
-          tension: 0.35,
-          pointRadius: 4,
-          pointBackgroundColor: '#4f46e5',
+          tension: 0.4,
+          pointRadius: 3,
+          pointBackgroundColor: '#6366f1',
+          pointBorderColor: isDark ? '#09090b' : '#ffffff',
+          pointBorderWidth: 1.5,
           pointHoverRadius: 6,
         },
       ],
     }),
-    [labels, values, title],
+    [labels, values, title, isDark],
   )
 
   return (

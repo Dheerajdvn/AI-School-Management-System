@@ -75,7 +75,7 @@ export default function AIQuizGeneratorPage() {
         <div className="col-md-4">
           <div className="glass-card shadow-sm h-100">
             <div className="card-header-custom p-3 border-bottom">
-              <h5 className="fw-bold mb-0 text-white" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>Quiz Settings</h5>
+              <h5 className="fw-bold mb-0" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>Quiz Settings</h5>
             </div>
             <div className="card-body p-4">
               <div className="mb-3.5">
@@ -146,7 +146,7 @@ export default function AIQuizGeneratorPage() {
           {questions.length === 0 ? (
             <div className="empty-state text-center py-5 rounded-4 border" style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}>
               <i className="bi bi-cpu text-muted display-4 mb-2 d-block" />
-              <h6 className="fw-bold text-white mb-1" style={{ color: 'var(--text)' }}>AI Workspace Ready</h6>
+              <h6 className="fw-bold mb-1" style={{ color: 'var(--text)' }}>AI Workspace Ready</h6>
               <p className="text-muted small mb-0">Configure settings and click "Generate Quiz" to load questions here.</p>
             </div>
           ) : (

@@ -58,7 +58,7 @@ export default function DocumentCard({ document, onDelete, onDownload, onPreview
         {/* Footer Actions / Preview */}
         <div className="mt-auto d-flex align-items-center justify-content-between pt-2 border-top">
           <button 
-            className="btn btn-sm btn-light text-primary fw-semibold px-2 py-1 text-xs d-flex align-items-center gap-1"
+            className="btn btn-action-view"
             onClick={() => onPreview?.(document)}
             title="File Preview"
           >

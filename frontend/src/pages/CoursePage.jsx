@@ -84,11 +84,11 @@ export default function CoursePage() {
                   </td>
                   <td>
                     <div className="d-flex gap-1">
-                      <Link to={`/admin/courses/${course.id}`} className="btn btn-sm btn-outline-primary">
-                        <i className="bi bi-eye"></i>
+                      <Link to={`/admin/courses/${course.id}`} className="btn btn-action-view" title="View Course">
+                        <i className="bi bi-eye" />
                       </Link>
-                      <Link to={`/admin/courses/${course.id}/edit`} className="btn btn-sm btn-outline-secondary">
-                        <i className="bi bi-pencil"></i>
+                      <Link to={`/admin/courses/${course.id}/edit`} className="btn btn-outline-secondary" title="Edit Course">
+                        <i className="bi bi-pencil" />
                       </Link>
                     </div>
                   </td>

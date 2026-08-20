@@ -5,35 +5,35 @@ export default function RoleShowcase() {
 
   const roles = {
     admin: {
-      title: 'School Administrator & Principal',
+      title: 'School Administrator & Leadership',
       subtitle: 'Centralized Multi-Campus Oversight & Governance',
       items: [
-        'Manage departments, staff rosters, and student enrollment records',
-        'Monitor active student stats, enrollment trends, and school performance telemetry',
-        'Configure system settings, RBAC roles, and security audit logs',
-        'Upload school-wide handbooks and policies to the RAG knowledge base'
+        'Manage academic departments, faculty rosters, and student enrollment records',
+        'Monitor live campus telemetry, enrollment growth, and institutional performance metrics',
+        'Configure system-wide academic calendars, roles, and administrative security logs',
+        'Publish institutional handbooks, policies, and school-wide curriculum libraries'
       ],
       icon: 'bi-building-gear'
     },
     teacher: {
-      title: 'Teachers & Instructors',
-      subtitle: 'Course Management, AI Lesson Planning & Grading',
+      title: 'Teachers & Faculty',
+      subtitle: 'Course Management, AI Lesson Planning & Smart Grading',
       items: [
-        'Create and manage courses, section timetables, and assignments',
-        'Use AI to generate lesson plans, quizzes, and practice exams',
-        'Grade student assignment submissions with automated AI rubric feedback',
-        'Upload subject syllabi and textbook materials for student RAG search'
+        'Create and organize interactive courses, class timetables, and assignment modules',
+        'Use AI to generate lesson plans, homework problem sets, and practice exams',
+        'Grade student submissions quickly with objective rubric scoring and personalized feedback',
+        'Upload course syllabi, lecture slides, and study guides for student instant search'
       ],
       icon: 'bi-journal-check'
     },
     student: {
       title: 'Students & Learners',
-      subtitle: '24/7 AI Tutor & Interactive Study Hub',
+      subtitle: '24/7 AI Personal Tutor & Interactive Learning Portal',
       items: [
-        'Ask the AI Tutor questions about course materials with verified page citations',
-        'Submit assignment homework and review structured rubric feedback',
-        'Take adaptive practice quizzes and track academic progress analytics',
-        'Access course syllabi, calendars, and announcements'
+        'Ask the AI Tutor questions about course materials with verified textbook citations',
+        'Submit assignments online and receive immediate structured rubric feedback',
+        'Take self-paced practice quizzes and track academic progress analytics over time',
+        'Access all course syllabi, assignment deadlines, and campus announcements in one place'
       ],
       icon: 'bi-mortarboard-fill'
     }
@@ -42,17 +42,20 @@ export default function RoleShowcase() {
   const current = roles[activeRole]
 
   return (
-    <section className="landing-section" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
-      <div className="container" style={{ maxWidth: '960px' }}>
-        <div className="text-center mb-3" style={{ marginBottom: '20px' }}>
-          <h2 className="fw-bold mb-2" style={{ color: 'var(--text)', fontSize: '1.9rem' }}>Tailored Experiences for Every Role</h2>
-          <p className="text-muted mx-auto mb-3" style={{ maxWidth: '580px', fontSize: '0.95rem', lineHeight: 1.5 }}>
-            Multi-tenant role-based access control (RBAC) ensures each user gets exact tools.
+    <section className="landing-section" style={{ paddingTop: '44px', paddingBottom: '44px' }}>
+      <div className="container" style={{ maxWidth: '980px' }}>
+        <div className="text-center mb-4">
+          <span className="badge bg-primary-subtle text-primary px-3 py-1.5 mb-2 rounded-pill fw-semibold">
+            Role-Based Portals
+          </span>
+          <h2 className="fw-bold mb-2" style={{ color: 'var(--text)', fontSize: '2rem' }}>Tailored Experiences for Every Role</h2>
+          <p className="text-muted mx-auto mb-3" style={{ maxWidth: '600px', fontSize: '1rem', lineHeight: 1.5 }}>
+            Dedicated portals tailored specifically for administrative leadership, classroom teachers, and student learners.
           </p>
         </div>
 
         {/* Role Tabs */}
-        <div className="d-flex justify-content-center gap-2 mb-4">
+        <div className="d-flex justify-content-center flex-wrap gap-2 mb-4">
           {[
             { key: 'admin', label: 'School Admin / Principal', icon: 'bi-shield-shaded' },
             { key: 'teacher', label: 'Teacher Portal', icon: 'bi-person-workspace' },
@@ -60,8 +63,10 @@ export default function RoleShowcase() {
           ].map(tab => (
             <button
               key={tab.key}
+              type="button"
               onClick={() => setActiveRole(tab.key)}
-              className={`btn ${activeRole === tab.key ? 'btn-primary' : 'btn-secondary'} px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2`}
+              className={`btn ${activeRole === tab.key ? 'btn-primary shadow-sm' : 'btn-secondary'} px-4 py-2.5 fw-semibold d-inline-flex align-items-center gap-2 rounded-pill`}
+              style={{ fontSize: '0.88rem' }}
             >
               <i className={`bi ${tab.icon}`}></i>
               <span>{tab.label}</span>
@@ -70,25 +75,24 @@ export default function RoleShowcase() {
         </div>
 
         {/* Role Content Card */}
-        <div className="p-4 rounded-4 animate-role-content landing-card">
-          <div className="d-flex align-items-center gap-3 mb-3">
+        <div className="p-4 p-md-5 rounded-4 animate-role-content landing-card shadow-md border">
+          <div className="d-flex align-items-center gap-3 mb-4">
             <div className="d-flex align-items-center justify-content-center rounded-3 bg-primary-subtle text-primary" 
-                 style={{ width: '48px', height: '48px', fontSize: '1.4rem' }}>
+                 style={{ width: '52px', height: '52px', fontSize: '1.5rem' }}>
               <i className={`bi ${current.icon}`}></i>
             </div>
             <div>
-              <h4 className="fw-bold mb-0" style={{ color: '#F8F8FA' }}>{current.title}</h4>
-              <span className="small text-muted" style={{ color: '#707784' }}>{current.subtitle}</span>
+              <h4 className="fw-bold mb-1" style={{ color: 'var(--text)' }}>{current.title}</h4>
+              <span className="small text-muted fw-medium">{current.subtitle}</span>
             </div>
           </div>
 
-          <div className="row g-3 mt-2">
+          <div className="row g-3">
             {current.items.map((item, idx) => (
               <div key={idx} className="col-12 col-md-6">
-                <div className="p-3 rounded-3 h-100 d-flex align-items-start gap-2" 
-                     style={{ background: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
-                  <i className="bi bi-check-circle-fill text-primary mt-1"></i>
-                  <span className="small fw-medium" style={{ color: '#F8F8FA', lineHeight: 1.5 }}>{item}</span>
+                <div className="p-3.5 rounded-3 h-100 d-flex align-items-start gap-2.5 bg-card border">
+                  <i className="bi bi-check-circle-fill text-primary mt-1 flex-shrink-0"></i>
+                  <span className="small fw-medium" style={{ color: 'var(--text)', lineHeight: 1.55 }}>{item}</span>
                 </div>
               </div>
             ))}

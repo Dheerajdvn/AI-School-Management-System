@@ -32,10 +32,16 @@ export default function CourseTable({ courses = [], onEdit, onDelete, onView, pa
                   <td>{c.status}</td>
                   <td>{formatDate(c.createdAt)}</td>
                   <td className="text-end">
-                    <div className="btn-group" role="group">
-                      <button className="btn btn-sm btn-outline-info" onClick={() => onView(c)}>View</button>
-                      <button className="btn btn-sm btn-outline-primary" onClick={() => onEdit(c)}>Edit</button>
-                      <button className="btn btn-sm btn-outline-danger" onClick={() => onDelete(c)}>Delete</button>
+                    <div className="btn-group btn-group-sm" role="group">
+                      <button className="btn btn-action-view" onClick={() => onView(c)}>
+                        <i className="bi bi-eye" /> View
+                      </button>
+                      <button className="btn btn-outline-secondary" onClick={() => onEdit(c)}>
+                        <i className="bi bi-pencil" /> Edit
+                      </button>
+                      <button className="btn btn-outline-danger" onClick={() => onDelete(c)}>
+                        <i className="bi bi-trash" /> Delete
+                      </button>
                     </div>
                   </td>
                 </tr>

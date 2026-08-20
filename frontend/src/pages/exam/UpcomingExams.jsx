@@ -58,7 +58,9 @@ export default function UpcomingExams() {
                 </div>
                 <div className="d-flex justify-content-between align-items-center">
                   <span className="text-muted small">Total Marks: <strong>{exam.totalMarks}</strong></span>
-                  <button className="btn btn-sm btn-outline-primary">View Details</button>
+                  <button className="btn btn-action-view">
+                    <i className="bi bi-eye" /> View Details
+                  </button>
                 </div>
               </div>
             </div>

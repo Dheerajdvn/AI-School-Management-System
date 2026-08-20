@@ -25,6 +25,16 @@ import java.util.List;
 @Slf4j
 public abstract class AbstractLlmProviderStrategy implements LlmProviderStrategy {
 
+    private static final ConnectionProvider SHARED_CONNECTION_PROVIDER = ConnectionProvider.builder("ai-provider-pool")
+            .maxConnections(50)
+            .pendingAcquireMaxCount(100)
+            .maxIdleTime(Duration.ofSeconds(60))
+            .build();
+
+    private static final HttpClient SHARED_HTTP_CLIENT = HttpClient.create(SHARED_CONNECTION_PROVIDER)
+            .option(io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS, 10_000)
+            .responseTimeout(Duration.ofSeconds(30));
+
     protected final ObjectMapper objectMapper;
 
     protected AbstractLlmProviderStrategy(ObjectMapper objectMapper) {
@@ -38,18 +48,11 @@ public abstract class AbstractLlmProviderStrategy implements LlmProviderStrategy
     protected WebClient buildClient(String apiKey, String baseUrl) {
         String effectiveBaseUrl = (baseUrl != null && !baseUrl.isBlank()) ? baseUrl : getDefaultBaseUrl();
 
-        HttpClient httpClient = HttpClient.create(ConnectionProvider.builder("ai-provider")
-                .maxConnections(10)
-                .pendingAcquireMaxCount(20)
-                .build())
-                .option(io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS, 10_000)
-                .responseTimeout(Duration.ofSeconds(30));
-
         WebClient.Builder builder = WebClient.builder()
                 .baseUrl(effectiveBaseUrl)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .clientConnector(new org.springframework.http.client.reactive.ReactorClientHttpConnector(httpClient));
+                .clientConnector(new org.springframework.http.client.reactive.ReactorClientHttpConnector(SHARED_HTTP_CLIENT));
 
         HttpHeaders headers = buildHeaders(apiKey);
         if (headers != null) {

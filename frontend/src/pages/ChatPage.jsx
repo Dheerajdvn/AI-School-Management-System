@@ -250,6 +250,9 @@ export default function ChatPage() {
               retrievedChunks={msg.retrievedChunks}
               isStreaming={streaming && i === messages.length - 1}
               onRetry={msg.role === 'assistant' && i === messages.length - 1 && !streaming ? retryLastMessage : undefined}
+              onSelectSuggestion={(suggestion) => {
+                setInput(suggestion)
+              }}
             />
           ))}
 

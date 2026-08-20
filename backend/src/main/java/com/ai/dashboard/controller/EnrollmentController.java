@@ -142,17 +142,36 @@ public class EnrollmentController {
 
 
     private Long extractUserId(Authentication authentication) {
-        if (authentication.getDetails() instanceof Long) {
-            return (Long) authentication.getDetails();
+        if (authentication == null) return null;
+        Object credentials = authentication.getCredentials();
+        if (credentials instanceof Long) {
+            return (Long) credentials;
+        }
+        Object details = authentication.getDetails();
+        if (details instanceof Long) {
+            return (Long) details;
         }
         return null;
     }
 
     private String getCurrentUserRole(Authentication authentication) {
-        return authentication.getAuthorities().stream()
-                .findFirst()
+        if (authentication == null) return "ROLE_STUDENT";
+        var authorities = authentication.getAuthorities().stream()
                 .map(auth -> auth.getAuthority())
-                .orElse("ROLE_STUDENT");
+                .collect(java.util.stream.Collectors.toSet());
+        if (authorities.contains("ROLE_SUPER_ADMIN") || authorities.contains("ROLE_ADMIN")) {
+            return "ROLE_ADMIN";
+        }
+        if (authorities.contains("ROLE_PRINCIPAL")) {
+            return "ROLE_PRINCIPAL";
+        }
+        if (authorities.contains("ROLE_SCHOOL_ADMIN")) {
+            return "ROLE_SCHOOL_ADMIN";
+        }
+        if (authorities.contains("ROLE_TEACHER")) {
+            return "ROLE_TEACHER";
+        }
+        return "ROLE_STUDENT";
     }
 
     private Sort buildSort(String sortBy, String direction) {

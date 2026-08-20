@@ -58,8 +58,8 @@ export default function TeacherPortalDashboard() {
       {/* Stats row */}
       <div className="row g-3 mb-4">
         <div className="col-md-3 col-sm-6">
-          <div className="stat-card gradient-card blue shadow-sm">
-            <div className="stat-icon"><i className="bi bi-layers-fill" /></div>
+          <div className="stat-card shadow-xs">
+            <div className="stat-icon"><i className="bi bi-layers-fill text-primary" /></div>
             <div className="stat-content">
               <span className="stat-label">My Classes</span>
               <strong className="stat-value" style={{ color: 'var(--text)' }}>{stats.myClasses}</strong>
@@ -67,8 +67,8 @@ export default function TeacherPortalDashboard() {
           </div>
         </div>
         <div className="col-md-3 col-sm-6">
-          <div className="stat-card gradient-card green shadow-sm">
-            <div className="stat-icon"><i className="bi bi-people-fill" /></div>
+          <div className="stat-card shadow-xs">
+            <div className="stat-icon"><i className="bi bi-people-fill text-primary" /></div>
             <div className="stat-content">
               <span className="stat-label">Total Students</span>
               <strong className="stat-value" style={{ color: 'var(--text)' }}>{stats.totalStudents}</strong>
@@ -76,8 +76,8 @@ export default function TeacherPortalDashboard() {
           </div>
         </div>
         <div className="col-md-3 col-sm-6">
-          <div className="stat-card gradient-card orange shadow-sm">
-            <div className="stat-icon"><i className="bi bi-card-text" /></div>
+          <div className="stat-card shadow-xs">
+            <div className="stat-icon"><i className="bi bi-card-text text-primary" /></div>
             <div className="stat-content">
               <span className="stat-label">Assignments</span>
               <strong className="stat-value" style={{ color: 'var(--text)' }}>{stats.assignments}</strong>
@@ -85,8 +85,8 @@ export default function TeacherPortalDashboard() {
           </div>
         </div>
         <div className="col-md-3 col-sm-6">
-          <div className="stat-card gradient-card purple shadow-sm">
-            <div className="stat-icon"><i className="bi bi-calendar-check-fill" /></div>
+          <div className="stat-card shadow-xs">
+            <div className="stat-icon"><i className="bi bi-calendar-check-fill text-primary" /></div>
             <div className="stat-content">
               <span className="stat-label">Attendance Today</span>
               <strong className="stat-value" style={{ color: 'var(--text)' }}>{stats.attendanceToday}%</strong>
@@ -94,8 +94,8 @@ export default function TeacherPortalDashboard() {
           </div>
         </div>
         <div className="col-md-4 col-sm-6">
-          <div className="stat-card gradient-card red shadow-sm">
-            <div className="stat-icon"><i className="bi bi-pencil-square" /></div>
+          <div className="stat-card shadow-xs">
+            <div className="stat-icon"><i className="bi bi-pencil-square text-primary" /></div>
             <div className="stat-content">
               <span className="stat-label">Pending Grading</span>
               <strong className="stat-value" style={{ color: 'var(--text)' }}>{stats.pendingGrading} Submissions</strong>
@@ -103,17 +103,17 @@ export default function TeacherPortalDashboard() {
           </div>
         </div>
         <div className="col-md-4 col-sm-6">
-          <div className="stat-card gradient-card cyan shadow-sm">
-            <div className="stat-icon"><i className="bi bi-robot" /></div>
+          <div className="stat-card shadow-xs">
+            <div className="stat-icon"><i className="bi bi-robot text-primary" /></div>
             <div className="stat-content">
-              <span className="stat-label">AI Prompt Requests</span>
-              <strong className="stat-value" style={{ color: 'var(--text)' }}>{stats.aiRequests} Calls</strong>
+              <span className="stat-label">AI Queries</span>
+              <strong className="stat-value" style={{ color: 'var(--text)' }}>{stats.aiRequests} Inquiries</strong>
             </div>
           </div>
         </div>
         <div className="col-md-4 col-sm-12">
-          <div className="stat-card gradient-card teal shadow-sm">
-            <div className="stat-icon"><i className="bi bi-bell-fill" /></div>
+          <div className="stat-card shadow-xs">
+            <div className="stat-icon"><i className="bi bi-bell-fill text-primary" /></div>
             <div className="stat-content">
               <span className="stat-label">Notifications</span>
               <strong className="stat-value" style={{ color: 'var(--text)' }}>{stats.notifications} Unread</strong>
@@ -127,7 +127,7 @@ export default function TeacherPortalDashboard() {
         <div className="col-md-4">
           <div className="chart-card shadow-sm">
             <div className="card-header-custom p-3 border-bottom">
-              <h5 className="fw-bold mb-0 text-white" style={{ color: 'var(--text)', fontSize: '0.9rem' }}>
+              <h5 className="fw-bold mb-0" style={{ color: 'var(--text)', fontSize: '0.9rem' }}>
                 <i className="bi bi-calendar-check text-success me-2" />Attendance Trend
               </h5>
             </div>
@@ -151,7 +151,7 @@ export default function TeacherPortalDashboard() {
         <div className="col-md-4">
           <div className="chart-card shadow-sm">
             <div className="card-header-custom p-3 border-bottom">
-              <h5 className="fw-bold mb-0 text-white" style={{ color: 'var(--text)', fontSize: '0.9rem' }}>
+              <h5 className="fw-bold mb-0" style={{ color: 'var(--text)', fontSize: '0.9rem' }}>
                 <i className="bi bi-card-text text-primary me-2" />Assignment Completion
               </h5>
             </div>
@@ -175,7 +175,7 @@ export default function TeacherPortalDashboard() {
         <div className="col-md-4">
           <div className="chart-card shadow-sm">
             <div className="card-header-custom p-3 border-bottom">
-              <h5 className="fw-bold mb-0 text-white" style={{ color: 'var(--text)', fontSize: '0.9rem' }}>
+              <h5 className="fw-bold mb-0" style={{ color: 'var(--text)', fontSize: '0.9rem' }}>
                 <i className="bi bi-graph-up text-warning me-2" />Student Performance
               </h5>
             </div>
@@ -202,7 +202,7 @@ export default function TeacherPortalDashboard() {
         <div className="col-md-6">
           <div className="glass-card shadow-sm">
             <div className="card-header-custom p-3 border-bottom">
-              <h5 className="fw-bold mb-0 text-white" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>
+              <h5 className="fw-bold mb-0" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>
                 <i className="bi bi-calendar-event text-success me-2" />Upcoming Classes
               </h5>
             </div>
@@ -213,7 +213,7 @@ export default function TeacherPortalDashboard() {
                     <i className="bi bi-clock me-1.5" />{cls.time}
                   </div>
                   <div className="class-info flex-grow-1 ms-3">
-                    <strong className="text-white d-block" style={{ color: 'var(--text)', fontSize: '13.5px' }}>{cls.subject}</strong>
+                    <strong className="d-block" style={{ color: 'var(--text)', fontSize: '13.5px' }}>{cls.subject}</strong>
                     <span className="text-muted small" style={{ fontSize: '11px' }}>Class {cls.class}</span>
                   </div>
                   <div className="class-room small text-muted font-medium">
@@ -229,7 +229,7 @@ export default function TeacherPortalDashboard() {
         <div className="col-md-6">
           <div className="glass-card shadow-sm">
             <div className="card-header-custom p-3 border-bottom">
-              <h5 className="fw-bold mb-0 text-white" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>
+              <h5 className="fw-bold mb-0" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>
                 <i className="bi bi-lightning-charge-fill text-warning me-2" />Quick Actions
               </h5>
             </div>

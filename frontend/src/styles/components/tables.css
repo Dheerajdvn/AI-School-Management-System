@@ -1,6 +1,6 @@
 .table-responsive {
   border-radius: var(--radius-card, 16px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
   background: var(--card);
   box-shadow: var(--shadow-sm, 0 2px 8px rgba(0,0,0,0.15));
   overflow-x: auto;
@@ -20,11 +20,11 @@
 .table thead th {
   background: var(--surface) !important;
   color: var(--muted) !important;
-  font-weight: 500 !important;
+  font-weight: 600 !important;
   text-transform: uppercase !important;
   font-size: 12px !important;
   letter-spacing: 0.04em;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-bottom: 1px solid var(--border) !important;
   padding: 10px 16px !important;
   height: 42px !important;
   vertical-align: middle !important;
@@ -39,7 +39,7 @@
 
 .table tbody td {
   padding: 8px 16px !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-bottom: 1px solid var(--border) !important;
   background: transparent !important;
   color: var(--text) !important;
   font-size: 14px !important;
@@ -48,7 +48,7 @@
 }
 
 .table tbody tr:hover td {
-  background-color: rgba(255, 255, 255, 0.025) !important;
+  background-color: var(--hover) !important;
 }
 
 .table tbody tr:last-child td {

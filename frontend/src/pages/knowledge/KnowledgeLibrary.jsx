@@ -96,11 +96,11 @@ export default function KnowledgeLibrary() {
                 <td>{item.uploadedAt ? new Date(item.uploadedAt).toLocaleDateString() : '—'}</td>
                 <td>
                   <div className="d-flex gap-1">
-                    <button className="btn btn-sm btn-outline-primary">
-                      <i className="bi bi-eye"></i>
+                    <button className="btn btn-action-view" title="View Document">
+                      <i className="bi bi-eye" />
                     </button>
-                    <button className="btn btn-sm btn-outline-danger">
-                      <i className="bi bi-trash"></i>
+                    <button className="btn btn-outline-danger" title="Delete Document">
+                      <i className="bi bi-trash" />
                     </button>
                   </div>
                 </td>

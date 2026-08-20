@@ -38,11 +38,19 @@ export default function UserTable({ users = [], onEdit, onDelete, onView, onTogg
                   <td>{formatDate(u.createdAt)}</td>
                   <td>{u.enabled ? <span className="badge bg-success">Enabled</span> : <span className="badge bg-secondary">Disabled</span>}</td>
                   <td className="text-end">
-                    <div className="btn-group" role="group">
-                      <button className="btn btn-sm btn-outline-info" onClick={() => onView(u)}>View</button>
-                      <button className="btn btn-sm btn-outline-primary" onClick={() => onEdit(u)}>Edit</button>
-                      <button className="btn btn-sm btn-outline-danger" onClick={() => onDelete(u)}>Delete</button>
-                      <button className="btn btn-sm btn-outline-secondary" onClick={() => onToggleEnabled(u)}>{u.enabled ? 'Disable' : 'Enable'}</button>
+                    <div className="btn-group btn-group-sm" role="group">
+                      <button className="btn btn-action-view" onClick={() => onView(u)}>
+                        <i className="bi bi-eye" /> View
+                      </button>
+                      <button className="btn btn-outline-secondary" onClick={() => onEdit(u)}>
+                        <i className="bi bi-pencil" /> Edit
+                      </button>
+                      <button className="btn btn-outline-danger" onClick={() => onDelete(u)}>
+                        <i className="bi bi-trash" /> Delete
+                      </button>
+                      <button className="btn btn-outline-secondary" onClick={() => onToggleEnabled(u)}>
+                        {u.enabled ? 'Disable' : 'Enable'}
+                      </button>
                     </div>
                   </td>
                 </tr>

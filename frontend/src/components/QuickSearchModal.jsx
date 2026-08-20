@@ -61,10 +61,22 @@ export default function QuickSearchModal() {
     }
   }, [isOpen])
 
-  const filtered = SEARCH_ITEMS.filter((item) =>
-    item.name.toLowerCase().includes(query.toLowerCase()) ||
-    item.category.toLowerCase().includes(query.toLowerCase())
-  )
+  const filtered = React.useMemo(() => {
+    const list = [...SEARCH_ITEMS]
+    if (query.trim()) {
+      list.unshift({
+        name: `Ask AI: "${query.trim()}"`,
+        to: `/chat?q=${encodeURIComponent(query.trim())}`,
+        category: 'AI Assistant',
+        icon: 'bi-stars',
+        isAiPrompt: true,
+      })
+    }
+    return list.filter((item) =>
+      item.name.toLowerCase().includes(query.toLowerCase()) ||
+      item.category.toLowerCase().includes(query.toLowerCase())
+    )
+  }, [query])
 
   const handleTrigger = (item) => {
     setIsOpen(false)

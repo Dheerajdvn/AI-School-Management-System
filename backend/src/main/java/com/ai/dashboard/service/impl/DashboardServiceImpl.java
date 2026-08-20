@@ -112,15 +112,22 @@ public class DashboardServiceImpl implements DashboardService {
         log.debug("Building teacher dashboard for teacherId={}", teacherId);
         long startTime = System.currentTimeMillis();
 
-        Long coursesTaught = courseRepository.count(CourseSpecifications.hasTeacherId(teacherId));
+        Long coursesTaught = teacherId != null ? courseRepository.count(CourseSpecifications.hasTeacherId(teacherId)) : 0L;
+        Long activeAssignments = teacherId != null ? assignmentRepository.count(
+                (root, query, cb) -> cb.equal(root.get("course").get("teacher").get("id"), teacherId)) : 0L;
+        long pendingGradingCount = teacherId != null ? submissionRepository.count(
+                (root, query, cb) -> cb.and(
+                        cb.equal(root.get("assignment").get("course").get("teacher").get("id"), teacherId),
+                        cb.equal(root.get("status"), Submission.Status.SUBMITTED)
+                )) : 0L;
 
         log.debug("Teacher dashboard built in {}ms", System.currentTimeMillis() - startTime);
 
         return TeacherDashboardResponse.builder()
                 .coursesTaught(coursesTaught)
                 .totalStudents(0L)
-                .activeAssignments(0L)
-                .pendingGradingCount(0)
+                .activeAssignments(activeAssignments)
+                .pendingGradingCount((int) pendingGradingCount)
                 .averageClassScore(0.0)
                 .assignmentCompletionRate(0.0)
                 .recentlySubmitted(Collections.emptyList())
@@ -181,6 +188,7 @@ public class DashboardServiceImpl implements DashboardService {
         long totalUsers = userRepository.count();
         long students = studentRepository != null ? studentRepository.count() : 0L;
         long teachers = userRepository.count(UserSpecifications.hasRole("ROLE_TEACHER"));
+        long admins = userRepository.count(UserSpecifications.hasRole("ROLE_ADMIN"));
         long courses = courseRepository.count();
         long documents = documentRepository != null ? documentRepository.count() : 0L;
         long assignments = assignmentRepository != null ? assignmentRepository.count() : 0L;
@@ -204,7 +212,7 @@ public class DashboardServiceImpl implements DashboardService {
         totals.put("activeSchools", activeSchools);
         totals.put("revenue", revenue);
         totals.put("roles", Map.of(
-                "ADMIN", teachers,
+                "ADMIN", admins,
                 "STUDENT", students,
                 "TEACHER", teachers
         ));

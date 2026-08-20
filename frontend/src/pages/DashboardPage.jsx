@@ -79,60 +79,64 @@ export default function DashboardPage() {
 
   return (
     <div className="dashboard-page animate-fade">
-      {/* Slim Top Welcome and Actions Banner */}
-      <div className="card p-3 mb-2 border-0 text-white" style={{ backgroundColor: 'var(--primary)', borderRadius: 'var(--radius-card)' }}>
-        <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 position-relative z-1">
+      {/* Sleek Top Header & Quick Action Bar */}
+      <div className="card p-3.5 mb-3 border shadow-xs bg-card">
+        <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
           <div>
-            <h4 className="fw-bold mb-0.5" style={{ fontSize: '15px' }}>
-              Welcome back, {user?.username || user?.name || 'Administrator'}
-            </h4>
-            <p className="mb-0 text-white-50" style={{ fontSize: '11px' }}>
-              All systems operational. AI Core online with real-time analytics.
+            <div className="d-flex align-items-center gap-2 mb-1">
+              <h4 className="fw-bold mb-0" style={{ fontSize: '1.15rem', color: 'var(--text)' }}>
+                Welcome back, {user?.username || user?.name || 'Administrator'}
+              </h4>
+              <span className="badge bg-success-subtle text-success border-0 rounded-pill px-2 py-0.5" style={{ fontSize: '0.72rem' }}>
+                ● Active
+              </span>
+            </div>
+            <p className="mb-0 text-muted small">
+              Institutional Command Center • Live analytics and AI services ready.
             </p>
           </div>
           
           <div className="d-flex align-items-center gap-2 flex-wrap">
-            <button className="btn btn-light btn-sm text-primary fw-semibold rounded-pill px-2.5" onClick={handleLaunchAi} style={{ height: '28px', fontSize: '10px' }}>
-              <i className="bi bi-robot me-1" /> Launch AI Tutor
+            <button className="btn btn-primary btn-sm px-3" onClick={handleLaunchAi}>
+              <i className="bi bi-robot me-1" /> Launch AI Assistant
             </button>
-            <button className="btn btn-outline-light btn-sm fw-semibold rounded-pill px-2.5" onClick={() => navigate('/knowledge')} style={{ height: '28px', fontSize: '10px' }}>
-              <i className="bi bi-lightbulb me-1" /> Knowledge Center
+            <button className="btn btn-secondary btn-sm px-3" onClick={() => navigate('/knowledge')}>
+              <i className="bi bi-lightbulb me-1" /> Knowledge Base
             </button>
 
             {/* Quick Actions Dropdown */}
             <div className="dropdown">
               <button 
-                className="btn btn-outline-light btn-sm fw-semibold rounded-pill dropdown-toggle px-2.5" 
+                className="btn btn-secondary btn-sm dropdown-toggle px-3" 
                 type="button" 
                 id="quickActionsDropdown" 
                 data-bs-toggle="dropdown" 
                 aria-expanded="false"
-                style={{ height: '28px', fontSize: '10px' }}
               >
-                <i className="bi bi-lightning-charge-fill me-1" /> Quick Actions
+                <i className="bi bi-lightning-charge-fill me-1 text-warning" /> Quick Actions
               </button>
-              <ul className="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="quickActionsDropdown" style={{ fontSize: '11px' }}>
+              <ul className="dropdown-menu dropdown-menu-end shadow border p-1" aria-labelledby="quickActionsDropdown" style={{ fontSize: '0.85rem' }}>
                 <li>
-                  <button className="dropdown-item py-1.5" onClick={() => navigate('/admin/students')}>
+                  <button className="dropdown-item py-2 rounded-2" onClick={() => navigate('/admin/students')}>
                     <i className="bi bi-person-plus me-2 text-primary" /> Add Student
                   </button>
                 </li>
                 <li>
-                  <button className="dropdown-item py-1.5" onClick={() => navigate('/admin/courses')}>
-                    <i className="bi bi-book me-2 text-secondary" /> Add Course
+                  <button className="dropdown-item py-2 rounded-2" onClick={() => navigate('/admin/courses')}>
+                    <i className="bi bi-book me-2 text-primary" /> Add Course
                   </button>
                 </li>
                 <li>
-                  <button className="dropdown-item py-1.5" onClick={() => navigate('/admin/documents')}>
-                    <i className="bi bi-file-earmark-arrow-up me-2 text-info" /> Upload Document
+                  <button className="dropdown-item py-2 rounded-2" onClick={() => navigate('/admin/documents')}>
+                    <i className="bi bi-file-earmark-arrow-up me-2 text-primary" /> Upload Document
                   </button>
                 </li>
                 <li>
                   <hr className="dropdown-divider my-1" />
                 </li>
                 <li>
-                  <button className="dropdown-item py-1.5" onClick={() => navigate('/admin/chat')}>
-                    <i className="bi bi-chat-dots me-2 text-success" /> Open AI Chat
+                  <button className="dropdown-item py-2 rounded-2" onClick={() => navigate('/admin/chat')}>
+                    <i className="bi bi-chat-dots me-2 text-primary" /> Open AI Chat
                   </button>
                 </li>
               </ul>

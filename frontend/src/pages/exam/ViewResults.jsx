@@ -68,28 +68,28 @@ export default function ViewResults() {
     <div className="container-fluid py-2">
       <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
         <div>
-          <h4 className="fw-bold text-white mb-1"><i className="bi bi-award-fill me-2 text-primary" />View Results</h4>
+          <h4 className="fw-bold mb-1" style={{ color: 'var(--text)' }}><i className="bi bi-award-fill me-2 text-primary" />View Results</h4>
           <p className="text-muted small mb-0">Monitor and export student performance metric sheets & grades.</p>
         </div>
         <div className="d-flex align-items-center gap-2">
           <select 
-            className="form-select w-auto bg-dark border-secondary text-white rounded-3 py-1.5"
+            className="form-select w-auto rounded-3 py-1.5"
             value={selectedExam}
             onChange={(e) => setSelectedExam(e.target.value)}
-            style={{ minWidth: '200px' }}
+            style={{ minWidth: '200px', backgroundColor: 'var(--surface)', color: 'var(--text)', borderColor: 'var(--border)' }}
           >
             <option value="All Exams">All Exams</option>
             <option value="Mid-Term Mathematics">Mid-Term Mathematics</option>
             <option value="Physics Unit Test">Physics Unit Test</option>
           </select>
-          <button className="btn btn-primary rounded-3 px-3 py-1.5 font-semibold shadow-glow d-flex align-items-center gap-2" onClick={handleExport}>
-            <i className="bi bi-download" />
+          <button className="btn btn-secondary rounded-3 px-3 py-1.5 font-semibold d-flex align-items-center gap-2 shadow-xs" onClick={handleExport}>
+            <i className="bi bi-download text-primary" />
             <span>Export CSV</span>
           </button>
         </div>
       </div>
 
-      <div className="card border-0 shadow-2xl" style={{ backgroundColor: 'rgba(17, 18, 23, 0.6)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '16px' }}>
+      <div className="card border shadow-xs bg-card overflow-hidden" style={{ borderRadius: '16px' }}>
         <div className="card-body p-0 overflow-hidden">
           <div className="table-responsive">
             <table className="table align-middle mb-0" style={{ color: 'inherit' }}>

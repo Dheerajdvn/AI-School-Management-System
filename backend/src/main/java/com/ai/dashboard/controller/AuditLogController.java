@@ -26,7 +26,7 @@ public class AuditLogController {
     private final AuditLogService auditLogService;
 
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
     @Operation(summary = "Get all audit logs with filters and pagination")
     public ApiResponse<PagedResponse<AuditLog>> getAllAuditLogs(
             @RequestParam(defaultValue = "0") int page,

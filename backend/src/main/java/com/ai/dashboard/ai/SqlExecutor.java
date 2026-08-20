@@ -34,6 +34,7 @@ public class SqlExecutor {
         return jdbcTemplate.query(con -> {
             var ps = con.prepareStatement(sql,
                     ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            ps.setQueryTimeout(5);
             ps.setFetchSize(MAX_ROWS);
             ps.setMaxRows(MAX_ROWS);
             return ps;

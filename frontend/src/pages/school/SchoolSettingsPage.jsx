@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
+import { useToast } from '../../hooks/useToast'
+import LoadingIndicator from '../../components/LoadingIndicator'
 
 export default function SchoolSettingsPage() {
+  const { success: showToast } = useToast()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [settings, setSettings] = useState({
@@ -12,10 +15,9 @@ export default function SchoolSettingsPage() {
     theme: { primaryColor: '#3b82f6', secondaryColor: '#8b5cf6', fontFamily: 'Inter' },
   })
   const [activeTab, setActiveTab] = useState('attendance')
-  const [success, setSuccess] = useState(false)
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 600)
+    const timer = setTimeout(() => setLoading(false), 400)
     return () => clearTimeout(timer)
   }, [])
 
@@ -24,209 +26,393 @@ export default function SchoolSettingsPage() {
       ...prev,
       [section]: { ...prev[section], [field]: value }
     }))
-    setSuccess(false)
   }
 
   const handleSave = () => {
     setSaving(true)
     setTimeout(() => {
       setSaving(false)
-      setSuccess(true)
-      setTimeout(() => setSuccess(false), 3000)
-    }, 800)
+      showToast('Institutional configuration saved successfully!')
+    }, 600)
   }
 
   if (loading) {
-    return (
-      <div className="ssp-page">
-        <div className="skeleton-tabs">{[...Array(5)].map((_, i) => <div key={i} className="skeleton-tab" />)}</div>
-        <div className="skeleton-content" />
-        <style>{sspStyles}</style>
-      </div>
-    )
+    return <LoadingIndicator message="Loading school settings..." />
   }
 
   const tabs = [
-    { id: 'attendance', label: 'Attendance', icon: 'bi-calendar-check' },
-    { id: 'ai', label: 'AI Features', icon: 'bi-robot' },
-    { id: 'assignments', label: 'Assignments', icon: 'bi-card-text' },
-    { id: 'exams', label: 'Exams', icon: 'bi-file-earmark-text' },
-    { id: 'notifications', label: 'Notifications', icon: 'bi-bell' },
-    { id: 'theme', label: 'Theme & Colors', icon: 'bi-palette' },
+    { id: 'attendance', label: 'Attendance', icon: 'bi-calendar-check', desc: 'Auto-marking & grace period' },
+    { id: 'ai', label: 'AI Intelligence', icon: 'bi-robot', desc: 'Student limits & permissions' },
+    { id: 'assignments', label: 'Assignments', icon: 'bi-card-text', desc: 'Late penalties & upload sizes' },
+    { id: 'exams', label: 'Exams & Quizzes', icon: 'bi-file-earmark-text', desc: 'Passing thresholds & attempts' },
+    { id: 'notifications', label: 'Notifications', icon: 'bi-bell', desc: 'Email, SMS & push channels' },
+    { id: 'theme', label: 'Branding & Theme', icon: 'bi-palette', desc: 'Colors & typography' },
   ]
 
   return (
-    <div className="ssp-page">
-      {success && (
-        <div className="alert alert-success alert-dismissible fade show" role="alert">
-          <i className="bi bi-check-circle-fill me-2" />Settings saved successfully.
-          <button type="button" className="btn-close" onClick={() => setSuccess(false)} />
-        </div>
-      )}
-
-      <div className="settings-layout">
-        <div className="settings-sidebar">
-          {tabs.map(tab => (
-            <button key={tab.id} className={`settings-tab ${activeTab === tab.id ? 'active' : ''}`} onClick={() => setActiveTab(tab.id)}>
-              <i className={`bi ${tab.icon}`} />
-              <span>{tab.label}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="settings-content">
-          {/* Attendance Settings */}
-          {activeTab === 'attendance' && (
-            <div className="settings-section">
-              <h5><i className="bi bi-calendar-check me-2" />Attendance Settings</h5>
-              <div className="setting-item">
-                <div><strong>Auto-Mark Attendance</strong><p className="mb-0 opacity-75">Automatically mark students present when they log in</p></div>
-                <div className="form-check form-switch"><input className="form-check-input" type="checkbox" checked={settings.attendance.autoMark} onChange={e => update('attendance', 'autoMark', e.target.checked)} /></div>
-              </div>
-              <div className="setting-item">
-                <div><strong>Grace Period (minutes)</strong><p className="mb-0 opacity-75">Late arrival grace period before marking absent</p></div>
-                <input type="number" className="form-control" style={{ width: '120px' }} value={settings.attendance.gracePeriod} onChange={e => update('attendance', 'gracePeriod', parseInt(e.target.value))} />
-              </div>
-              <div className="setting-item">
-                <div><strong>Notify Absent Students</strong><p className="mb-0 opacity-75">Send notification when student is marked absent</p></div>
-                <div className="form-check form-switch"><input className="form-check-input" type="checkbox" checked={settings.attendance.notifyAbsent} onChange={e => update('attendance', 'notifyAbsent', e.target.checked)} /></div>
-              </div>
-            </div>
-          )}
-
-          {/* AI Features */}
-          {activeTab === 'ai' && (
-            <div className="settings-section">
-              <h5><i className="bi bi-robot me-2" />AI Features</h5>
-              <div className="setting-item">
-                <div><strong>Enable AI Features</strong><p className="mb-0 opacity-75">Allow AI-powered features across the school</p></div>
-                <div className="form-check form-switch"><input className="form-check-input" type="checkbox" checked={settings.ai.enabled} onChange={e => update('ai', 'enabled', e.target.checked)} /></div>
-              </div>
-              <div className="setting-item">
-                <div><strong>Allow Students to Use AI</strong><p className="mb-0 opacity-75">Students can access AI assistant</p></div>
-                <div className="form-check form-switch"><input className="form-check-input" type="checkbox" checked={settings.ai.allowStudents} onChange={e => update('ai', 'allowStudents', e.target.checked)} /></div>
-              </div>
-              <div className="setting-item">
-                <div><strong>Daily AI Request Limit</strong><p className="mb-0 opacity-75">Maximum AI requests per day per user</p></div>
-                <input type="number" className="form-control" style={{ width: '120px' }} value={settings.ai.dailyLimit} onChange={e => update('ai', 'dailyLimit', parseInt(e.target.value))} />
-              </div>
-            </div>
-          )}
-
-          {/* Assignment Rules */}
-          {activeTab === 'assignments' && (
-            <div className="settings-section">
-              <h5><i className="bi bi-card-text me-2" />Assignment Rules</h5>
-              <div className="setting-item">
-                <div><strong>Allow Late Submission</strong><p className="mb-0 opacity-75">Students can submit after due date with penalty</p></div>
-                <div className="form-check form-switch"><input className="form-check-input" type="checkbox" checked={settings.assignments.allowLateSubmission} onChange={e => update('assignments', 'allowLateSubmission', e.target.checked)} /></div>
-              </div>
-              <div className="setting-item">
-                <div><strong>Late Penalty (%)</strong><p className="mb-0 opacity-75">Percentage deduction for late submissions</p></div>
-                <input type="number" className="form-control" style={{ width: '120px' }} value={settings.assignments.latePenalty} onChange={e => update('assignments', 'latePenalty', parseInt(e.target.value))} />
-              </div>
-              <div className="setting-item">
-                <div><strong>Max File Size (MB)</strong><p className="mb-0 opacity-75">Maximum attachment file size</p></div>
-                <input type="number" className="form-control" style={{ width: '120px' }} value={settings.assignments.maxFileSize} onChange={e => update('assignments', 'maxFileSize', parseInt(e.target.value))} />
-              </div>
-            </div>
-          )}
-
-          {/* Exam Rules */}
-          {activeTab === 'exams' && (
-            <div className="settings-section">
-              <h5><i className="bi bi-file-earmark-text me-2" />Exam Rules</h5>
-              <div className="setting-item">
-                <div><strong>Passing Marks (%)</strong><p className="mb-0 opacity-75">Minimum marks required to pass</p></div>
-                <input type="number" className="form-control" style={{ width: '120px' }} value={settings.exams.passingMarks} onChange={e => update('exams', 'passingMarks', parseInt(e.target.value))} />
-              </div>
-              <div className="setting-item">
-                <div><strong>Max Attempts</strong><p className="mb-0 opacity-75">Maximum re-exam attempts allowed</p></div>
-                <input type="number" className="form-control" style={{ width: '120px' }} value={settings.exams.maxAttempts} onChange={e => update('exams', 'maxAttempts', parseInt(e.target.value))} />
-              </div>
-            </div>
-          )}
-
-          {/* Notifications */}
-          {activeTab === 'notifications' && (
-            <div className="settings-section">
-              <h5><i className="bi bi-bell me-2" />Notification Settings</h5>
-              <div className="setting-item">
-                <div><strong>Email Notifications</strong><p className="mb-0 opacity-75">Send email notifications to users</p></div>
-                <div className="form-check form-switch"><input className="form-check-input" type="checkbox" checked={settings.notifications.emailEnabled} onChange={e => update('notifications', 'emailEnabled', e.target.checked)} /></div>
-              </div>
-              <div className="setting-item">
-                <div><strong>SMS Notifications</strong><p className="mb-0 opacity-75">Send SMS alerts for important events</p></div>
-                <div className="form-check form-switch"><input className="form-check-input" type="checkbox" checked={settings.notifications.smsEnabled} onChange={e => update('notifications', 'smsEnabled', e.target.checked)} /></div>
-              </div>
-              <div className="setting-item">
-                <div><strong>Push Notifications</strong><p className="mb-0 opacity-75">Browser push notifications</p></div>
-                <div className="form-check form-switch"><input className="form-check-input" type="checkbox" checked={settings.notifications.pushEnabled} onChange={e => update('notifications', 'pushEnabled', e.target.checked)} /></div>
-              </div>
-            </div>
-          )}
-
-          {/* Theme */}
-          {activeTab === 'theme' && (
-            <div className="settings-section">
-              <h5><i className="bi bi-palette me-2" />Theme & Colors</h5>
-              <div className="setting-item">
-                <div><strong>Primary Color</strong></div>
-                <div className="d-flex align-items-center gap-2">
-                  <input type="color" value={settings.theme.primaryColor} onChange={e => update('theme', 'primaryColor', e.target.value)} style={{ width: '50px', height: '38px', border: 'none', borderRadius: '8px', cursor: 'pointer' }} />
-                  <code>{settings.theme.primaryColor}</code>
-                </div>
-              </div>
-              <div className="setting-item">
-                <div><strong>Secondary Color</strong></div>
-                <div className="d-flex align-items-center gap-2">
-                  <input type="color" value={settings.theme.secondaryColor} onChange={e => update('theme', 'secondaryColor', e.target.value)} style={{ width: '50px', height: '38px', border: 'none', borderRadius: '8px', cursor: 'pointer' }} />
-                  <code>{settings.theme.secondaryColor}</code>
-                </div>
-              </div>
-              <div className="setting-item">
-                <div><strong>Font Family</strong></div>
-                <select className="form-select" style={{ width: '200px' }} value={settings.theme.fontFamily} onChange={e => update('theme', 'fontFamily', e.target.value)}>
-                  <option>Inter</option><option>Roboto</option><option>Poppins</option><option>Open Sans</option>
-                </select>
-              </div>
-            </div>
-          )}
-
-          <div className="save-bar">
-            <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
-              {saving ? <><span className="spinner-border spinner-border-sm me-1" />Saving...</> : <><i className="bi bi-check-lg me-1" />Save Settings</>}
-            </button>
-          </div>
+    <div className="container-fluid p-0 animate-fade">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h3 className="fw-bold mb-1" style={{ color: 'var(--text)' }}>School Settings</h3>
+          <p className="text-muted small m-0">Configure institution-wide academic rules, AI limits, and notification preferences.</p>
         </div>
       </div>
 
-      <style>{sspStyles}</style>
+      <div className="row g-4">
+        {/* Navigation Tabs */}
+        <div className="col-lg-3 col-md-4">
+          <div className="card border shadow-xs bg-card p-2" style={{ borderRadius: '16px' }}>
+            <div className="d-flex flex-column gap-1">
+              {tabs.map(tab => {
+                const isActive = activeTab === tab.id
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    className={`btn text-start rounded-3 p-2.5 d-flex align-items-center gap-3 border-0 transition-all ${
+                      isActive 
+                        ? 'btn-primary shadow-xs' 
+                        : 'btn-ghost text-body bg-surface-hover'
+                    }`}
+                    onClick={() => setActiveTab(tab.id)}
+                    style={{ transition: 'all 0.2s ease' }}
+                  >
+                    <div 
+                      className={`rounded-3 p-2 d-flex align-items-center justify-content-center ${
+                        isActive ? 'bg-white bg-opacity-20 text-white' : 'bg-primary-subtle text-primary'
+                      }`}
+                      style={{ width: '34px', height: '34px' }}
+                    >
+                      <i className={`bi ${tab.icon} fs-6`} />
+                    </div>
+                    <div className="min-width-0 flex-grow-1">
+                      <div className="fw-semibold small text-truncate">{tab.label}</div>
+                      <div 
+                        className={`x-small text-truncate ${isActive ? 'text-white text-opacity-75' : 'text-muted'}`}
+                        style={{ fontSize: '11px' }}
+                      >
+                        {tab.desc}
+                      </div>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Content Section */}
+        <div className="col-lg-9 col-md-8">
+          <div className="card border shadow-xs bg-card overflow-hidden" style={{ borderRadius: '16px' }}>
+            <div className="card-header border-bottom py-3 bg-card">
+              <h5 className="mb-0 fw-bold" style={{ color: 'var(--text)', fontSize: '15px' }}>
+                <i className={`bi ${tabs.find(t => t.id === activeTab)?.icon} me-2 text-primary`} />
+                {tabs.find(t => t.id === activeTab)?.label} Configuration
+              </h5>
+            </div>
+
+            <div className="card-body p-4">
+              {/* Attendance Settings */}
+              {activeTab === 'attendance' && (
+                <div className="d-flex flex-column gap-3">
+                  <div className="d-flex justify-content-between align-items-center pb-3 border-bottom">
+                    <div>
+                      <div className="fw-semibold small" style={{ color: 'var(--text)' }}>Auto-Mark Attendance</div>
+                      <small className="text-muted">Automatically mark students present when they log in to the portal</small>
+                    </div>
+                    <div className="form-check form-switch m-0">
+                      <input 
+                        className="form-check-input" 
+                        type="checkbox" 
+                        checked={settings.attendance.autoMark} 
+                        onChange={e => update('attendance', 'autoMark', e.target.checked)} 
+                        style={{ cursor: 'pointer' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="d-flex justify-content-between align-items-center pb-3 border-bottom">
+                    <div>
+                      <div className="fw-semibold small" style={{ color: 'var(--text)' }}>Grace Period (minutes)</div>
+                      <small className="text-muted">Allowed late arrival window before marking as tardy or absent</small>
+                    </div>
+                    <input 
+                      type="number" 
+                      className="form-control bg-surface border" 
+                      style={{ width: '120px' }} 
+                      value={settings.attendance.gracePeriod} 
+                      onChange={e => update('attendance', 'gracePeriod', parseInt(e.target.value) || 0)} 
+                    />
+                  </div>
+
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div>
+                      <div className="fw-semibold small" style={{ color: 'var(--text)' }}>Notify Absent Students & Parents</div>
+                      <small className="text-muted">Send automated SMS/email alerts when student is marked absent</small>
+                    </div>
+                    <div className="form-check form-switch m-0">
+                      <input 
+                        className="form-check-input" 
+                        type="checkbox" 
+                        checked={settings.attendance.notifyAbsent} 
+                        onChange={e => update('attendance', 'notifyAbsent', e.target.checked)} 
+                        style={{ cursor: 'pointer' }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* AI Features */}
+              {activeTab === 'ai' && (
+                <div className="d-flex flex-column gap-3">
+                  <div className="d-flex justify-content-between align-items-center pb-3 border-bottom">
+                    <div>
+                      <div className="fw-semibold small" style={{ color: 'var(--text)' }}>Enable AI Assistant Platform-wide</div>
+                      <small className="text-muted">Allow teachers and administrators to generate quizzes and lesson plans</small>
+                    </div>
+                    <div className="form-check form-switch m-0">
+                      <input 
+                        className="form-check-input" 
+                        type="checkbox" 
+                        checked={settings.ai.enabled} 
+                        onChange={e => update('ai', 'enabled', e.target.checked)} 
+                        style={{ cursor: 'pointer' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="d-flex justify-content-between align-items-center pb-3 border-bottom">
+                    <div>
+                      <div className="fw-semibold small" style={{ color: 'var(--text)' }}>Allow Student AI Tutor</div>
+                      <small className="text-muted">Grant students access to interactive AI homework tutoring</small>
+                    </div>
+                    <div className="form-check form-switch m-0">
+                      <input 
+                        className="form-check-input" 
+                        type="checkbox" 
+                        checked={settings.ai.allowStudents} 
+                        onChange={e => update('ai', 'allowStudents', e.target.checked)} 
+                        style={{ cursor: 'pointer' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div>
+                      <div className="fw-semibold small" style={{ color: 'var(--text)' }}>Daily AI Query Limit Per User</div>
+                      <small className="text-muted">Maximum number of AI prompts per student per calendar day</small>
+                    </div>
+                    <input 
+                      type="number" 
+                      className="form-control bg-surface border" 
+                      style={{ width: '120px' }} 
+                      value={settings.ai.dailyLimit} 
+                      onChange={e => update('ai', 'dailyLimit', parseInt(e.target.value) || 0)} 
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Assignments */}
+              {activeTab === 'assignments' && (
+                <div className="d-flex flex-column gap-3">
+                  <div className="d-flex justify-content-between align-items-center pb-3 border-bottom">
+                    <div>
+                      <div className="fw-semibold small" style={{ color: 'var(--text)' }}>Allow Late Submissions</div>
+                      <small className="text-muted">Allow students to submit work after the scheduled deadline</small>
+                    </div>
+                    <div className="form-check form-switch m-0">
+                      <input 
+                        className="form-check-input" 
+                        type="checkbox" 
+                        checked={settings.assignments.allowLateSubmission} 
+                        onChange={e => update('assignments', 'allowLateSubmission', e.target.checked)} 
+                        style={{ cursor: 'pointer' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="d-flex justify-content-between align-items-center pb-3 border-bottom">
+                    <div>
+                      <div className="fw-semibold small" style={{ color: 'var(--text)' }}>Late Penalty (% deduction)</div>
+                      <small className="text-muted">Automatic percentage deducted per day for late assignments</small>
+                    </div>
+                    <input 
+                      type="number" 
+                      className="form-control bg-surface border" 
+                      style={{ width: '120px' }} 
+                      value={settings.assignments.latePenalty} 
+                      onChange={e => update('assignments', 'latePenalty', parseInt(e.target.value) || 0)} 
+                    />
+                  </div>
+
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div>
+                      <div className="fw-semibold small" style={{ color: 'var(--text)' }}>Max File Size (MB)</div>
+                      <small className="text-muted">Maximum attachment file size allowed per student submission</small>
+                    </div>
+                    <input 
+                      type="number" 
+                      className="form-control bg-surface border" 
+                      style={{ width: '120px' }} 
+                      value={settings.assignments.maxFileSize} 
+                      onChange={e => update('assignments', 'maxFileSize', parseInt(e.target.value) || 0)} 
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Exams */}
+              {activeTab === 'exams' && (
+                <div className="d-flex flex-column gap-3">
+                  <div className="d-flex justify-content-between align-items-center pb-3 border-bottom">
+                    <div>
+                      <div className="fw-semibold small" style={{ color: 'var(--text)' }}>Minimum Passing Marks (%)</div>
+                      <small className="text-muted">Standard institutional passing threshold for tests and quizzes</small>
+                    </div>
+                    <input 
+                      type="number" 
+                      className="form-control bg-surface border" 
+                      style={{ width: '120px' }} 
+                      value={settings.exams.passingMarks} 
+                      onChange={e => update('exams', 'passingMarks', parseInt(e.target.value) || 0)} 
+                    />
+                  </div>
+
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div>
+                      <div className="fw-semibold small" style={{ color: 'var(--text)' }}>Max Practice Attempts</div>
+                      <small className="text-muted">Allowed retry attempts for formative practice quizzes</small>
+                    </div>
+                    <input 
+                      type="number" 
+                      className="form-control bg-surface border" 
+                      style={{ width: '120px' }} 
+                      value={settings.exams.maxAttempts} 
+                      onChange={e => update('exams', 'maxAttempts', parseInt(e.target.value) || 0)} 
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Notifications */}
+              {activeTab === 'notifications' && (
+                <div className="d-flex flex-column gap-3">
+                  <div className="d-flex justify-content-between align-items-center pb-3 border-bottom">
+                    <div>
+                      <div className="fw-semibold small" style={{ color: 'var(--text)' }}>Email Notifications</div>
+                      <small className="text-muted">Send automated grade cards and attendance reports via email</small>
+                    </div>
+                    <div className="form-check form-switch m-0">
+                      <input 
+                        className="form-check-input" 
+                        type="checkbox" 
+                        checked={settings.notifications.emailEnabled} 
+                        onChange={e => update('notifications', 'emailEnabled', e.target.checked)} 
+                        style={{ cursor: 'pointer' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="d-flex justify-content-between align-items-center pb-3 border-bottom">
+                    <div>
+                      <div className="fw-semibold small" style={{ color: 'var(--text)' }}>SMS Alerts</div>
+                      <small className="text-muted">Send urgent alerts and emergency notices to parent phone numbers</small>
+                    </div>
+                    <div className="form-check form-switch m-0">
+                      <input 
+                        className="form-check-input" 
+                        type="checkbox" 
+                        checked={settings.notifications.smsEnabled} 
+                        onChange={e => update('notifications', 'smsEnabled', e.target.checked)} 
+                        style={{ cursor: 'pointer' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div>
+                      <div className="fw-semibold small" style={{ color: 'var(--text)' }}>Browser Push Notifications</div>
+                      <small className="text-muted">Instant web alerts for real-time exam reminders and chat messages</small>
+                    </div>
+                    <div className="form-check form-switch m-0">
+                      <input 
+                        className="form-check-input" 
+                        type="checkbox" 
+                        checked={settings.notifications.pushEnabled} 
+                        onChange={e => update('notifications', 'pushEnabled', e.target.checked)} 
+                        style={{ cursor: 'pointer' }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Branding & Theme */}
+              {activeTab === 'theme' && (
+                <div className="d-flex flex-column gap-3">
+                  <div className="d-flex justify-content-between align-items-center pb-3 border-bottom">
+                    <div>
+                      <div className="fw-semibold small" style={{ color: 'var(--text)' }}>Institutional Primary Color</div>
+                      <small className="text-muted">Brand accent color used across portal navigation and badges</small>
+                    </div>
+                    <div className="d-flex align-items-center gap-2">
+                      <input 
+                        type="color" 
+                        value={settings.theme.primaryColor} 
+                        onChange={e => update('theme', 'primaryColor', e.target.value)} 
+                        style={{ width: '44px', height: '36px', border: '1px solid var(--border)', borderRadius: '8px', cursor: 'pointer' }} 
+                      />
+                      <code className="bg-surface px-2 py-1 rounded border">{settings.theme.primaryColor}</code>
+                    </div>
+                  </div>
+
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div>
+                      <div className="fw-semibold small" style={{ color: 'var(--text)' }}>Font Family</div>
+                      <small className="text-muted">Primary typographic typeface for administrative reports</small>
+                    </div>
+                    <select 
+                      className="form-select bg-surface border" 
+                      style={{ width: '180px' }} 
+                      value={settings.theme.fontFamily} 
+                      onChange={e => update('theme', 'fontFamily', e.target.value)}
+                    >
+                      <option>Inter</option>
+                      <option>Roboto</option>
+                      <option>Poppins</option>
+                      <option>Outfit</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {/* Save Footer Bar */}
+              <div className="d-flex justify-content-end gap-2 pt-4 mt-4 border-top">
+                <button 
+                  type="button" 
+                  className="btn btn-primary rounded-3 px-4 py-2 fw-semibold d-flex align-items-center gap-2"
+                  onClick={handleSave}
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm" />
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    <>
+                      <i className="bi bi-check2" />
+                      <span>Save Changes</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
-
-const sspStyles = `
-.ssp-page .skeleton-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-.ssp-page .skeleton-tab { width: 140px; height: 40px; border-radius: 10px; background: rgba(255,255,255,0.06); animation: pulse 1.5s infinite; }
-.ssp-page .skeleton-content { height: 400px; border-radius: 16px; background: rgba(255,255,255,0.06); animation: pulse 1.5s infinite; }
-.ssp-page .settings-layout { display: flex; gap: 1.5rem; min-height: 500px; }
-.ssp-page .settings-sidebar { width: 240px; flex-shrink: 0; display: flex; flex-direction: column; gap: 0.5rem; }
-.ssp-page .settings-tab { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); color: inherit; text-align: left; transition: all 0.2s; cursor: pointer; font-size: 0.9rem; }
-.ssp-page .settings-tab:hover { background: rgba(255,255,255,0.08); }
-.ssp-page .settings-tab.active { background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(139,92,246,0.2)); border-color: rgba(59,130,246,0.4); }
-.ssp-page .settings-content { flex: 1; background: rgba(255,255,255,0.06); backdrop-filter: blur(12px); border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); padding: 1.5rem; }
-.ssp-page .settings-section h5 { font-weight: 700; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
-.ssp-page .setting-item { display: flex; align-items: flex-start; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); gap: 1rem; }
-.ssp-page .setting-item:last-child { border-bottom: none; }
-.ssp-page .setting-item div:first-child { flex: 1; }
-.ssp-page .setting-item strong { font-weight: 600; }
-.ssp-page .setting-item p { margin: 0.25rem 0 0; font-size: 0.8rem; }
-.ssp-page .form-control { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: inherit; border-radius: 10px; padding: 0.5rem 0.75rem; }
-.ssp-page .form-control:focus { background: rgba(255,255,255,0.1); border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
-.ssp-page .form-check-input { width: 2.5em; height: 1.2em; cursor: pointer; }
-.ssp-page .save-bar { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: flex-end; }
-.ssp-page .btn-primary { background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; border-radius: 10px; font-weight: 600; padding: 0.6rem 1.5rem; }
-.ssp-page code { background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; }
-@keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.7; } }
-`

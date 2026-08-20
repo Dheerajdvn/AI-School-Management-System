@@ -33,12 +33,8 @@ public class KnowledgeController {
     private final DocumentService documentService;
     private final DocumentContentRepository documentContentRepository;
     private final KnowledgeDashboardService knowledgeDashboardService;
-
-    private final List<Map<String, Object>> collections = new CopyOnWriteArrayList<>(List.of(
-            new HashMap<>(Map.of("id", 1, "name", "General Documents", "count", 45)),
-            new HashMap<>(Map.of("id", 2, "name", "Course Syllabi", "count", 25)),
-            new HashMap<>(Map.of("id", 3, "name", "Research Papers", "count", 30))
-    ));
+    private final com.ai.dashboard.ai.rag.service.RagService ragService;
+    private final com.ai.dashboard.document.repository.DocumentRepository documentRepository;
 
     @GetMapping("/dashboard")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_SCHOOL_ADMIN', 'ROLE_TEACHER')")
@@ -164,40 +160,62 @@ public class KnowledgeController {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
     @Operation(summary = "Reindex document")
     public ApiResponse<Void> reindexDocument(@PathVariable Long id) {
-        return ApiResponse.success("Document reindexed", null);
+        ragService.reindexDocument(id);
+        return ApiResponse.success("Document reindexed successfully", null);
     }
 
     @PostMapping("/search")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     @Operation(summary = "Search knowledge")
-    public ApiResponse<List<Object>> search(@RequestBody Map<String, String> body) {
-        return ApiResponse.success(List.of());
+    public ApiResponse<Object> search(@RequestBody Map<String, String> body) {
+        String query = body.getOrDefault("query", body.getOrDefault("question", body.get("search")));
+        if (query == null || query.isBlank()) {
+            return ApiResponse.success(List.of());
+        }
+        var response = ragService.answerQuestion(query);
+        return ApiResponse.success(response);
     }
 
     @GetMapping("/collections")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     @Operation(summary = "Get collections")
     public ApiResponse<List<Map<String, Object>>> getCollections() {
-        return ApiResponse.success(collections);
-    }
-
-    @PostMapping("/collections")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
-    @Operation(summary = "Create collection")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> createCollection(@RequestBody Map<String, Object> data) {
-        Map<String, Object> newCollection = new HashMap<>();
-        newCollection.put("id", collections.size() + 1);
-        newCollection.put("name", data.getOrDefault("name", "New Collection"));
-        newCollection.put("count", 0);
-        collections.add(newCollection);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("Collection created", newCollection));
+        List<Object[]> rows = documentRepository.countDocumentsByCollection();
+        List<Map<String, Object>> result = new ArrayList<>();
+        int id = 1;
+        for (Object[] row : rows) {
+            Map<String, Object> item = new HashMap<>();
+            item.put("id", id++);
+            item.put("name", row[0] != null ? row[0].toString() : "General");
+            item.put("count", row[1] != null ? ((Number) row[1]).longValue() : 0L);
+            result.add(item);
+        }
+        if (result.isEmpty()) {
+            result.add(Map.of("id", 1, "name", "General Documents", "count", 0L));
+        }
+        return ApiResponse.success(result);
     }
 
     @GetMapping("/queue")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
     @Operation(summary = "Get processing queue")
-    public ApiResponse<List<Object>> getProcessingQueue() {
-        return ApiResponse.success(List.of());
+    public ApiResponse<List<Map<String, Object>>> getProcessingQueue() {
+        var page = documentRepository.findAll(
+                PageRequest.of(0, 50, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "uploadTime"))
+        );
+        List<Map<String, Object>> queue = page.getContent().stream()
+                .filter(d -> d.getProcessingStatus() == com.ai.dashboard.document.entity.Document.ProcessingStatus.PENDING
+                        || d.getProcessingStatus() == com.ai.dashboard.document.entity.Document.ProcessingStatus.PROCESSING)
+                .map(d -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", d.getId());
+                    map.put("filename", d.getOriginalFilename());
+                    map.put("status", d.getProcessingStatus().name());
+                    map.put("uploadedAt", d.getUploadTime());
+                    return map;
+                })
+                .collect(java.util.stream.Collectors.toList());
+        return ApiResponse.success(queue);
     }
 
     private Long extractUserId(Authentication authentication) {

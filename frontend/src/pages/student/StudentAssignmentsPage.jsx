@@ -70,8 +70,16 @@ export default function StudentAssignmentsPage() {
                   <td><span className={`badge bg-${getPriorityColor(a.priority)}`}>{a.priority}</span></td>
                   <td><span className={`badge bg-${getStatusColor(a.status)}`}>{a.status}</span></td>
                   <td>
-                    {a.status === 'Pending' && <a href={`/student/submit-assignment/${a.id}`} className="btn btn-sm btn-outline-primary">Submit</a>}
-                    {a.status === 'Graded' && <a href={`/student/submit-assignment/${a.id}`} className="btn btn-sm btn-outline-success">View</a>}
+                    {a.status === 'Pending' && (
+                      <a href={`/student/submit-assignment/${a.id}`} className="btn btn-sm btn-primary">
+                        <i className="bi bi-upload" /> Submit
+                      </a>
+                    )}
+                    {a.status === 'Graded' && (
+                      <a href={`/student/submit-assignment/${a.id}`} className="btn btn-action-view">
+                        <i className="bi bi-eye" /> View
+                      </a>
+                    )}
                   </td>
                 </tr>
               ))}

@@ -11,15 +11,19 @@ import java.util.Set;
 
 /**
  * Validates AI-generated SQL using structured parsing (JSqlParser) before execution.
- * Enforces strict read-only SELECT rules, centralized table whitelisting, and rejection of system schemas.
+ * Enforces strict read-only SELECT rules, centralized table whitelisting, and rejection of system schemas and sensitive tables.
  */
 @Component
 public class SqlValidator {
 
     private static final Set<String> ALLOWED_TABLES = Set.of(
-            "student", "users", "roles", "user_roles", "courses",
-            "assignments", "enrollments", "submissions", "grade_history",
-            "documents", "document_contents", "document_chunks"
+            "student", "courses", "assignments", "enrollments",
+            "submissions", "grade_history", "documents",
+            "document_contents", "document_chunks"
+    );
+
+    private static final Set<String> FORBIDDEN_COLUMNS = Set.of(
+            "password", "password_hash", "api_key", "secret", "token", "refresh_token"
     );
 
     /**
@@ -39,6 +43,13 @@ public class SqlValidator {
         }
 
         try {
+            String lowerSql = sql.toLowerCase();
+            for (String forbiddenCol : FORBIDDEN_COLUMNS) {
+                if (lowerSql.matches(".*\\b" + forbiddenCol + "\\b.*")) {
+                    return ValidationResult.fail("Access to sensitive column '" + forbiddenCol + "' is forbidden");
+                }
+            }
+
             Statement statement = CCJSqlParserUtil.parse(sql);
 
             // Allow ONLY Select statements
@@ -60,13 +71,14 @@ public class SqlValidator {
                 if (cleanName.startsWith("information_schema") ||
                     cleanName.startsWith("mysql") ||
                     cleanName.startsWith("performance_schema") ||
+                    cleanName.startsWith("pg_") ||
                     cleanName.startsWith("sys")) {
                     return ValidationResult.fail("Access to system tables is forbidden");
                 }
 
                 // Check table whitelist
                 if (!ALLOWED_TABLES.contains(cleanName)) {
-                    return ValidationResult.fail("Table not allowed: " + tableName);
+                    return ValidationResult.fail("Table not allowed or access restricted: " + tableName);
                 }
             }
 
@@ -96,3 +108,4 @@ public class SqlValidator {
         return s.trim();
     }
 }
+

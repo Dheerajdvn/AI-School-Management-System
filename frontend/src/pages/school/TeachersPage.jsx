@@ -326,7 +326,7 @@ export default function TeachersPage() {
                   const isChecked = assignForm.selectedSubjects.includes(sub)
                   return (
                     <div key={sub} className="col-6">
-                      <div className="form-check p-2.5 rounded-3 border d-flex align-items-center" style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.1)' }}>
+                      <div className="form-check p-2.5 rounded-3 border d-flex align-items-center" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}>
                         <input
                           className="form-check-input ms-0 me-2"
                           type="checkbox"
@@ -335,7 +335,7 @@ export default function TeachersPage() {
                           onChange={e => handleSubjectCheckboxChange(sub, e.target.checked)}
                           style={{ cursor: 'pointer' }}
                         />
-                        <label className="form-check-label text-white small cursor-pointer" htmlFor={`assign-sub-${sub}`}>
+                        <label className="form-check-label small cursor-pointer" style={{ color: 'var(--text)' }} htmlFor={`assign-sub-${sub}`}>
                           {sub}
                         </label>
                       </div>

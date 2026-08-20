@@ -152,7 +152,12 @@ public class QdrantProvider implements VectorStoreProvider {
 
 
     private void doUpsert(String collection, StoredDocument doc) {
-        String pointId = doc.getPointId() != null ? doc.getPointId() : UUID.randomUUID().toString();
+        String pointId = doc.getPointId();
+        if (pointId == null || pointId.isBlank()) {
+            pointId = UUID.randomUUID().toString();
+        } else if (!isUuidOrUint(pointId)) {
+            pointId = UUID.nameUUIDFromBytes(pointId.getBytes(java.nio.charset.StandardCharsets.UTF_8)).toString();
+        }
 
         ObjectNode payload = objectMapper.createObjectNode();
         payload.put("document_id", doc.getDocumentId());
@@ -319,6 +324,17 @@ public class QdrantProvider implements VectorStoreProvider {
                 }
                 backoff *= 2;
             }
+        }
+    }
+
+    private boolean isUuidOrUint(String id) {
+        if (id == null || id.isBlank()) return false;
+        if (id.matches("^\\d{1,20}$")) return true;
+        try {
+            UUID.fromString(id);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
         }
     }
 

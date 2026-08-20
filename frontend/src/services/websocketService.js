@@ -13,6 +13,14 @@ const getConnectionState = () => ({
   ERROR: 'ERROR',
 })
 
+const getWsUrl = () => {
+  const envBase = import.meta.env.VITE_WS_URL || import.meta.env.VITE_API_BASE_URL
+  if (envBase && envBase.startsWith('http')) {
+    return envBase.replace(/\/api\/?$/, '') + '/ws'
+  }
+  return '/api/ws'
+}
+
 export const websocketService = {
   connect: (userId, role, onMessage, onError, onConnect, onDisconnect) => {
     // Guard: prevent duplicate connections
@@ -28,9 +36,12 @@ export const websocketService = {
       stompClient = null
     }
 
-    const socket = new SockJS('/api/ws')
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token')
+    const wsUrl = getWsUrl()
+
     stompClient = new Client({
-      webSocketFactory: () => socket,
+      webSocketFactory: () => new SockJS(wsUrl),
+      connectHeaders: token ? { Authorization: `Bearer ${token}` } : {},
       reconnectDelay: reconnectDelay,
       heartbeatIncoming: 10000,
       heartbeatOutgoing: 10000,

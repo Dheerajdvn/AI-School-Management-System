@@ -69,7 +69,7 @@ export default function AILessonPlannerPage() {
         <div className="col-md-8">
           <div className="glass-card shadow-sm h-100">
             <div className="card-header-custom p-3 border-bottom d-flex align-items-center justify-content-between">
-              <h5 className="fw-bold mb-0 text-white" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>Lesson Details</h5>
+              <h5 className="fw-bold mb-0" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>Lesson Details</h5>
               {result && (
                 <button className="btn btn-outline-danger btn-sm border-0 rounded-pill" onClick={handleClearPlan}>
                   <i className="bi bi-trash" /> Clear Plan
@@ -149,7 +149,7 @@ export default function AILessonPlannerPage() {
         <div className="col-md-4">
           <div className="glass-card shadow-sm h-100">
             <div className="card-header-custom p-3 border-bottom">
-              <h5 className="fw-bold mb-0 text-white" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>AI Workspace Tips</h5>
+              <h5 className="fw-bold mb-0" style={{ color: 'var(--text)', fontSize: '0.95rem' }}>AI Workspace Tips</h5>
             </div>
             <div className="card-body p-4">
               <ul className="list-unstyled mb-0 d-flex flex-column gap-3">
@@ -183,7 +183,7 @@ export default function AILessonPlannerPage() {
             <div className="col-md-4 col-sm-6" key={i}>
               <div className="glass-card shadow-sm h-100 d-flex flex-column">
                 <div className="card-header-custom p-3 border-bottom">
-                  <h5 className="fw-bold mb-0 text-white" style={{ color: 'var(--text)', fontSize: '0.9rem' }}>
+                  <h5 className="fw-bold mb-0" style={{ color: 'var(--text)', fontSize: '0.9rem' }}>
                     <i className={`bi ${item.icon} me-2`} style={{ color: item.color }} />{item.title}
                   </h5>
                 </div>

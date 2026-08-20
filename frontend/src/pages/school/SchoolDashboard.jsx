@@ -91,9 +91,9 @@ export default function SchoolDashboard() {
       {/* Stats Cards Grid */}
       <div className="row g-3 mb-4.5">
         <div className="col-md-3 col-sm-6">
-          <div className="stat-card gradient-card blue">
+          <div className="stat-card shadow-xs">
             <div className="stat-icon">
-              <i className="bi bi-people-fill" />
+              <i className="bi bi-people-fill text-primary" />
             </div>
             <div className="stat-content">
               <span className="stat-label">Total Students</span>
@@ -103,9 +103,9 @@ export default function SchoolDashboard() {
           </div>
         </div>
         <div className="col-md-3 col-sm-6">
-          <div className="stat-card gradient-card green">
+          <div className="stat-card shadow-xs">
             <div className="stat-icon">
-              <i className="bi bi-person-badge-fill" />
+              <i className="bi bi-person-badge-fill text-primary" />
             </div>
             <div className="stat-content">
               <span className="stat-label">Total Teachers</span>
@@ -115,21 +115,21 @@ export default function SchoolDashboard() {
           </div>
         </div>
         <div className="col-md-3 col-sm-6">
-          <div className="stat-card gradient-card orange">
+          <div className="stat-card shadow-xs">
             <div className="stat-icon">
-              <i className="bi bi-layers-fill" />
+              <i className="bi bi-layers-fill text-primary" />
             </div>
             <div className="stat-content">
               <span className="stat-label">Total Classes</span>
               <span className="stat-value">{stats.totalClasses}</span>
-              <span className="stat-change up" style={{ color: '#fbbf24' }}>{stats.totalSubjects} Subjects</span>
+              <span className="stat-change up">{stats.totalSubjects} Subjects</span>
             </div>
           </div>
         </div>
         <div className="col-md-3 col-sm-6">
-          <div className="stat-card gradient-card purple">
+          <div className="stat-card shadow-xs">
             <div className="stat-icon">
-              <i className="bi bi-calendar-check-fill" />
+              <i className="bi bi-calendar-check-fill text-primary" />
             </div>
             <div className="stat-content">
               <span className="stat-label">Attendance Today</span>
@@ -139,9 +139,9 @@ export default function SchoolDashboard() {
           </div>
         </div>
         <div className="col-md-3 col-sm-6">
-          <div className="stat-card gradient-card red">
+          <div className="stat-card shadow-xs">
             <div className="stat-icon">
-              <i className="bi bi-card-text" />
+              <i className="bi bi-card-text text-primary" />
             </div>
             <div className="stat-content">
               <span className="stat-label">Assignments</span>
@@ -151,21 +151,21 @@ export default function SchoolDashboard() {
           </div>
         </div>
         <div className="col-md-3 col-sm-6">
-          <div className="stat-card gradient-card cyan">
+          <div className="stat-card shadow-xs">
             <div className="stat-icon">
-              <i className="bi bi-robot" />
+              <i className="bi bi-robot text-primary" />
             </div>
             <div className="stat-content">
-              <span className="stat-label">AI Requests Today</span>
+              <span className="stat-label">AI Queries</span>
               <span className="stat-value">{stats.aiRequests}</span>
               <span className="stat-change up">+18% usage</span>
             </div>
           </div>
         </div>
         <div className="col-md-3 col-sm-6">
-          <div className="stat-card gradient-card teal">
+          <div className="stat-card shadow-xs">
             <div className="stat-icon">
-              <i className="bi bi-hdd-stack-fill" />
+              <i className="bi bi-hdd-stack-fill text-primary" />
             </div>
             <div className="stat-content">
               <span className="stat-label">Storage Used</span>
@@ -175,9 +175,9 @@ export default function SchoolDashboard() {
           </div>
         </div>
         <div className="col-md-3 col-sm-6">
-          <div className="stat-card gradient-card pink">
+          <div className="stat-card shadow-xs">
             <div className="stat-icon">
-              <i className="bi bi-graph-up-arrow" />
+              <i className="bi bi-graph-up-arrow text-primary" />
             </div>
             <div className="stat-content">
               <span className="stat-label">Growth Rate</span>

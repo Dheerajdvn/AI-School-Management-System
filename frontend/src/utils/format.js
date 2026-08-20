@@ -35,9 +35,16 @@ export const hexToRgba = (hex, alpha = 1) => {
 }
 
 export const PALETTE = [
-  '#4f46e5', '#22d3ee', '#10b981', '#f59e0b', '#ef4444',
-  '#8b5cf6', '#ec4899', '#14b8a6', '#3b82f6', '#f97316',
-  '#84cc16', '#a855f7',
+  '#6366f1', // Indigo (Primary)
+  '#8b5cf6', // Soft Violet
+  '#3b82f6', // Slate Blue
+  '#0d9488', // Muted Teal
+  '#d97706', // Warm Muted Amber
+  '#64748b', // Slate Grey
+  '#0284c7', // Deep Sky Blue
+  '#059669', // Muted Emerald
+  '#7c3aed', // Deep Violet
+  '#475569', // Cool Slate
 ]
 
 /**

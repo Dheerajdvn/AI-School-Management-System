@@ -42,7 +42,8 @@ export default function RoleProtectedRoute({
   
   const userRoles = user.roles || []
   
-  const hasRequiredRole = required.some(role => userRoles.includes(role))
+  const isSuperAdmin = userRoles.includes('ROLE_SUPER_ADMIN')
+  const hasRequiredRole = isSuperAdmin || required.some(role => userRoles.includes(role))
 
   if (!hasRequiredRole) {
     return <Navigate to={redirectTo} replace />

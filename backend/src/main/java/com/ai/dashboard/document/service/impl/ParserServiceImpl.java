@@ -79,19 +79,9 @@ public class ParserServiceImpl implements ParserService {
             log.info("Text extraction completed for documentId={}", documentId);
         } catch (Exception e) {
             log.error("Text extraction failed for documentId={}: {}", documentId, e.getMessage(), e);
-            try {
-                DocumentContent content = documentContentRepository.findByDocumentId(documentId)
-                        .orElseGet(() -> DocumentContent.builder().document(managedDocument).build());
-                content.setDocument(managedDocument);
-                content.setExtractedText("[Document text extraction encountered an issue, file stored successfully]");
-                content.setExtractedAt(LocalDateTime.now());
-                documentContentRepository.save(content);
-            } catch (Exception inner) {
-                log.error("Failed to save fallback document content for documentId={}", documentId, inner);
-            }
-            managedDocument.setProcessingStatus(Document.ProcessingStatus.COMPLETED);
-            log.info("Saving managedDocument fallback: documentId={}, processingStatus={}", documentId, managedDocument.getProcessingStatus());
+            managedDocument.setProcessingStatus(Document.ProcessingStatus.FAILED);
             documentRepository.save(managedDocument);
+            throw new RuntimeException("Text extraction failed: " + e.getMessage(), e);
         }
     }
 

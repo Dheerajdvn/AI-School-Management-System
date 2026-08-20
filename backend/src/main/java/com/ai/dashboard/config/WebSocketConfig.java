@@ -21,10 +21,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
      */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws")
+        registry.addEndpoint("/ws", "/api/ws")
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
-        log.info("WebSocket STOMP endpoint registered at /ws");
+        log.info("WebSocket STOMP endpoints registered at /ws and /api/ws");
     }
 
     /**

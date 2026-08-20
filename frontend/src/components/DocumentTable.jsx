@@ -33,16 +33,20 @@ export default function DocumentTable({ documents = [], onPreview, onDownload, o
                 </span>
               </td>
               <td className="text-end">
-                <div className="btn-group" role="group">
-                  <button aria-label={`Preview ${doc.originalFilename}`} className="btn btn-sm btn-outline-primary" onClick={() => onPreview?.(doc)} title="Preview"><i className="bi bi-eye" /></button>
-                  <button aria-label={`Download ${doc.originalFilename}`} className="btn btn-sm btn-outline-secondary" onClick={() => onDownload?.(doc)} title="Download"><i className="bi bi-download" /></button>
+                <div className="btn-group btn-group-sm" role="group">
+                  <button aria-label={`Preview ${doc.originalFilename}`} className="btn btn-action-view" onClick={() => onPreview?.(doc)} title="Preview">
+                    <i className="bi bi-eye" />
+                  </button>
+                  <button aria-label={`Download ${doc.originalFilename}`} className="btn btn-outline-secondary" onClick={() => onDownload?.(doc)} title="Download">
+                    <i className="bi bi-download" />
+                  </button>
                   {onReindex && (
-                    <button aria-label={`Reindex ${doc.originalFilename}`} className="btn btn-sm btn-outline-info" onClick={() => onReindex?.(doc)} title="Reindex" disabled={doc.processingStatus !== 'COMPLETED'}>
+                    <button aria-label={`Reindex ${doc.originalFilename}`} className="btn btn-outline-secondary" onClick={() => onReindex?.(doc)} title="Reindex" disabled={doc.processingStatus !== 'COMPLETED'}>
                       <i className="bi bi-arrow-clockwise" />
                     </button>
                   )}
                   {onDelete && (
-                    <button aria-label={`Delete ${doc.originalFilename}`} className="btn btn-sm btn-outline-danger" onClick={() => onDelete?.(doc)} title="Delete">
+                    <button aria-label={`Delete ${doc.originalFilename}`} className="btn btn-outline-danger" onClick={() => onDelete?.(doc)} title="Delete">
                       <i className="bi bi-trash" />
                     </button>
                   )}

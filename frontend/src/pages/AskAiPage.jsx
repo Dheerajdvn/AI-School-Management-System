@@ -64,12 +64,12 @@ export default function AskAiPage() {
                 <span className="spinner-grow spinner-grow-sm text-success me-2" role="status" />
                 <span className="small fw-semibold text-uppercase tracking-wider">Natural Language to SQL Engine</span>
               </div>
-              <h1 className="display-6 fw-bold mb-2 text-body">Ask AI in Plain English</h1>
+              <h1 className="display-6 fw-bold mb-2" style={{ color: 'var(--text)' }}>Ask AI in Plain English</h1>
               <p className="lead mb-4 text-muted">
                 Type any analytical query about your student database. Our enterprise AI instantly converts your question into optimized SQL, executes it securely, and visualizes results.
               </p>
 
-              <div className="input-group input-group-lg shadow-sm rounded-3 overflow-hidden bg-white p-1">
+              <div className="input-group input-group-lg shadow-sm rounded-3 overflow-hidden p-1 border" style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}>
                 <span className="input-group-text bg-transparent border-0 ps-3 text-muted">
                   <i className="bi bi-search" />
                 </span>
@@ -108,16 +108,16 @@ export default function AskAiPage() {
 
               {/* Suggestions */}
               <div className="mt-4">
-                <div className="text-white-50 small mb-2 fw-semibold text-uppercase tracking-wider">Suggested Queries:</div>
+                <div className="text-muted small mb-2 fw-semibold text-uppercase tracking-wider">Suggested Queries:</div>
                 <div className="d-flex flex-wrap gap-2">
                   {SUGGESTIONS.map((s) => (
                     <button
                       key={s.label}
-                      className="btn btn-sm btn-light bg-white bg-opacity-10 text-white border-0 rounded-pill px-3 py-2 d-inline-flex align-items-center gap-2 hover-glass transition"
+                      className="btn btn-sm rounded-pill px-3 py-2 d-inline-flex align-items-center gap-2 border transition shadow-xs"
                       onClick={() => ask(s.label)}
-                      style={{ backdropFilter: 'blur(4px)', transition: 'all 0.2s ease' }}
+                      style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text)' }}
                     >
-                      <i className={`bi ${s.icon} text-info`} />
+                      <i className={`bi ${s.icon} text-primary`} />
                       <span>{s.label}</span>
                     </button>
                   ))}
@@ -140,19 +140,19 @@ export default function AskAiPage() {
 
           {response && !loading && (
             <div className="card border-0 shadow-sm rounded-4 mb-4">
-              <div className="card-header bg-white border-0 pt-4 pb-3 px-4 d-flex justify-content-between align-items-start flex-wrap gap-3">
+              <div className="card-header bg-card border-0 pt-4 pb-3 px-4 d-flex justify-content-between align-items-start flex-wrap gap-3">
                 <div>
                   <div className="text-uppercase text-muted small fw-bold tracking-wider mb-1">Executed Question</div>
-                  <h4 className="fw-bold text-dark mb-1">{response.question}</h4>
+                  <h4 className="fw-bold mb-1" style={{ color: 'var(--text)' }}>{response.question}</h4>
                   {response.summary && (
-                    <p className="text-secondary mb-0 mt-2 fs-6 bg-light p-3 rounded-3 border-start border-primary border-4">
+                    <p className="mb-0 mt-2 fs-6 p-3 rounded-3 border-start border-primary border-4" style={{ backgroundColor: 'var(--surface)', color: 'var(--text)' }}>
                       {response.summary}
                     </p>
                   )}
                 </div>
                 <div className="d-flex gap-2">
                   <button 
-                    className={`btn btn-sm ${showSql ? 'btn-dark' : 'btn-outline-dark'} rounded-pill px-3`} 
+                    className="btn btn-sm btn-secondary rounded-pill px-3" 
                     onClick={() => setShowSql((v) => !v)}
                   >
                     <i className="bi bi-code-slash me-1" />

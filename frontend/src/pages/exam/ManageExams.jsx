@@ -120,18 +120,18 @@ export default function ManageExams() {
                       <td>{exam.totalMarks}</td>
                       <td>{getStatusBadge(exam.status)}</td>
                       <td className="px-4 py-3 text-end">
-                        <div className="btn-group btn-group-sm">
+                        <div className="btn-group btn-group-sm" role="group">
                           <button 
-                            className="btn btn-outline-primary px-2.5 py-1"
+                            className="btn btn-outline-secondary"
                             onClick={() => setEditingExam({ ...exam })}
                           >
-                            Edit
+                            <i className="bi bi-pencil" /> Edit
                           </button>
                           <button 
-                            className="btn btn-outline-danger px-2.5 py-1"
+                            className="btn btn-outline-danger"
                             onClick={() => setDeleteExamId(exam.id)}
                           >
-                            Delete
+                            <i className="bi bi-trash" /> Delete
                           </button>
                         </div>
                       </td>
