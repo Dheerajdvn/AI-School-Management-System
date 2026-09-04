@@ -43,8 +43,8 @@ public class AssignmentController {
     private final AssignmentService assignmentService;
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER')")
-    @Operation(summary = "Create a new assignment (ADMIN/TEACHER - own courses only)")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
+    @Operation(summary = "Create a new assignment (ADMIN/SUPER_ADMIN/TEACHER - own courses only)")
     public ResponseEntity<ApiResponse<AssignmentResponse>> create(
             @RequestParam(required = false) Long courseId,
             @Valid @RequestBody AssignmentRequest request,
@@ -64,8 +64,8 @@ public class AssignmentController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER')")
-    @Operation(summary = "Update an assignment (ADMIN/TEACHER - own courses only)")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
+    @Operation(summary = "Update an assignment (ADMIN/SUPER_ADMIN/TEACHER - own courses only)")
     public ApiResponse<AssignmentResponse> update(
             @PathVariable Long id,
             @Valid @RequestBody AssignmentRequest request,
@@ -79,8 +79,8 @@ public class AssignmentController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER')")
-    @Operation(summary = "Delete an assignment (ADMIN/TEACHER - own courses only)")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
+    @Operation(summary = "Delete an assignment (ADMIN/SUPER_ADMIN/TEACHER - own courses only)")
     public ApiResponse<Void> delete(
             @PathVariable Long id,
             Authentication authentication) {
@@ -93,7 +93,7 @@ public class AssignmentController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     @Operation(summary = "Get an assignment by ID")
     public ApiResponse<AssignmentResponse> getById(
             @PathVariable Long id,
@@ -106,7 +106,7 @@ public class AssignmentController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     @Operation(summary = "Get all assignments")
     public ApiResponse<PagedResponse<AssignmentResponse>> getAll(
             @RequestParam(defaultValue = "0") int page,
@@ -124,7 +124,7 @@ public class AssignmentController {
     }
 
     @GetMapping("/search")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     @Operation(summary = "Search assignments")
     public ApiResponse<PagedResponse<AssignmentResponse>> search(
             @RequestParam(required = false) Long courseId,
@@ -147,8 +147,8 @@ public class AssignmentController {
     }
 
     @PutMapping("/{id}/publish")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER')")
-    @Operation(summary = "Publish an assignment (ADMIN/TEACHER - own courses only)")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
+    @Operation(summary = "Publish an assignment (ADMIN/SUPER_ADMIN/TEACHER - own courses only)")
     public ApiResponse<AssignmentResponse> publish(
             @PathVariable Long id,
             Authentication authentication) {
@@ -161,8 +161,8 @@ public class AssignmentController {
     }
 
     @PutMapping("/{id}/close")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER')")
-    @Operation(summary = "Close an assignment (ADMIN/TEACHER - own courses only)")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
+    @Operation(summary = "Close an assignment (ADMIN/SUPER_ADMIN/TEACHER - own courses only)")
     public ApiResponse<AssignmentResponse> close(
             @PathVariable Long id,
             Authentication authentication) {

@@ -67,6 +67,7 @@ export default function FloatingAIAssistant() {
 
   const messagesEndRef = useRef(null)
   const collapseTimerRef = useRef(null)
+  const conversationIdRef = useRef(Date.now().toString(36) + Math.random().toString(36).substring(2))
 
   useEffect(() => {
     try {
@@ -154,7 +155,7 @@ export default function FloatingAIAssistant() {
 
     try {
       if (isAuthenticated) {
-        const res = await aiChatService.chat({ message: text })
+        const res = await aiChatService.chat({ message: text, conversationId: conversationIdRef.current })
         setMessages(prev => [...prev, {
           role: 'assistant',
           content: res.answer || res.content || 'I processed your query.',
@@ -169,12 +170,13 @@ export default function FloatingAIAssistant() {
           setLoading(false)
         }, 350)
       }
-    } catch {
+    } catch (err) {
+      const errorMsg = err?.response?.data?.message || err?.message || 'I encountered an error communicating with the AI LLM backend. Please check your configuration.'
       setMessages(prev => [...prev, {
         role: 'assistant',
         content: isPublicMode
           ? getPublicAssistantReply(text)
-          : 'I encountered an error communicating with the AI LLM backend. Please try again.'
+          : errorMsg
       }])
     } finally {
       if (isAuthenticated) setLoading(false)

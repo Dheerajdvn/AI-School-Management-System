@@ -52,6 +52,8 @@ app:
   jwt:
     secret: ${JWT_SECRET}
     expiration: ${JWT_EXPIRATION:86400000}
+  security:
+    encryption-key: ${APP_ENCRYPTION_KEY}
 
 management:
   endpoint:

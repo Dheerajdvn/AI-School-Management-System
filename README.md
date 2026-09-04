@@ -34,7 +34,7 @@ This platform was built to demonstrate how enterprise-grade Java architectures (
 > 1. Simply log in and open **AI Settings** (`/settings`).
 > 2. Select a Cloud AI Provider such as **Groq** *(Free & Ultra-Fast)*, **OpenAI**, **Google Gemini**, **Anthropic**, **OpenRouter**, **Azure OpenAI**, **DeepSeek**, or **Mistral AI**.
 > 3. Enter your API key, click **Verify Connection**, and click **Save Settings**.
-> Your API key will be encrypted using **AES-128** in the database, and the assistant will immediately respond using your chosen cloud provider!
+> Your API key will be encrypted using **AES-256-GCM** in the database, and the assistant will immediately respond using your chosen cloud provider!
 
 ### Who Can Use It
 - **Super Admins / Platform Owners**: Manage multi-tenant schools, system users, subscriptions, and platform-wide analytics.
@@ -50,7 +50,7 @@ This platform was built to demonstrate how enterprise-grade Java architectures (
 ### 🔐 Authentication & Security
 - **Stateless JWT Authentication** with refresh token support and 24-hour expiration (`86,400,000 ms`).
 - **Role-Based Access Control (RBAC)** supporting `ROLE_ADMIN`, `ROLE_SCHOOL_ADMIN`, `ROLE_PRINCIPAL`, `ROLE_TEACHER`, and `ROLE_STUDENT`.
-- **AES-128 Database Field Encryption** (`AesEncryptionConverter`) securing sensitive user API keys in PostgreSQL.
+- **AES-256-GCM Database Field Encryption** (`AesEncryptionConverter`) securing sensitive user API keys in PostgreSQL.
 - **Rate Limiting Protection** (`RateLimitingFilter`) backed by Upstash Redis to prevent brute-force attacks and API abuse.
 
 ### 🤖 Multi-Provider AI & RAG Pipeline
@@ -78,7 +78,7 @@ graph TD
     Services --> ProviderRegistry[ProviderRegistry & Strategy Layer]
     Services --> VectorStore[Qdrant Vector Store Service]
     
-    ProviderRegistry -->|User Key Encrypted AES-128| CloudLLM["Cloud LLMs (Groq / OpenAI / Gemini / Anthropic / DeepSeek)"]
+    ProviderRegistry -->|User Key Encrypted AES-256-GCM| CloudLLM["Cloud LLMs (Groq / OpenAI / Gemini / Anthropic / DeepSeek)"]
     ProviderRegistry -->|Fallback| Ollama[Local Ollama Engine]
     
     VectorStore --> QdrantCloud[(Qdrant Cloud Cluster)]
@@ -175,9 +175,9 @@ npm run dev
 
 ### Step 5: Access & Configure AI
 1. Open your browser to `http://localhost:5173`.
-2. Log in with admin credentials:
-   - **Username**: `dheerajdvn`
-   - **Password**: `root@123`
+2. Log in with the admin account you provisioned. The default admin user is only created when
+   `ADMIN_INIT_PASSWORD` is set in the environment — pick a strong value and keep it out of version
+   control. If no password is supplied, admin creation is skipped by design.
 3. Go to **AI Settings** (`/settings`).
 4. Select **Groq** (or your preferred provider), paste your API key, click **Verify Connection**, and click **Save Settings**.
 
@@ -201,7 +201,9 @@ npm run dev
 | `CORS_ALLOWED_ORIGINS` | Allowed CORS origins | `http://localhost:5173,http://localhost:3000` | `https://aischoolsystem.vercel.app` |
 | `JWT_SECRET` | Signing secret key | Long local secret | Cryptographically random secret |
 | `JWT_EXPIRATION` | Token expiry (ms) | `86400000` (24 Hours) | `86400000` (24 Hours) |
-| `APP_ENCRYPTION_KEY` | AES-128 Field key | `1234567890123456` | 16-byte secret encryption key |
+| `APP_ENCRYPTION_KEY` | AES-256 field encryption key | *(dev profile default)* | Random secret, 32+ characters |
+| `ADMIN_INIT_USERNAME` | Initial admin username | `dheerajdvn` | Your chosen admin username |
+| `ADMIN_INIT_PASSWORD` | Initial admin password — admin creation is skipped if unset | *(unset)* | Strong random secret |
 | `JAVA_OPTS` | JVM memory limits | *(default)* | `-Xmx320m -Xms256m -XX:+UseG1GC -XX:+ExitOnOutOfMemoryError` |
 
 ---

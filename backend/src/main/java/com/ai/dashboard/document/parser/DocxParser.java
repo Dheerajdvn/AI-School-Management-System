@@ -20,8 +20,8 @@ public class DocxParser implements DocumentParser {
     public String extractText(String filePath) {
         log.debug("Extracting text from DOCX: {}", filePath);
         try (FileInputStream fis = new FileInputStream(Path.of(filePath).toFile());
-             XWPFDocument document = new XWPFDocument(fis)) {
-            XWPFWordExtractor extractor = new XWPFWordExtractor(document);
+             XWPFDocument document = new XWPFDocument(fis);
+             XWPFWordExtractor extractor = new XWPFWordExtractor(document)) {
             String text = extractor.getText();
             log.debug("Extracted {} characters from DOCX", text.length());
             return text;

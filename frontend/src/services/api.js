@@ -59,8 +59,8 @@ export const DocumentApi = {
 export const GradeApi = {
   list: (params) => api.get('/grades', { params }).then(r => r.data?.data || r.data),
   get: (id) => api.get(`/grades/${id}`).then(r => r.data?.data || r.data),
-  grade: (submissionId, data) => api.post(`/grades/${submissionId}`, data).then(r => r.data?.data || r.data),
-  publish: (submissionId) => api.post(`/grades/${submissionId}/publish`).then(r => r.data?.data || r.data),
+  grade: (submissionId, data) => api.put(`/grades/${submissionId}`, data).then(r => r.data?.data || r.data),
+  publish: (submissionId) => api.put(`/grades/${submissionId}/publish`).then(r => r.data?.data || r.data),
 }
 
 export const StudentApi = {

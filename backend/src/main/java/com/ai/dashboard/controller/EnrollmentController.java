@@ -45,8 +45,8 @@ public class EnrollmentController {
     private final EnrollmentService enrollmentService;
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_STUDENT')")
-    @Operation(summary = "Enroll a student in a course (ADMIN only, or STUDENT for themselves)")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_STUDENT')")
+    @Operation(summary = "Enroll a student in a course (ADMIN/SUPER_ADMIN only, or STUDENT for themselves)")
     public ResponseEntity<ApiResponse<EnrollmentResponse>> enroll(
             @Valid @RequestBody EnrollmentRequest request,
             Authentication authentication) {
@@ -60,8 +60,8 @@ public class EnrollmentController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
-    @Operation(summary = "Remove enrollment (ADMIN/TEACHER for own courses/STUDENT for own enrollments)")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @Operation(summary = "Remove enrollment (ADMIN/SUPER_ADMIN/TEACHER for own courses/STUDENT for own enrollments)")
     public ApiResponse<Void> remove(
             @PathVariable Long id,
             Authentication authentication) {
@@ -74,7 +74,7 @@ public class EnrollmentController {
     }
 
     @GetMapping("/student/{studentId}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     @Operation(summary = "Get student enrollments")
     public ApiResponse<PagedResponse<EnrollmentResponse>> getByStudent(
             @PathVariable Long studentId,
@@ -93,8 +93,8 @@ public class EnrollmentController {
     }
 
     @GetMapping("/course/{courseId}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER')")
-    @Operation(summary = "Get enrollments for a course (ADMIN/TEACHER for own courses)")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
+    @Operation(summary = "Get enrollments for a course (ADMIN/SUPER_ADMIN/TEACHER for own courses)")
     public ApiResponse<PagedResponse<EnrollmentResponse>> getByCourse(
             @PathVariable Long courseId,
             @RequestParam(defaultValue = "0") int page,
@@ -112,7 +112,7 @@ public class EnrollmentController {
     }
 
     @PutMapping("/{id}/progress")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     @Operation(summary = "Update enrollment progress")
     public ApiResponse<EnrollmentResponse> updateProgress(
             @PathVariable Long id,
@@ -127,7 +127,7 @@ public class EnrollmentController {
     }
 
     @PutMapping("/{id}/complete")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     @Operation(summary = "Complete enrollment (sets progress to 100)")
     public ApiResponse<EnrollmentResponse> complete(
             @PathVariable Long id,

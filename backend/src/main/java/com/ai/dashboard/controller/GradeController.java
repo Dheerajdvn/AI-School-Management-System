@@ -37,9 +37,9 @@ public class GradeController {
 
     private final GradeService gradeService;
 
-    @PutMapping("/{submissionId}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER')")
-    @Operation(summary = "Grade a submission (ADMIN/TEACHER - own courses only)")
+    @RequestMapping(value = "/{submissionId}", method = {RequestMethod.PUT, RequestMethod.POST})
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
+    @Operation(summary = "Grade a submission (ADMIN/SUPER_ADMIN/TEACHER - own courses only)")
     public ApiResponse<GradeResponse> grade(
             @PathVariable Long submissionId,
             @Valid @RequestBody GradeRequest request,
@@ -52,9 +52,9 @@ public class GradeController {
                 gradeService.gradeSubmission(submissionId, request, currentUserId, currentUserRole));
     }
 
-    @PutMapping("/{submissionId}/publish")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER')")
-    @Operation(summary = "Publish a grade (ADMIN/TEACHER - own courses only)")
+    @RequestMapping(value = "/{submissionId}/publish", method = {RequestMethod.PUT, RequestMethod.POST})
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
+    @Operation(summary = "Publish a grade (ADMIN/SUPER_ADMIN/TEACHER - own courses only)")
     public ApiResponse<GradeResponse> publish(
             @PathVariable Long submissionId,
             Authentication authentication) {
@@ -66,8 +66,48 @@ public class GradeController {
                 gradeService.publishGrade(submissionId, currentUserId, currentUserRole));
     }
 
+    @GetMapping
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @Operation(summary = "List grades with optional course or student filter")
+    public ApiResponse<PagedResponse<GradeResponse>> list(
+            @RequestParam(required = false) Long courseId,
+            @RequestParam(required = false) Long studentId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction,
+            Authentication authentication) {
+
+        Long currentUserId = extractUserId(authentication);
+        String currentUserRole = getCurrentUserRole(authentication);
+        Sort sort = buildSort(sortBy, direction);
+
+        if (courseId != null) {
+            return ApiResponse.success(gradeService.getCourseGrades(
+                    courseId, PageRequest.of(page, size, sort), currentUserId, currentUserRole));
+        }
+        if (studentId != null) {
+            return ApiResponse.success(gradeService.getStudentGrades(
+                    studentId, PageRequest.of(page, size, sort), currentUserId, currentUserRole));
+        }
+        if ("ROLE_STUDENT".equals(currentUserRole) && currentUserId != null) {
+            return ApiResponse.success(gradeService.getStudentGrades(
+                    currentUserId, PageRequest.of(page, size, sort), currentUserId, currentUserRole));
+        }
+        PagedResponse<GradeResponse> empty = PagedResponse.<GradeResponse>builder()
+                .content(List.of())
+                .page(page)
+                .size(size)
+                .totalElements(0L)
+                .totalPages(0)
+                .first(true)
+                .last(true)
+                .build();
+        return ApiResponse.success(empty);
+    }
+
     @GetMapping("/student/{studentId}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     @Operation(summary = "Get all grades for a student")
     public ApiResponse<PagedResponse<GradeResponse>> getByStudent(
             @PathVariable Long studentId,
@@ -86,8 +126,8 @@ public class GradeController {
     }
 
     @GetMapping("/course/{courseId}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER')")
-    @Operation(summary = "Get all grades for a course (ADMIN/TEACHER - own courses only)")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
+    @Operation(summary = "Get all grades for a course (ADMIN/SUPER_ADMIN/TEACHER - own courses only)")
     public ApiResponse<PagedResponse<GradeResponse>> getByCourse(
             @PathVariable Long courseId,
             @RequestParam(defaultValue = "0") int page,
@@ -105,12 +145,14 @@ public class GradeController {
     }
 
     @GetMapping("/history/{submissionId}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER')")
-    @Operation(summary = "Get grade history for a submission (ADMIN/TEACHER - own courses only)")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
+    @Operation(summary = "Get grade history for a submission (ADMIN/SUPER_ADMIN/TEACHER - own courses only)")
     public ApiResponse<PagedResponse<GradeHistoryResponse>> getHistory(
             @PathVariable Long submissionId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction,
             Authentication authentication) {
 
         Long currentUserId = extractUserId(authentication);
@@ -121,8 +163,8 @@ public class GradeController {
     }
 
     @GetMapping("/statistics")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER')")
-    @Operation(summary = "Get grade statistics (ADMIN/TEACHER - own courses only)")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
+    @Operation(summary = "Get grade statistics (ADMIN/SUPER_ADMIN/TEACHER - own courses only)")
     public ApiResponse<GradeStatistics> getStatistics(
             @RequestParam(required = false) Long courseId,
             @RequestParam(required = false) Long assignmentId,

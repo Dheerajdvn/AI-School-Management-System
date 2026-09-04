@@ -67,7 +67,7 @@ backend/src/main/java/com/ai/dashboard/
 ├── repository/                        # Spring Data JPA repositories
 ├── security/                          # JwtAuthenticationFilter & CustomUserDetailsService
 ├── service/                           # Business logic services
-└── util/                              # AesEncryptionConverter (AES-128 API key encryption)
+└── util/                              # AesEncryptionConverter (AES-256-GCM API key encryption)
 ```
 
 ---
@@ -90,7 +90,7 @@ sequenceDiagram
     AuthController-->>Client: {accessToken, refreshToken}
     Client->>AiConfigController: POST /api/ai/config (Provider, API Key)
     AiConfigController->>AesEncryptionConverter: convertToDatabaseColumn (API Key)
-    AesEncryptionConverter->>PostgreSQL: Store 128-bit AES Encrypted Key
+    AesEncryptionConverter->>PostgreSQL: Store AES-256-GCM Encrypted Key
 ```
 
 ---

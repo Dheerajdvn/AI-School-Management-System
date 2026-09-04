@@ -39,6 +39,7 @@ public class RefreshTokenController {
             return ResponseEntity.badRequest().build();
         }
         UserDetails userDetails = userDetailsService.loadUserById(userId);
+        refreshTokenService.revokeRefreshToken(token);
         String newAccessToken = jwtService.generateToken(userDetails, userId);
         String newRefreshToken = refreshTokenService.createRefreshToken(userId);
 

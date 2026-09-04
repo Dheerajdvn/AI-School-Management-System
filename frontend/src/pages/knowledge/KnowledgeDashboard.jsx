@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import knowledgeService from '../../services/knowledgeService'
 import StatCard from '../../components/StatCard'
 import Chart from '../../components/Charts'
@@ -78,11 +79,29 @@ export default function KnowledgeDashboard() {
 
   return (
     <div className="container-fluid p-0">
-      {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
+      {/* Header with Quick Navigation */}
+      <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <div>
           <h3 className="fw-bold mb-0" style={{ fontSize: '18px' }}>AI Knowledge Dashboard</h3>
           <p className="text-muted m-0" style={{ fontSize: '13px' }}>Real-time overview of AI knowledge base, collections, and vector ingestion</p>
+        </div>
+        <div className="d-flex align-items-center gap-2 flex-wrap">
+          <Link to="/knowledge/library" className="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1">
+            <i className="bi bi-collection" />
+            <span>Library</span>
+          </Link>
+          <Link to="/knowledge/search" className="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1">
+            <i className="bi bi-search" />
+            <span>AI Search</span>
+          </Link>
+          <Link to="/knowledge/chat" className="btn btn-sm btn-outline-primary d-flex align-items-center gap-1">
+            <i className="bi bi-chat-dots" />
+            <span>AI Chat</span>
+          </Link>
+          <Link to="/knowledge/upload" className="btn btn-sm btn-primary d-flex align-items-center gap-1">
+            <i className="bi bi-cloud-arrow-up" />
+            <span>Upload Document</span>
+          </Link>
         </div>
       </div>
 
@@ -136,7 +155,6 @@ export default function KnowledgeDashboard() {
             {uploadsPerDay.length > 0 ? (
               <Chart
                 type="line"
-                title="Uploads Count"
                 labels={uploadsPerDay.map(u => u.date || '')}
                 values={uploadsPerDay.map(u => u.count || 0)}
               />
@@ -156,7 +174,6 @@ export default function KnowledgeDashboard() {
             {documentsByType.length > 0 ? (
               <Chart
                 type="pie"
-                title="File Types"
                 labels={documentsByType.map(t => t.name || t.type || 'Other')}
                 values={documentsByType.map(t => t.count || 0)}
               />
@@ -172,14 +189,18 @@ export default function KnowledgeDashboard() {
         {/* Documents by Collection */}
         <div className="col-lg-6">
           <div className="card h-100 p-3">
-            <h5 className="fw-bold mb-3" style={{ fontSize: '14px' }}>
-              <i className="bi bi-bar-chart me-2 text-success" />
-              Documents by Collection
-            </h5>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h5 className="fw-bold mb-0" style={{ fontSize: '14px' }}>
+                <i className="bi bi-bar-chart me-2 text-success" />
+                Documents by Collection
+              </h5>
+              <Link to="/knowledge/collections" className="btn btn-sm btn-link text-decoration-none p-0" style={{ fontSize: '12px' }}>
+                Manage <i className="bi bi-arrow-right" />
+              </Link>
+            </div>
             {documentsByCollection.length > 0 ? (
               <Chart
                 type="bar"
-                title="Collection Breakdown"
                 labels={documentsByCollection.map(c => c.name || 'General')}
                 values={documentsByCollection.map(c => c.count || 0)}
               />
@@ -192,10 +213,15 @@ export default function KnowledgeDashboard() {
         {/* Recent Uploads Table */}
         <div className="col-lg-6">
           <div className="card h-100 p-3">
-            <h5 className="fw-bold mb-3" style={{ fontSize: '14px' }}>
-              <i className="bi bi-clock me-2 text-warning" />
-              Recent Uploads
-            </h5>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h5 className="fw-bold mb-0" style={{ fontSize: '14px' }}>
+                <i className="bi bi-clock me-2 text-warning" />
+                Recent Uploads
+              </h5>
+              <Link to="/knowledge/library" className="btn btn-sm btn-link text-decoration-none p-0" style={{ fontSize: '12px' }}>
+                View All <i className="bi bi-arrow-right" />
+              </Link>
+            </div>
             {recentUploads.length > 0 ? (
               <div className="table-responsive">
                 <table className="table table-hover table-borderless align-middle mb-0" style={{ fontSize: '12px' }}>
@@ -211,11 +237,16 @@ export default function KnowledgeDashboard() {
                     {recentUploads.map((doc) => (
                       <tr key={doc.id || doc.originalFilename}>
                         <td>
-                          <div className="fw-semibold text-truncate" style={{ maxWidth: '180px' }} title={doc.originalFilename || doc.filename}>
+                          <Link 
+                            to={`/knowledge/document/${doc.id}`}
+                            className="fw-semibold text-truncate text-decoration-none d-inline-block" 
+                            style={{ maxWidth: '280px', color: 'inherit' }} 
+                            title={doc.originalFilename || doc.filename}
+                          >
                             {doc.originalFilename || doc.filename || `Document #${doc.id}`}
-                          </div>
+                          </Link>
                           {doc.courseCode && (
-                            <small className="text-muted">{doc.courseCode}</small>
+                            <small className="text-muted d-block">{doc.courseCode}</small>
                           )}
                         </td>
                         <td>

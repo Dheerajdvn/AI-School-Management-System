@@ -189,6 +189,11 @@ public class RagServiceImpl implements RagService {
                 try {
                     fullAnswer.append(token);
                     emitter.send(SseEmitter.event().name("token").data(token));
+                    try {
+                        Thread.sleep(12);
+                    } catch (InterruptedException ignored) {
+                        Thread.currentThread().interrupt();
+                    }
                 } catch (Exception ex) {
                     log.warn("Failed to push SSE token: {}", ex.getMessage());
                 }

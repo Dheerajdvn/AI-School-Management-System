@@ -36,38 +36,38 @@ public class StudentController {
     private final StudentService studentService;
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_TEACHER', 'ROLE_ADMIN')")
-    @Operation(summary = "Create a new student (TEACHER/ADMIN only)")
+    @PreAuthorize("hasAnyAuthority('ROLE_TEACHER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
+    @Operation(summary = "Create a new student (TEACHER/ADMIN/SUPER_ADMIN)")
     public ResponseEntity<ApiResponse<StudentDto>> create(@Valid @RequestBody StudentDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Student created", studentService.create(dto)));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_TEACHER', 'ROLE_ADMIN')")
-    @Operation(summary = "Update an existing student (TEACHER/ADMIN only)")
+    @PreAuthorize("hasAnyAuthority('ROLE_TEACHER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
+    @Operation(summary = "Update an existing student (TEACHER/ADMIN/SUPER_ADMIN)")
     public ApiResponse<StudentDto> update(@PathVariable Long id, @Valid @RequestBody StudentDto dto) {
         return ApiResponse.success("Student updated", studentService.update(id, dto));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
-    @Operation(summary = "Get a student by id (ADMIN/TEACHER/STUDENT)")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @Operation(summary = "Get a student by id (ADMIN/SUPER_ADMIN/TEACHER/STUDENT)")
     public ApiResponse<StudentDto> getById(@PathVariable Long id) {
         return ApiResponse.success(studentService.getById(id));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_TEACHER', 'ROLE_ADMIN')")
-    @Operation(summary = "Delete a student (TEACHER/ADMIN only)")
+    @PreAuthorize("hasAnyAuthority('ROLE_TEACHER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
+    @Operation(summary = "Delete a student (TEACHER/ADMIN/SUPER_ADMIN)")
     public ApiResponse<Void> delete(@PathVariable Long id) {
         studentService.delete(id);
         return ApiResponse.success("Student deleted", null);
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
-    @Operation(summary = "List all students with pagination and sorting (ADMIN/TEACHER/STUDENT)")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @Operation(summary = "List all students with pagination and sorting (ADMIN/SUPER_ADMIN/TEACHER/STUDENT)")
     public ApiResponse<PagedResponse<StudentDto>> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -77,8 +77,8 @@ public class StudentController {
     }
 
     @GetMapping("/search")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
-    @Operation(summary = "Dynamic filtered search (ADMIN/TEACHER/STUDENT)")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @Operation(summary = "Dynamic filtered search (ADMIN/SUPER_ADMIN/TEACHER/STUDENT)")
     public ApiResponse<PagedResponse<StudentDto>> search(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String course,
@@ -98,8 +98,8 @@ public class StudentController {
     }
 
     @GetMapping("/keyword")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
-    @Operation(summary = "Simple keyword search (ADMIN/TEACHER/STUDENT)")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @Operation(summary = "Simple keyword search (ADMIN/SUPER_ADMIN/TEACHER/STUDENT)")
     public ApiResponse<PagedResponse<StudentDto>> keyword(
             @RequestParam String q,
             @RequestParam(defaultValue = "0") int page,
@@ -108,8 +108,8 @@ public class StudentController {
     }
 
     @GetMapping("/count")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
-    @Operation(summary = "Total student count (ADMIN/TEACHER/STUDENT)")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @Operation(summary = "Total student count (ADMIN/SUPER_ADMIN/TEACHER/STUDENT)")
     public ApiResponse<Long> count() {
         return ApiResponse.success(studentService.count());
     }

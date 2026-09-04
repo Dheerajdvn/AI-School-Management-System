@@ -17,21 +17,36 @@ public class RefreshTokenService {
     private static final String REFRESH_TOKEN_PREFIX = "refresh_token:";
     private static final String USER_TOKENS_PREFIX = "user_tokens:";
     private static final long REFRESH_TOKEN_EXPIRY = 7; // 7 days
+    private static final long REFRESH_TOKEN_EXPIRY_MILLIS = TimeUnit.DAYS.toMillis(REFRESH_TOKEN_EXPIRY);
 
-    private final java.util.Map<String, Long> memoryStore = new java.util.concurrent.ConcurrentHashMap<>();
+    private record TokenEntry(Long userId, long expiresAtMillis) {}
+    private final java.util.concurrent.ConcurrentHashMap<String, TokenEntry> memoryStore = new java.util.concurrent.ConcurrentHashMap<>();
+
+    private boolean isRedisAvailable() {
+        try {
+            return redisTemplate != null && redisTemplate.getConnectionFactory() != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     public String createRefreshToken(Long userId) {
         String refreshToken = UUID.randomUUID().toString();
+        boolean savedInRedis = false;
         try {
-            if (redisTemplate != null && redisTemplate.getConnectionFactory() != null) {
+            if (isRedisAvailable()) {
                 String key = REFRESH_TOKEN_PREFIX + refreshToken;
                 redisTemplate.opsForValue().set(key, userId.toString(), REFRESH_TOKEN_EXPIRY, TimeUnit.DAYS);
                 redisTemplate.opsForSet().add(USER_TOKENS_PREFIX + userId, refreshToken);
+                savedInRedis = true;
             }
         } catch (Exception e) {
             // Fallback to memory store if Redis is unavailable
         }
-        memoryStore.put(refreshToken, userId);
+        if (!savedInRedis) {
+            pruneExpiredTokens();
+            memoryStore.put(refreshToken, new TokenEntry(userId, System.currentTimeMillis() + REFRESH_TOKEN_EXPIRY_MILLIS));
+        }
         return refreshToken;
     }
 
@@ -40,23 +55,34 @@ public class RefreshTokenService {
             return null;
         }
         try {
-            if (redisTemplate != null && redisTemplate.getConnectionFactory() != null) {
+            if (isRedisAvailable()) {
                 String key = REFRESH_TOKEN_PREFIX + refreshToken;
                 String userId = redisTemplate.opsForValue().get(key);
                 if (userId != null) {
                     return Long.valueOf(userId);
                 }
+                // If Redis is active and key is missing, token was evicted/expired
+                return null;
             }
         } catch (Exception e) {
+            // Fall back to memory store on Redis communication failure
         }
-        return memoryStore.get(refreshToken);
+        TokenEntry entry = memoryStore.get(refreshToken);
+        if (entry != null) {
+            if (System.currentTimeMillis() > entry.expiresAtMillis()) {
+                memoryStore.remove(refreshToken);
+                return null;
+            }
+            return entry.userId();
+        }
+        return null;
     }
 
     public void revokeRefreshToken(String refreshToken) {
         if (refreshToken == null) return;
         memoryStore.remove(refreshToken);
         try {
-            if (redisTemplate != null && redisTemplate.getConnectionFactory() != null) {
+            if (isRedisAvailable()) {
                 String key = REFRESH_TOKEN_PREFIX + refreshToken;
                 String userId = redisTemplate.opsForValue().get(key);
                 if (userId != null) {
@@ -70,9 +96,9 @@ public class RefreshTokenService {
 
     public void revokeAllUserTokens(Long userId) {
         if (userId == null) return;
-        memoryStore.values().removeIf(id -> id.equals(userId));
+        memoryStore.values().removeIf(entry -> entry.userId().equals(userId));
         try {
-            if (redisTemplate != null && redisTemplate.getConnectionFactory() != null) {
+            if (isRedisAvailable()) {
                 String userTokensKey = USER_TOKENS_PREFIX + userId;
                 var tokens = redisTemplate.opsForSet().members(userTokensKey);
                 if (tokens != null) {
@@ -81,6 +107,13 @@ public class RefreshTokenService {
                 redisTemplate.delete(userTokensKey);
             }
         } catch (Exception e) {
+        }
+    }
+
+    private void pruneExpiredTokens() {
+        if (memoryStore.size() > 500) {
+            long now = System.currentTimeMillis();
+            memoryStore.entrySet().removeIf(e -> now > e.getValue().expiresAtMillis());
         }
     }
 

@@ -2,22 +2,22 @@ import React, { useState, useEffect } from 'react'
 import { AiConfigApi } from '../services/api'
 
 const PROVIDER_INFO = {
-  Ollama: { icon: 'bi-hdd-network', requiresKey: false, defaultBaseUrl: 'http://localhost:11434' },
-  OpenAI: { icon: 'bi-translate', requiresKey: true, defaultBaseUrl: 'https://api.openai.com' },
-  Anthropic: { icon: 'bi-shield-check', requiresKey: true, defaultBaseUrl: 'https://api.anthropic.com' },
-  'Google Gemini': { icon: 'bi-stars', requiresKey: true, defaultBaseUrl: 'https://generativelanguage.googleapis.com' },
-  Groq: { icon: 'bi-lightning', requiresKey: true, defaultBaseUrl: 'https://api.groq.com' },
-  OpenRouter: { icon: 'bi-router', requiresKey: true, defaultBaseUrl: 'https://openrouter.ai' },
-  'Azure OpenAI': { icon: 'bi-cloud', requiresKey: true, defaultBaseUrl: 'https://your-resource.openai.azure.com' },
-  DeepSeek: { icon: 'bi-eye', requiresKey: true, defaultBaseUrl: 'https://api.deepseek.com' },
-  'Mistral AI': { icon: 'bi-wind', requiresKey: true, defaultBaseUrl: 'https://api.mistral.ai' },
+  Ollama: { icon: 'bi-hdd-network', requiresKey: false, defaultBaseUrl: 'http://localhost:11434', defaultModel: 'qwen2.5-coder:3b' },
+  OpenAI: { icon: 'bi-translate', requiresKey: true, defaultBaseUrl: 'https://api.openai.com', defaultModel: 'gpt-4o-mini' },
+  Anthropic: { icon: 'bi-shield-check', requiresKey: true, defaultBaseUrl: 'https://api.anthropic.com', defaultModel: 'claude-3-5-sonnet-20241022' },
+  'Google Gemini': { icon: 'bi-stars', requiresKey: true, defaultBaseUrl: 'https://generativelanguage.googleapis.com', defaultModel: 'gemini-3.6-flash' },
+  Groq: { icon: 'bi-lightning', requiresKey: true, defaultBaseUrl: 'https://api.groq.com', defaultModel: 'llama-3.3-70b-versatile' },
+  OpenRouter: { icon: 'bi-router', requiresKey: true, defaultBaseUrl: 'https://openrouter.ai', defaultModel: 'meta-llama/llama-3.3-70b-instruct' },
+  'Azure OpenAI': { icon: 'bi-cloud', requiresKey: true, defaultBaseUrl: 'https://your-resource.openai.azure.com', defaultModel: 'gpt-4o' },
+  DeepSeek: { icon: 'bi-eye', requiresKey: true, defaultBaseUrl: 'https://api.deepseek.com', defaultModel: 'deepseek-chat' },
+  'Mistral AI': { icon: 'bi-wind', requiresKey: true, defaultBaseUrl: 'https://api.mistral.ai', defaultModel: 'mistral-small-latest' },
 }
 
 const DEFAULT_CONFIG = {
   provider: 'Ollama',
   apiKey: '',
   baseUrl: 'http://localhost:11434',
-  model: '',
+  model: 'qwen2.5-coder:3b',
   temperature: 0.2,
   maxTokens: 2048,
   streamingEnabled: true,
@@ -49,17 +49,23 @@ const AiSettings = () => {
       ])
 
       if (configRes) {
+        const prov = configRes.provider || 'Ollama'
+        const defaultMod = PROVIDER_INFO[prov]?.defaultModel || ''
+        const resolvedModel = configRes.model || defaultMod
         setConfig({
-          provider: configRes.provider || 'Ollama',
+          provider: prov,
           apiKey: configRes.apiKey || '',
-          baseUrl: configRes.baseUrl || getDefaultBaseUrl(configRes.provider || 'Ollama'),
-          model: configRes.model || '',
+          baseUrl: configRes.baseUrl || getDefaultBaseUrl(prov),
+          model: resolvedModel,
           temperature: configRes.temperature ?? 0.2,
           maxTokens: configRes.maxTokens ?? 2048,
           streamingEnabled: configRes.streamingEnabled ?? true,
           aiSuggestionsEnabled: configRes.aiSuggestionsEnabled ?? true,
           isConnected: configRes.isConnected ?? false,
         })
+        if (resolvedModel) {
+          setAvailableModels([resolvedModel])
+        }
       }
 
       if (providersRes) {
@@ -80,15 +86,16 @@ const AiSettings = () => {
   const handleProviderChange = (e) => {
     const newProvider = e.target.value
     const info = PROVIDER_INFO[newProvider]
+    const defaultMod = info?.defaultModel || ''
     setConfig(prev => ({
       ...prev,
       provider: newProvider,
       apiKey: info.requiresKey ? prev.apiKey : '',
       baseUrl: info.defaultBaseUrl,
-      model: '',
+      model: defaultMod,
       isConnected: false,
     }))
-    setAvailableModels([])
+    setAvailableModels(defaultMod ? [defaultMod] : [])
     setSuccess('')
     setError('')
   }
@@ -106,9 +113,16 @@ const AiSettings = () => {
       })
 
       if (result.connected) {
-        setAvailableModels(result.models || [])
-        setConfig(prev => ({ ...prev, isConnected: true }))
-        setSuccess(`Connection verified successfully. ${result.models?.length || 0} model(s) available.`)
+        const models = result.models || []
+        setAvailableModels(models)
+        setConfig(prev => ({
+          ...prev,
+          isConnected: true,
+          model: (prev.model && models.includes(prev.model))
+            ? prev.model
+            : (models[0] || PROVIDER_INFO[prev.provider]?.defaultModel || prev.model || '')
+        }))
+        setSuccess(`Connection verified successfully. ${models.length} model(s) available.`)
       } else {
         setConfig(prev => ({ ...prev, isConnected: false }))
         setError(result.message || 'Failed to connect to the provider.')
@@ -127,7 +141,13 @@ const AiSettings = () => {
     setSuccess('')
 
     try {
-      await AiConfigApi.saveConfig(config)
+      const defaultMod = PROVIDER_INFO[config.provider]?.defaultModel || ''
+      const payload = {
+        ...config,
+        model: (config.model && config.model.trim()) ? config.model.trim() : defaultMod
+      }
+      await AiConfigApi.saveConfig(payload)
+      setConfig(payload)
       setSuccess('AI settings saved successfully!')
     } catch (err) {
       setError('Failed to save settings. Please try again.')

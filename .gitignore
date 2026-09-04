@@ -46,3 +46,12 @@ coverage/
 
 # Uploaded files
 backend/uploads/
+uploads/
+
+# Local workspace & scratch
+scratch/
+.claude/
+dev-dashboard.html
+frontend/public/dev-dashboard.html
+start-dev.bat
+stop-listener.ps1

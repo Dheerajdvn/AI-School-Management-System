@@ -44,8 +44,8 @@ public class SubmissionController {
     private final SubmissionService submissionService;
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_STUDENT')")
-    @Operation(summary = "Submit an assignment (ADMIN/STUDENT)")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_STUDENT')")
+    @Operation(summary = "Submit an assignment (ADMIN/SUPER_ADMIN/STUDENT)")
     public ResponseEntity<ApiResponse<SubmissionResponse>> submit(
             @RequestParam Long assignmentId,
             @Valid @RequestBody SubmissionRequest request,
@@ -60,8 +60,8 @@ public class SubmissionController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_STUDENT')")
-    @Operation(summary = "Update a submission (ADMIN/STUDENT - own submissions only)")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_STUDENT')")
+    @Operation(summary = "Update a submission (ADMIN/SUPER_ADMIN/STUDENT - own submissions only)")
     public ApiResponse<SubmissionResponse> update(
             @PathVariable Long id,
             @Valid @RequestBody SubmissionRequest request,
@@ -75,8 +75,8 @@ public class SubmissionController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_STUDENT')")
-    @Operation(summary = "Delete a submission (ADMIN/STUDENT - own submissions only)")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_STUDENT')")
+    @Operation(summary = "Delete a submission (ADMIN/SUPER_ADMIN/STUDENT - own submissions only)")
     public ApiResponse<Void> delete(
             @PathVariable Long id,
             Authentication authentication) {
@@ -89,7 +89,7 @@ public class SubmissionController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     @Operation(summary = "Get a submission by ID")
     public ApiResponse<SubmissionResponse> getById(
             @PathVariable Long id,
@@ -102,7 +102,7 @@ public class SubmissionController {
     }
 
     @GetMapping("/student/{studentId}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     @Operation(summary = "Get all submissions for a student")
     public ApiResponse<PagedResponse<SubmissionResponse>> getByStudent(
             @PathVariable Long studentId,
@@ -121,8 +121,8 @@ public class SubmissionController {
     }
 
     @GetMapping("/assignment/{assignmentId}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER')")
-    @Operation(summary = "Get all submissions for an assignment (ADMIN/TEACHER - own courses only)")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
+    @Operation(summary = "Get all submissions for an assignment (ADMIN/SUPER_ADMIN/TEACHER - own courses only)")
     public ApiResponse<PagedResponse<SubmissionResponse>> getByAssignment(
             @PathVariable Long assignmentId,
             @RequestParam(defaultValue = "0") int page,
@@ -140,8 +140,8 @@ public class SubmissionController {
     }
 
     @PutMapping("/{id}/grade")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER')")
-    @Operation(summary = "Grade a submission (ADMIN/TEACHER - own courses only)")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
+    @Operation(summary = "Grade a submission (ADMIN/SUPER_ADMIN/TEACHER - own courses only)")
     public ApiResponse<SubmissionResponse> grade(
             @PathVariable Long id,
             @Valid @RequestBody GradeRequest request,
@@ -155,7 +155,7 @@ public class SubmissionController {
     }
 
     @GetMapping("/search")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     @Operation(summary = "Search submissions")
     public ApiResponse<PagedResponse<SubmissionResponse>> search(
             @RequestParam(required = false) Long assignmentId,

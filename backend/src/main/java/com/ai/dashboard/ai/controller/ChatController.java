@@ -32,7 +32,7 @@ public class ChatController {
     private final AIService aiService;
 
     @PostMapping("/chat")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Generate a chat response")
     public ApiResponse<ChatResponse> chat(@Valid @RequestBody ChatRequest request) {
 
@@ -44,7 +44,7 @@ public class ChatController {
     }
 
     @PostMapping(value = "/chat/stream", produces = MediaType.TEXT_PLAIN_VALUE)
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Generate a streaming chat response")
     public String streamChat(@RequestBody ChatRequest request) {
 

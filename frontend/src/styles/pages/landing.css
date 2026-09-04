@@ -2,18 +2,18 @@
 
 [data-theme="dark"] .home-page,
 body.dark-mode .home-page {
-  --home-bg: linear-gradient(180deg, #09090B 0%, #0C0C0F 50%, #101014 100%);
-  --home-nav-bg: rgba(15, 15, 18, 0.78);
-  --home-card-bg: rgba(20, 20, 24, 0.8);
-  --home-card-hover: rgba(26, 26, 32, 0.85);
-  --home-footer-bg: #0F1117;
+  --home-bg: #000000;
+  --home-nav-bg: rgba(0, 0, 0, 0.8);
+  --home-card-bg: #0b0b0c;
+  --home-card-hover: #131315;
+  --home-footer-bg: #000000;
   --home-text: #F8F8FA;
   --home-heading: #F8F8FA;
   --home-paragraph: #A8ADB8;
   --home-muted: #707784;
   --home-border: rgba(255, 255, 255, 0.08);
-  --home-border-hover: rgba(255, 255, 255, 0.16);
-  --home-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+  --home-border-hover: rgba(139, 92, 246, 0.2);
+  --home-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
 }
 
 [data-theme="light"] .home-page,
@@ -695,7 +695,7 @@ body.light-mode .home-page {
   left: 12px;
   right: 12px;
   height: 2px;
-  background: linear-gradient(90deg, #6D7CFF, #8B7CFF);
+  background: linear-gradient(90deg, #8b5cf6, #a78bfa);
   border-radius: 2px;
   transform: scaleX(0);
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -736,7 +736,7 @@ body.light-mode .home-page {
 }
 
 .home-page .btn-primary {
-  background: linear-gradient(135deg, #6D7CFF, #8B7CFF) !important;
+  background: linear-gradient(135deg, #8b5cf6, #c084fc) !important;
   border: none !important;
   color: #FFFFFF !important;
   font-weight: 600 !important;
@@ -746,9 +746,9 @@ body.light-mode .home-page {
 
 .home-page .btn-primary:hover,
 .home-page .btn-primary:focus {
-  background: linear-gradient(135deg, #7C8CFF, #9B8CFF) !important;
+  background: linear-gradient(135deg, #a78bfa, #d8b4fe) !important;
   color: #FFFFFF !important;
-  box-shadow: 0 0 25px rgba(109, 124, 255, 0.3) !important;
+  box-shadow: 0 0 25px rgba(139, 92, 246, 0.45) !important;
   transform: translateY(-1px) !important;
 }
 

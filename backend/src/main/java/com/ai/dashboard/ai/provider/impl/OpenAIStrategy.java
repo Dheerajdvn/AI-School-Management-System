@@ -44,12 +44,16 @@ public class OpenAIStrategy extends AbstractLlmProviderStrategy {
     @Override
     public String generate(String apiKey, String baseUrl, String model, Double temperature, Integer maxTokens, String systemPrompt, String prompt) {
         WebClient client = buildClient(apiKey, baseUrl);
+        String modelName = (model != null && !model.isBlank()) ? model.trim() : "gpt-4o-mini";
+
         ObjectNode body = objectMapper.createObjectNode();
-        body.put("model", model);
+        body.put("model", modelName);
         ArrayNode messages = body.putArray("messages");
-        messages.add(objectMapper.createObjectNode()
-                .put("role", "system")
-                .put("content", systemPrompt != null ? systemPrompt : ""));
+        if (systemPrompt != null && !systemPrompt.isBlank()) {
+            messages.add(objectMapper.createObjectNode()
+                    .put("role", "system")
+                    .put("content", systemPrompt));
+        }
         messages.add(objectMapper.createObjectNode()
                 .put("role", "user")
                 .put("content", prompt));
@@ -64,7 +68,19 @@ public class OpenAIStrategy extends AbstractLlmProviderStrategy {
                     .bodyToMono(String.class)
                     .timeout(Duration.ofSeconds(60))
                     .block();
-            return extractResponseField(response, "choices", 0, "message", "content");
+            String text = extractResponseField(response, "choices", 0, "message", "content");
+            if (text == null || text.isBlank()) {
+                JsonNode root = objectMapper.readTree(response);
+                if (root.has("error")) {
+                    String errorMsg = root.path("error").path("message").asText("Unknown error from OpenAI");
+                    throw new RuntimeException(errorMsg);
+                }
+                String refusal = root.path("choices").path(0).path("message").path("refusal").asText(null);
+                if (refusal != null && !refusal.isBlank()) {
+                    return refusal;
+                }
+            }
+            return text;
         } catch (Exception e) {
             log.error("OpenAI generate failed: {}", e.getMessage());
             throw new RuntimeException("Failed to generate response from OpenAI: " + e.getMessage(), e);

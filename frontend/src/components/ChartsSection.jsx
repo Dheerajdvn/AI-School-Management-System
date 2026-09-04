@@ -17,8 +17,11 @@ const ChartsSection = ({
     { label: 'Data Structures', count: 26 }
   ]
 
-  const courseLabels = byCourse.length > 0 ? byCourse.map((b) => b.courseName || b.title || b.label) : defaultEnrollment.map(d => d.label)
-  const courseValues = byCourse.length > 0 ? byCourse.map((b) => b.studentCount || b.count || b.value) : defaultEnrollment.map(d => d.count)
+  const sortedCourses = byCourse.length > 0
+    ? [...byCourse].sort((a, b) => (b.studentCount || b.count || b.value || 0) - (a.studentCount || a.count || a.value || 0)).slice(0, 8)
+    : defaultEnrollment
+  const courseLabels = sortedCourses.map((b) => b.courseName || b.title || b.label)
+  const courseValues = sortedCourses.map((b) => b.studentCount || b.count || b.value)
 
   const rolesObj = Object.keys(rolesDistribution).length > 0
     ? rolesDistribution

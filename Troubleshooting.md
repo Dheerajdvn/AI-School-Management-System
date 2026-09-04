@@ -44,12 +44,20 @@ This caps Java heap at 320 MB, keeping total RAM safely under Render's 512 MB li
 
 ---
 
-### 🔑 AES Encryption Key Length Error
+### 🔑 AES Encryption Key Errors
 
-**Error**: `InvalidAESKeyException: Invalid AES key length: X bytes`
+**Error**: `No encryption key configured` or `Configured encryption key is too short`
 
 **Solution**:
-Set `APP_ENCRYPTION_KEY` in environment variables to an exact 16-byte string (e.g. `1234567890123456`).
+Set `APP_ENCRYPTION_KEY` to a random secret of **at least 32 characters**. The application refuses to
+start without one rather than falling back to a built-in default. Generate one with:
+
+```bash
+openssl rand -base64 32
+```
+
+Note: changing this value makes previously stored provider API keys unreadable — users will need to
+re-enter them under **AI Settings**.
 
 ---
 

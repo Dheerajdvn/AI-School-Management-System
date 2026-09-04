@@ -1,5 +1,6 @@
 package com.ai.dashboard.ai.provider.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
@@ -54,8 +55,10 @@ public class OllamaStrategy extends AbstractLlmProviderStrategy {
     @Override
     public String generate(String apiKey, String baseUrl, String model, Double temperature, Integer maxTokens, String systemPrompt, String prompt) {
         WebClient client = buildClient(apiKey, baseUrl);
+        String modelName = (model != null && !model.isBlank()) ? model.trim() : "qwen2.5-coder:3b";
+
         ObjectNode body = objectMapper.createObjectNode()
-                .put("model", model)
+                .put("model", modelName)
                 .put("prompt", prompt)
                 .put("stream", false);
         if (systemPrompt != null && !systemPrompt.isBlank()) {
@@ -73,7 +76,15 @@ public class OllamaStrategy extends AbstractLlmProviderStrategy {
                     .bodyToMono(String.class)
                     .timeout(Duration.ofSeconds(60))
                     .block();
-            return extractResponseField(response, "response");
+            String text = extractResponseField(response, "response");
+            if (text == null || text.isBlank()) {
+                JsonNode root = objectMapper.readTree(response);
+                if (root.has("error")) {
+                    String errorMsg = root.path("error").asText("Unknown error from Ollama");
+                    throw new RuntimeException(errorMsg);
+                }
+            }
+            return text;
         } catch (Exception e) {
             log.error("Ollama generate failed: {}", e.getMessage());
             throw new RuntimeException("Failed to generate response from Ollama: " + e.getMessage(), e);

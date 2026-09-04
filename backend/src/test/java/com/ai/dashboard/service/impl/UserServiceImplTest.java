@@ -71,11 +71,24 @@ class UserServiceImplTest {
         CreateUserRequest request = TestBuilders.buildCreateUserRequest("newuser", "new@example.com", "pass", Set.of("ROLE_USER"));
         when(userRepository.existsByUsername("newuser")).thenReturn(false);
         when(userRepository.existsByEmail("new@example.com")).thenReturn(false);
+        when(roleRepository.findByName("ROLE_USER")).thenReturn(Optional.of(Role.builder().name("ROLE_USER").build()));
         when(passwordEncoder.encode("pass")).thenReturn("encodedPass");
         User savedUser = TestBuilders.buildUser(1L, "newuser", "new@example.com", "ROLE_USER");
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
         UserDto dto = userService.createUser(request);
         assertEquals("newuser", dto.getUsername());
+    }
+
+    @Test
+    void createUser_unknownRole_throwsAndDoesNotCreateRole() {
+        CreateUserRequest request = TestBuilders.buildCreateUserRequest("newuser", "new@example.com", "pass", Set.of("ROLE_MADE_UP"));
+        when(userRepository.existsByUsername("newuser")).thenReturn(false);
+        when(userRepository.existsByEmail("new@example.com")).thenReturn(false);
+        when(roleRepository.findByName("ROLE_MADE_UP")).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> userService.createUser(request));
+        verify(roleRepository, never()).save(any(Role.class));
+        verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
@@ -99,6 +112,7 @@ class UserServiceImplTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(existing));
         when(userRepository.existsByUsername("newname")).thenReturn(false);
         when(userRepository.existsByEmail("new@example.com")).thenReturn(false);
+        when(roleRepository.findByName("ROLE_USER")).thenReturn(Optional.of(Role.builder().name("ROLE_USER").build()));
         when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
         UpdateUserRequest request = TestBuilders.buildUpdateUserRequest("newname", "new@example.com", null, Set.of("ROLE_USER"), true);
         UserDto dto = userService.updateUser(1L, request);

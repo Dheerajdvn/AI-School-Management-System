@@ -62,7 +62,11 @@ public class JwtService {
      * @throws io.jsonwebtoken.JwtException if token is invalid
      */
     public Long extractUserId(String token) {
-        return getClaims(token).get("userId", Long.class);
+        Object userId = getClaims(token).get("userId");
+        if (userId instanceof Number number) {
+            return number.longValue();
+        }
+        return null;
     }
 
     /**

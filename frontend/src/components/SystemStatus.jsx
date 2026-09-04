@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { AiApi, DashboardApi } from '../services/api'
+import { tokenStore } from '../api/tokenStore'
 
 const SystemStatus = () => {
   const [status, setStatus] = useState({
@@ -18,7 +19,7 @@ const SystemStatus = () => {
   const checkStatus = async () => {
     setLoading(true)
     try {
-      const token = localStorage.getItem('token')
+      const token = tokenStore.getToken()
       const headers = token ? { Authorization: `Bearer ${token}` } : {}
       const response = await fetch(window.location.origin + '/api/actuator/health', { headers })
       const data = await response.json().catch(() => ({}))

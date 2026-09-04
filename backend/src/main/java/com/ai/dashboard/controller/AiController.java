@@ -45,15 +45,15 @@ public class AiController {
     private final UserAiConfigService configService;
 
     @PostMapping("/ask")
-    @PreAuthorize("hasAnyAuthority('ROLE_TEACHER', 'ROLE_ADMIN', 'ROLE_PRINCIPAL', 'ROLE_SCHOOL_ADMIN')")
-    @Operation(summary = "Ask a natural-language question (TEACHER/ADMIN/PRINCIPAL/SCHOOL_ADMIN only)")
+    @PreAuthorize("hasAnyAuthority('ROLE_TEACHER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_PRINCIPAL', 'ROLE_SCHOOL_ADMIN')")
+    @Operation(summary = "Ask a natural-language question (TEACHER/ADMIN/SUPER_ADMIN/PRINCIPAL/SCHOOL_ADMIN only)")
     public ApiResponse<AiQueryResponse> ask(@Valid @RequestBody AiQueryRequest request) {
         return ApiResponse.success(aiQueryService.ask(request));
     }
 
     @PostMapping("/sql")
-    @PreAuthorize("hasAnyAuthority('ROLE_TEACHER', 'ROLE_ADMIN', 'ROLE_PRINCIPAL', 'ROLE_SCHOOL_ADMIN')")
-    @Operation(summary = "Generate SQL only (TEACHER/ADMIN/PRINCIPAL/SCHOOL_ADMIN only)")
+    @PreAuthorize("hasAnyAuthority('ROLE_TEACHER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_PRINCIPAL', 'ROLE_SCHOOL_ADMIN')")
+    @Operation(summary = "Generate SQL only (TEACHER/ADMIN/SUPER_ADMIN/PRINCIPAL/SCHOOL_ADMIN only)")
     public ApiResponse<Map<String, String>> sql(@Valid @RequestBody AiQueryRequest request) {
         return ApiResponse.success(Map.of("sql", aiQueryService.generateSqlOnly(request.getQuestion())));
     }

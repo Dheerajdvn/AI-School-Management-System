@@ -25,7 +25,6 @@ public class DocumentContent {
     @JoinColumn(name = "document_id", nullable = false, unique = true)
     private Document document;
 
-    @Lob
     @Column(name = "extracted_text", columnDefinition = "TEXT")
     private String extractedText;
 

@@ -14,6 +14,7 @@ import {
   getCurrentUser,
   isAuthenticated as checkAuth
 } from '../services/AuthService'
+import { tokenStore } from '../api/tokenStore'
 
 const AuthContext = createContext(null)
 
@@ -127,7 +128,7 @@ export const AuthProvider = ({ children }) => {
     expiryTimerRef.current = setInterval(async () => {
       try {
         // Check if token is expired using JWT decode
-        const token = localStorage.getItem('token') || sessionStorage.getItem('session_token')
+        const token = tokenStore.getToken()
         if (!token) {
           handleExpiredSession()
           return

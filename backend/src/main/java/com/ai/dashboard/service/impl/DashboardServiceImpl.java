@@ -224,6 +224,7 @@ public class DashboardServiceImpl implements DashboardService {
     public List<Map<String, Object>> getEnrollmentByCourse() {
         List<Object[]> rows = enrollmentRepository.countEnrollmentsGroupByCourse();
         return rows.stream()
+                .limit(25)
                 .map(row -> {
                     Map<String, Object> entry = new HashMap<>();
                     String label = row[0] != null ? row[0].toString() : "Course";

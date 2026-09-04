@@ -34,9 +34,11 @@ export default function AskAiPage() {
     setQuestion(query)
     try {
       const res = await AiApi.ask(query)
-      setResponse(res.data)
+      // AiApi.ask already unwraps the { data: ... } envelope; do not unwrap a second time.
+      setResponse(res)
     } catch (e) {
-      setError(e.message || 'Failed to process AI query')
+      const msg = e.response?.data?.message || e.response?.data?.error || e.message || 'Failed to process AI query'
+      setError(msg)
     } finally {
       setLoading(false)
     }
@@ -65,9 +67,20 @@ export default function AskAiPage() {
                 <span className="small fw-semibold text-uppercase tracking-wider">Natural Language to SQL Engine</span>
               </div>
               <h1 className="display-6 fw-bold mb-2" style={{ color: 'var(--text)' }}>Ask AI in Plain English</h1>
-              <p className="lead mb-4 text-muted">
-                Type any analytical query about your student database. Our enterprise AI instantly converts your question into optimized SQL, executes it securely, and visualizes results.
+              <p className="lead mb-3 text-muted">
+                Type any analytical query about the student dataset. Your question is converted into SQL,
+                executed read-only, and the results are visualized below.
               </p>
+
+              <div className="d-flex align-items-start gap-2 mb-4 p-3 rounded-3 border-start border-info border-4" style={{ backgroundColor: 'var(--surface)' }}>
+                <i className="bi bi-info-circle-fill text-info mt-1" />
+                <div className="small text-muted">
+                  <span className="fw-semibold" style={{ color: 'var(--text)' }}>Data scope:</span> this
+                  assistant queries the standalone <code>student</code> demo dataset only. It is separate
+                  from the platform's registered users, enrolments, and grades, so counts here will not
+                  match your dashboard totals.
+                </div>
+              </div>
 
               <div className="input-group input-group-lg shadow-sm rounded-3 overflow-hidden p-1 border" style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}>
                 <span className="input-group-text bg-transparent border-0 ps-3 text-muted">

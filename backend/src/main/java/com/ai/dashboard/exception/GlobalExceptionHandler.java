@@ -47,7 +47,37 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, ex.getMessage(), req, null);
     }
 
+    // AccessDeniedException is listed for all three types deliberately. The application's own
+    // AccessDeniedException is what every ownership check throws ("you can only view your own
+    // submissions", "you do not have permission to modify this user profile"); without it here those
+    // fall through to handleAll and surface as 500 "An unexpected error occurred", which the client
+    // cannot distinguish from a crash.
+    @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
+    public ResponseEntity<ErrorDetail> handleBadCredentials(org.springframework.security.authentication.BadCredentialsException ex, HttpServletRequest req) {
+        log.warn("Authentication failed: invalid credentials for path: {}", req.getRequestURI());
+        return build(HttpStatus.UNAUTHORIZED, "Invalid username or password. Please verify your credentials.", req, null);
+    }
+
+    @ExceptionHandler(org.springframework.security.authentication.DisabledException.class)
+    public ResponseEntity<ErrorDetail> handleDisabled(org.springframework.security.authentication.DisabledException ex, HttpServletRequest req) {
+        log.warn("Authentication failed: account is disabled");
+        return build(HttpStatus.FORBIDDEN, "Your account has been deactivated. Please contact an administrator.", req, null);
+    }
+
+    @ExceptionHandler(org.springframework.security.authentication.LockedException.class)
+    public ResponseEntity<ErrorDetail> handleLocked(org.springframework.security.authentication.LockedException ex, HttpServletRequest req) {
+        log.warn("Authentication failed: account is locked");
+        return build(HttpStatus.FORBIDDEN, "Account is locked. Please try again later.", req, null);
+    }
+
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    public ResponseEntity<ErrorDetail> handleAuthentication(org.springframework.security.core.AuthenticationException ex, HttpServletRequest req) {
+        log.warn("Authentication error: {}", ex.getMessage());
+        return build(HttpStatus.UNAUTHORIZED, "Authentication failed: " + ex.getMessage(), req, null);
+    }
+
     @ExceptionHandler({
+        com.ai.dashboard.exception.AccessDeniedException.class,
         org.springframework.security.access.AccessDeniedException.class,
         org.springframework.security.authorization.AuthorizationDeniedException.class
     })

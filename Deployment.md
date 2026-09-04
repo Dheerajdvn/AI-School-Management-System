@@ -72,7 +72,8 @@ Configure these environment variables in your **Render Web Service**:
 | `CORS_ALLOWED_ORIGINS` | Allowed Frontend Origin | `https://aischoolsystem.vercel.app` |
 | `JWT_SECRET` | JWT Secret Key | `your-secure-jwt-secret-key` |
 | `JWT_EXPIRATION` | Token Expiry (ms) | `86400000` (24 Hours) |
-| `APP_ENCRYPTION_KEY` | 16-byte AES Field Key | `1234567890123456` |
+| `APP_ENCRYPTION_KEY` | AES-256 Field Key (32+ chars, required in prod) | `openssl rand -base64 32` |
+| `ADMIN_INIT_PASSWORD` | Initial admin password (admin creation skipped if unset) | `openssl rand -base64 24` |
 | `JAVA_OPTS` | **Render Memory Heap Limit** | `-Xmx320m -Xms256m -XX:+UseG1GC -XX:+ExitOnOutOfMemoryError` |
 
 > [!IMPORTANT]

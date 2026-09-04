@@ -14,7 +14,6 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [sessionExpiredMsg, setSessionExpiredMsg] = useState('')
   const [loading, setLoading] = useState(false)
-  const [activeDemoRole, setActiveDemoRole] = useState('')
 
   const { login, clearSessionExpired } = useAuth()
   const navigate = useNavigate()
@@ -130,14 +129,6 @@ export default function LoginPage() {
     }
   }, [])
 
-  // Quick Demo Autofill Helper
-  const fillDemoRole = (role, user, pass) => {
-    setActiveDemoRole(role)
-    setUsername(user)
-    setPassword(pass)
-    setError('')
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
@@ -208,40 +199,6 @@ export default function LoginPage() {
                 </div>
                 <h3 className="fw-extrabold mb-1.5 tracking-tight" style={{ fontSize: '24px', color: 'var(--text)' }}>Welcome Back</h3>
                 <p className="text-muted small mb-0">Sign in to access AI School OS Command Center</p>
-              </div>
-
-              {/* Quick Demo Role Selector Chips */}
-              <div className="mb-4 p-2.5 rounded-3 border bg-surface">
-                <div className="d-flex align-items-center justify-content-between mb-2">
-                  <span className="text-muted small fw-semibold" style={{ fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Quick Demo Accounts</span>
-                  <span className="badge bg-primary-subtle text-primary" style={{ fontSize: '0.7rem' }}>1-Click Fill</span>
-                </div>
-                <div className="d-flex gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => fillDemoRole('admin', 'admin', 'password')}
-                    className={`btn btn-sm flex-fill rounded-2 border ${activeDemoRole === 'admin' ? 'btn-primary' : 'btn-secondary'}`}
-                    style={{ fontSize: '0.78rem', height: '32px' }}
-                  >
-                    <i className="bi bi-shield-lock me-1" /> Admin
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => fillDemoRole('teacher', 'teacher', 'password')}
-                    className={`btn btn-sm flex-fill rounded-2 border ${activeDemoRole === 'teacher' ? 'btn-primary' : 'btn-secondary'}`}
-                    style={{ fontSize: '0.78rem', height: '32px' }}
-                  >
-                    <i className="bi bi-person-workspace me-1" /> Teacher
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => fillDemoRole('student', 'student', 'password')}
-                    className={`btn btn-sm flex-fill rounded-2 border ${activeDemoRole === 'student' ? 'btn-primary' : 'btn-secondary'}`}
-                    style={{ fontSize: '0.78rem', height: '32px' }}
-                  >
-                    <i className="bi bi-mortarboard me-1" /> Student
-                  </button>
-                </div>
               </div>
 
               {/* Error Alert */}

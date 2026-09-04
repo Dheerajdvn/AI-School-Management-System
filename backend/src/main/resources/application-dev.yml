@@ -36,3 +36,7 @@ app:
     # A safe, long default JWT secret for local development only
     secret: ${JWT_SECRET:local-dev-very-long-secret-key-that-exceeds-256-bits-for-hmac-sha-signing}
     expiration: ${JWT_EXPIRATION:86400000}
+  security:
+    # Local-development default only. The prod profile has no fallback and requires
+    # APP_ENCRYPTION_KEY to be supplied, so a real deployment cannot start without one.
+    encryption-key: ${APP_ENCRYPTION_KEY:local-dev-only-field-encryption-key-not-for-deployment}

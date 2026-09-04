@@ -167,11 +167,21 @@ export default function ChatPage() {
       onDone: (doneData) => {
         setStreaming(false)
         abortControllerRef.current = null
+        if (!fullText) {
+          setMessages(prev =>
+            prev.map(m => m.id === assistantMsgId ? { ...m, content: "No answer could be retrieved for this query." } : m)
+          )
+        }
       },
       onError: (errMessage) => {
         setStreaming(false)
         setError(errMessage || 'Failed to complete SSE chat stream')
         abortControllerRef.current = null
+        if (!fullText) {
+          setMessages(prev =>
+            prev.map(m => m.id === assistantMsgId ? { ...m, content: errMessage || 'Failed to complete SSE chat stream' } : m)
+          )
+        }
       }
     })
   }, [input, messages, activeConversationId, streaming, saveToConversation])

@@ -19,10 +19,8 @@ public class RedisHealthIndicator implements HealthIndicator {
 
     @Override
     public Health health() {
-        try {
-            var connection = redisConnectionFactory.getConnection();
+        try (var connection = redisConnectionFactory.getConnection()) {
             connection.ping();
-            connection.close();
             log.debug("Redis health check: UP");
             return Health.up()
                     .withDetail("component", "redis")

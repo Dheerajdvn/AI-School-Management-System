@@ -201,7 +201,7 @@ public class QdrantProvider implements VectorStoreProvider {
             vectorArr.add(v);
         }
 
-        body.putObject("with_payload").put("enable", true);
+        body.put("with_payload", true);
 
         if (courseId != null) {
             ObjectNode filter = objectMapper.createObjectNode();

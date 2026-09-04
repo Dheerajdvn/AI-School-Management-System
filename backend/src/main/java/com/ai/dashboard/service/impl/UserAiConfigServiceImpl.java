@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.InetAddress;
 import java.net.URI;
 import java.util.List;
 import java.util.Set;
@@ -132,6 +133,9 @@ public class UserAiConfigServiceImpl implements UserAiConfigService {
 
             if (connected) {
                 List<String> models = strategy.getModels(apiKey, baseUrl);
+                if (models == null || models.isEmpty()) {
+                    models = getFallbackModelsForProvider(dto.getProvider());
+                }
                 return VerifyConnectionResponseDto.builder()
                         .connected(true)
                         .message("Connection verified successfully")
@@ -203,16 +207,30 @@ public class UserAiConfigServiceImpl implements UserAiConfigService {
                 throw new IllegalArgumentException("Invalid URL scheme: only http and https are permitted");
             }
             String host = uri.getHost();
-            if (host != null) {
-                String lowerHost = host.toLowerCase();
-                if (BLOCKED_HOSTS.contains(lowerHost)) {
-                    throw new IllegalArgumentException("Access to cloud metadata endpoints is blocked");
+            if (host == null || host.isBlank()) {
+                throw new IllegalArgumentException("Invalid host in baseUrl");
+            }
+            String lowerHost = host.toLowerCase();
+            if (BLOCKED_HOSTS.contains(lowerHost)) {
+                throw new IllegalArgumentException("Access to cloud metadata endpoints is blocked");
+            }
+
+            boolean isLocalOllama = "Ollama".equalsIgnoreCase(provider)
+                    && (lowerHost.equals("localhost") || lowerHost.equals("127.0.0.1"));
+
+            if (!isLocalOllama) {
+                InetAddress[] addresses = InetAddress.getAllByName(host);
+                for (InetAddress addr : addresses) {
+                    if (addr.isLoopbackAddress() || addr.isSiteLocalAddress() || addr.isLinkLocalAddress()
+                            || addr.isAnyLocalAddress() || addr.isMulticastAddress()) {
+                        throw new IllegalArgumentException("Access to private/internal network addresses is blocked");
+                    }
                 }
             }
         } catch (IllegalArgumentException e) {
             throw e;
         } catch (Exception e) {
-            throw new IllegalArgumentException("Malformed baseUrl: " + e.getMessage());
+            throw new IllegalArgumentException("Malformed or unresolvable baseUrl: " + e.getMessage());
         }
     }
 
@@ -252,6 +270,22 @@ public class UserAiConfigServiceImpl implements UserAiConfigService {
             return "********";
         }
         return apiKey.substring(0, 4) + "..." + apiKey.substring(apiKey.length() - 4);
+    }
+
+    private List<String> getFallbackModelsForProvider(String provider) {
+        if (provider == null) return List.of();
+        return switch (provider) {
+            case "OpenAI" -> List.of("gpt-4o-mini", "gpt-4o", "gpt-4-turbo", "o1-mini");
+            case "Google Gemini" -> List.of("gemini-3.6-flash", "gemini-3.8-flash", "gemini-3.7-flash", "gemini-flash-latest");
+            case "Anthropic" -> List.of("claude-3-5-sonnet-20241022", "claude-3-5-haiku-20241022", "claude-3-opus-20240229");
+            case "Groq" -> List.of("llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768");
+            case "DeepSeek" -> List.of("deepseek-chat", "deepseek-reasoner");
+            case "Mistral AI" -> List.of("mistral-small-latest", "mistral-large-latest", "codestral-latest");
+            case "OpenRouter" -> List.of("meta-llama/llama-3.3-70b-instruct", "google/gemini-flash-1.5", "openai/gpt-4o-mini");
+            case "Azure OpenAI" -> List.of("gpt-4o-mini", "gpt-4o");
+            case "Ollama" -> List.of("qwen2.5-coder:3b", "llama3.2:3b", "mistral:7b");
+            default -> List.of();
+        };
     }
 }
 

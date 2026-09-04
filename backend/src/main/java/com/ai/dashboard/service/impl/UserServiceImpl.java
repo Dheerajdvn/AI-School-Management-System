@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
         Set<String> targetRoles = (request.getRoles() != null && !request.getRoles().isEmpty()) ? request.getRoles() : Set.of("ROLE_SCHOOL_ADMIN");
         targetRoles.forEach(rn -> {
             Role role = roleRepository.findByName(rn)
-                    .orElseGet(() -> roleRepository.save(Role.builder().name(rn).build()));
+                    .orElseThrow(() -> new IllegalArgumentException("Unknown role: " + rn));
             roles.add(role);
         });
         u.setRoles(roles);
@@ -125,7 +125,7 @@ public class UserServiceImpl implements UserService {
             Set<Role> roles = new HashSet<>();
             request.getRoles().forEach(rn -> {
                 Role role = roleRepository.findByName(rn)
-                        .orElseGet(() -> roleRepository.save(Role.builder().name(rn).build()));
+                        .orElseThrow(() -> new IllegalArgumentException("Unknown role: " + rn));
                 roles.add(role);
             });
             u.setRoles(roles);

@@ -93,6 +93,16 @@ public class UserController {
             @Valid @RequestBody UpdateUserRequest request,
             Authentication authentication) {
         validateUserAccess(id, authentication);
+        // Privilege fields are admin-only. A non-admin may update their own profile, so silently
+        // discard any roles/enabled values they submit rather than rejecting the whole request.
+        // Admins keep full pass-through; role changes should otherwise go via POST /{id}/roles.
+        if (!isAdmin(authentication)) {
+            if (request.getRoles() != null || request.getEnabled() != null) {
+                log.warn("Non-admin user attempted to modify privilege fields on user {}; roles/enabled ignored", id);
+            }
+            request.setRoles(null);
+            request.setEnabled(null);
+        }
         return ApiResponse.success("User updated", userService.updateUser(id, request));
     }
 
@@ -209,13 +219,19 @@ public class UserController {
         return ApiResponse.success("Profile picture removed", updated);
     }
 
+    private boolean isAdmin(Authentication authentication) {
+        if (authentication == null) {
+            return false;
+        }
+        return authentication.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()) || "ROLE_SUPER_ADMIN".equals(a.getAuthority()));
+    }
+
     private void validateUserAccess(Long targetUserId, Authentication authentication) {
         if (authentication == null) {
             throw new AccessDeniedException("User not authenticated");
         }
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()) || "ROLE_SUPER_ADMIN".equals(a.getAuthority()));
-        if (isAdmin) {
+        if (isAdmin(authentication)) {
             return;
         }
         Long currentUserId = extractUserId(authentication);

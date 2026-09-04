@@ -42,10 +42,22 @@ public class AnthropicStrategy extends AbstractLlmProviderStrategy {
     }
 
     @Override
+    protected org.springframework.http.HttpHeaders buildHeaders(String apiKey) {
+        org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+        if (apiKey != null && !apiKey.isBlank()) {
+            headers.set("x-api-key", apiKey);
+        }
+        headers.set("anthropic-version", "2023-06-01");
+        return headers;
+    }
+
+    @Override
     public String generate(String apiKey, String baseUrl, String model, Double temperature, Integer maxTokens, String systemPrompt, String prompt) {
         WebClient client = buildClient(apiKey, baseUrl);
+        String modelName = (model != null && !model.isBlank()) ? model.trim() : "claude-3-5-sonnet-20241022";
+
         ObjectNode body = objectMapper.createObjectNode();
-        body.put("model", model);
+        body.put("model", modelName);
         ArrayNode messages = body.putArray("messages");
         messages.add(objectMapper.createObjectNode()
                 .put("role", "user")
@@ -59,13 +71,20 @@ public class AnthropicStrategy extends AbstractLlmProviderStrategy {
         try {
             String response = client.post()
                     .uri("/v1/messages")
-                    .header("anthropic-version", "2023-06-01")
                     .bodyValue(body)
                     .retrieve()
                     .bodyToMono(String.class)
                     .timeout(Duration.ofSeconds(60))
                     .block();
-            return extractResponseField(response, "content", 0, "text");
+            String text = extractResponseField(response, "content", 0, "text");
+            if (text == null || text.isBlank()) {
+                JsonNode root = objectMapper.readTree(response);
+                if (root.has("error")) {
+                    String errorMsg = root.path("error").path("message").asText("Unknown error from Anthropic");
+                    throw new RuntimeException(errorMsg);
+                }
+            }
+            return text;
         } catch (Exception e) {
             log.error("Anthropic generate failed: {}", e.getMessage());
             throw new RuntimeException("Failed to generate response from Anthropic: " + e.getMessage(), e);

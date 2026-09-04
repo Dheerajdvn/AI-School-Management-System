@@ -58,8 +58,8 @@ export default function HomePage() {
       <header className="sticky-top transition-all px-2 px-sm-3" style={{ top: 0, zIndex: 1000 }}>
         <div className="landing-floating-nav container-fluid d-flex align-items-center justify-content-between">
           <Link to="/" className="text-decoration-none fw-bold fs-5 landing-brand-link d-flex align-items-center gap-2 my-auto">
-            <div className="d-flex align-items-center justify-content-center rounded-3 px-2 py-1 brand-icon-badge" style={{ background: 'linear-gradient(135deg, #6D7CFF, #8B7CFF)', color: '#fff' }}>
-              <i className="bi bi-mortarboard-fill fs-5"></i>
+            <div class="d-flex align-items-center justify-content-center rounded-3 px-2 py-1 brand-icon-badge" style={{ background: 'linear-gradient(135deg, #8b5cf6, #c084fc)', color: '#fff' }}>
+              <i class="bi bi-mortarboard-fill fs-5"></i>
             </div>
             <span className="landing-brand-text">AI School OS</span>
           </Link>

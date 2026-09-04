@@ -20,6 +20,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -72,8 +74,7 @@ public class DocumentServiceImpl implements DocumentService {
             uploadedBy = userRepository.findById(userId).orElse(null);
         }
         if (uploadedBy == null) {
-            uploadedBy = userRepository.findAll().stream().findFirst()
-                    .orElseThrow(() -> new ResourceNotFoundException("No user found for document upload"));
+            throw new ResourceNotFoundException("Authenticated user not found for document upload");
         }
         Course course = null;
         if (request.getCourseId() != null) {
@@ -84,8 +85,15 @@ public class DocumentServiceImpl implements DocumentService {
         try {
             log.info("Step: Save physical file started");
             Files.createDirectories(storagePath);
-            String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            Path targetPath = storagePath.resolve(filename);
+            String rawOriginalFilename = file.getOriginalFilename();
+            String safeOriginalFilename = rawOriginalFilename != null
+                    ? Path.of(rawOriginalFilename).getFileName().toString()
+                    : "unknown";
+            String filename = UUID.randomUUID() + "_" + safeOriginalFilename;
+            Path targetPath = storagePath.resolve(filename).normalize();
+            if (!targetPath.startsWith(storagePath)) {
+                throw new IllegalArgumentException("Invalid file path / path traversal detected");
+            }
             Files.copy(file.getInputStream(), targetPath);
             log.info("Step: Save physical file completed");
 
@@ -101,7 +109,7 @@ public class DocumentServiceImpl implements DocumentService {
             log.info("Step: Save Document entity started");
             Document document = Document.builder()
                     .filename(filename)
-                    .originalFilename(file.getOriginalFilename())
+                    .originalFilename(safeOriginalFilename)
                     .contentType(file.getContentType())
                     .fileSize(file.getSize())
                     .uploadedBy(uploadedBy)
@@ -116,12 +124,27 @@ public class DocumentServiceImpl implements DocumentService {
             documentRepository.flush();
             log.info("Upload started: documentId={}", saved.getId());
 
-            // Trigger background processing asynchronously
-            try {
-                documentProcessingService.processDocumentAsync(saved.getId());
-                log.info("Async background processing triggered for documentId={}", saved.getId());
-            } catch (Exception e) {
-                log.error("Failed to trigger async processing for documentId={}: {}", saved.getId(), e.getMessage(), e);
+            // Trigger background processing asynchronously AFTER the current transaction commits
+            final Long docId = saved.getId();
+            if (TransactionSynchronizationManager.isSynchronizationActive()) {
+                TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        try {
+                            documentProcessingService.processDocumentAsync(docId);
+                            log.info("Async background processing triggered after commit for documentId={}", docId);
+                        } catch (Exception e) {
+                            log.error("Failed to trigger async processing after commit for documentId={}: {}", docId, e.getMessage(), e);
+                        }
+                    }
+                });
+            } else {
+                try {
+                    documentProcessingService.processDocumentAsync(docId);
+                    log.info("Async background processing triggered for documentId={}", docId);
+                } catch (Exception e) {
+                    log.error("Failed to trigger async processing for documentId={}: {}", docId, e.getMessage(), e);
+                }
             }
 
             DocumentResponse response = toResponse(saved);

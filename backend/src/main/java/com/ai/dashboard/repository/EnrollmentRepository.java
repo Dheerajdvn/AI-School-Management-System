@@ -42,7 +42,8 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long>, J
     @org.springframework.data.jpa.repository.Query(
         "SELECT COALESCE(c.title, c.courseCode), COUNT(e) " +
         "FROM Course c LEFT JOIN Enrollment e ON e.course.id = c.id " +
-        "GROUP BY c.id, c.title, c.courseCode"
+        "GROUP BY c.id, c.title, c.courseCode " +
+        "ORDER BY COUNT(e) DESC"
     )
     java.util.List<Object[]> countEnrollmentsGroupByCourse();
 

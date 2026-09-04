@@ -64,14 +64,16 @@ public class AzureOpenAIStrategy extends AbstractLlmProviderStrategy {
     @Override
     public String generate(String apiKey, String baseUrl, String model, Double temperature, Integer maxTokens, String systemPrompt, String prompt) {
         WebClient client = buildClient(apiKey, baseUrl);
-        String deployment = model != null ? model : "gpt-4o-mini";
+        String deployment = (model != null && !model.isBlank()) ? model.trim() : "gpt-4o-mini";
         String uri = "/openai/deployments/" + deployment + "/chat/completions?api-version=" + API_VERSION;
 
         ObjectNode body = objectMapper.createObjectNode();
         ArrayNode messages = body.putArray("messages");
-        messages.add(objectMapper.createObjectNode()
-                .put("role", "system")
-                .put("content", systemPrompt != null ? systemPrompt : ""));
+        if (systemPrompt != null && !systemPrompt.isBlank()) {
+            messages.add(objectMapper.createObjectNode()
+                    .put("role", "system")
+                    .put("content", systemPrompt));
+        }
         messages.add(objectMapper.createObjectNode()
                 .put("role", "user")
                 .put("content", prompt));
@@ -86,7 +88,15 @@ public class AzureOpenAIStrategy extends AbstractLlmProviderStrategy {
                     .bodyToMono(String.class)
                     .timeout(Duration.ofSeconds(60))
                     .block();
-            return extractResponseField(response, "choices", 0, "message", "content");
+            String text = extractResponseField(response, "choices", 0, "message", "content");
+            if (text == null || text.isBlank()) {
+                JsonNode root = objectMapper.readTree(response);
+                if (root.has("error")) {
+                    String errorMsg = root.path("error").path("message").asText("Unknown error from Azure OpenAI");
+                    throw new RuntimeException(errorMsg);
+                }
+            }
+            return text;
         } catch (Exception e) {
             log.error("Azure OpenAI generate failed: {}", e.getMessage());
             throw new RuntimeException("Failed to generate response from Azure OpenAI: " + e.getMessage(), e);

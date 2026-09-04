@@ -32,8 +32,8 @@ public abstract class AbstractLlmProviderStrategy implements LlmProviderStrategy
             .build();
 
     private static final HttpClient SHARED_HTTP_CLIENT = HttpClient.create(SHARED_CONNECTION_PROVIDER)
-            .option(io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS, 10_000)
-            .responseTimeout(Duration.ofSeconds(30));
+            .option(io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS, 15_000)
+            .responseTimeout(Duration.ofSeconds(120));
 
     protected final ObjectMapper objectMapper;
 

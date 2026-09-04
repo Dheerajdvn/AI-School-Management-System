@@ -221,15 +221,21 @@
                             <goal>check</goal>
                         </goals>
                         <configuration>
+                            <!-- haltOnFailure is false, so this rule only warns; it is a ratchet marker,
+                                 not a gate. Flipping it to true is a separate CI decision. -->
                             <haltOnFailure>false</haltOnFailure>
                             <rules>
                                 <rule>
                                     <element>BUNDLE</element>
                                     <limits>
                                         <limit>
+                                            <!-- Actual instruction coverage is 25.4% as of the
+                                                 authorization + context-smoke test additions. The floor sits
+                                                 a few points below that so ordinary refactoring does not
+                                                 trip it; raise it when coverage genuinely climbs. -->
                                             <counter>INSTRUCTION</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.15</minimum>
+                                            <minimum>0.22</minimum>
                                         </limit>
                                     </limits>
                                 </rule>

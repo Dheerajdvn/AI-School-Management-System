@@ -16,11 +16,17 @@ import java.util.Set;
 @Component
 public class SqlValidator {
 
-    private static final Set<String> ALLOWED_TABLES = Set.of(
-            "student", "courses", "assignments", "enrollments",
-            "submissions", "grade_history", "documents",
-            "document_contents", "document_chunks"
-    );
+    /**
+     * Tables the NL-to-SQL feature may read.
+     *
+     * <p>This is deliberately limited to the tables that {@code PromptTemplates.NL2SQL_SYSTEM}
+     * actually describes to the model. The {@code student} table is a standalone demo dataset and
+     * is not linked to the {@code users} table that holds real accounts, so the AI cannot reach
+     * registered users, credentials, or any of the operational school data. Widening this set means
+     * widening what a prompt-injected query can read — only add a table here once the system prompt
+     * describes it and the data in it is safe for any authenticated caller to aggregate.</p>
+     */
+    private static final Set<String> ALLOWED_TABLES = Set.of("student");
 
     private static final Set<String> FORBIDDEN_COLUMNS = Set.of(
             "password", "password_hash", "api_key", "secret", "token", "refresh_token"

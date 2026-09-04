@@ -36,8 +36,7 @@ public class ChatMessage {
     @Column(nullable = false, length = 20)
     private Role role;
 
-    @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
     @Column(name = "token_count")
@@ -47,7 +46,7 @@ public class ChatMessage {
     @CreatedDate
     private LocalDateTime createdAt;
 
-    @Column(name = "context_used", length = 2000)
+    @Column(name = "context_used", columnDefinition = "TEXT")
     private String contextUsed;
 
     /**

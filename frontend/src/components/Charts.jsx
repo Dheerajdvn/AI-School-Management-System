@@ -50,7 +50,8 @@ const getBaseOptions = (title, onClick, isDark) => ({
       beginAtZero: true,
       ticks: {
         color: isDark ? '#94a3b8' : '#475569',
-        font: { size: 11 }
+        font: { size: 11 },
+        precision: 0,
       },
       grid: {
         color: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'
@@ -95,22 +96,72 @@ export function BarChart({ title, labels, values, onClick }) {
       labels,
       datasets: [
         {
-          label: title || 'Data',
+          label: title || 'Count',
           data: values,
-          backgroundColor: labels.map((_, i) => hexToRgba(PALETTE[i % PALETTE.length], isDark ? 0.45 : 0.65)),
+          backgroundColor: labels.map((_, i) => hexToRgba(PALETTE[i % PALETTE.length], isDark ? 0.65 : 0.75)),
           borderColor: labels.map((_, i) => PALETTE[i % PALETTE.length]),
           borderWidth: 1.5,
-          borderRadius: 6,
+          borderRadius: 8,
           borderSkipped: false,
+          maxBarThickness: 42,
         },
       ],
     }),
     [labels, values, title, isDark],
   )
 
+  const options = useMemo(() => {
+    const base = getBaseOptions(title, onClick, isDark)
+    return {
+      ...base,
+      scales: {
+        ...base.scales,
+        x: {
+          ...base.scales.x,
+          ticks: {
+            ...base.scales.x.ticks,
+            maxRotation: 28,
+            minRotation: 0,
+            autoSkip: false,
+            callback: function(val) {
+              const raw = this.getLabelForValue(val) || ''
+              return raw.length > 18 ? raw.slice(0, 16) + '…' : raw
+            }
+          }
+        },
+        y: {
+          ...base.scales.y,
+          grid: {
+            ...base.scales.y.grid,
+            borderDash: [3, 3],
+          },
+          ticks: {
+            ...base.scales.y.ticks,
+            stepSize: 5,
+          }
+        }
+      },
+      plugins: {
+        ...base.plugins,
+        tooltip: {
+          ...base.plugins.tooltip,
+          callbacks: {
+            title: function(context) {
+              return labels[context[0].dataIndex] || context[0].label
+            },
+            label: function(context) {
+              const datasetLabel = context.dataset.label || 'Count'
+              return `  ${datasetLabel}: ${context.parsed.y}`
+            }
+          }
+        }
+      }
+    }
+  }, [title, onClick, isDark, labels])
+
   return (
-    <div style={{ height: 300, cursor: onClick ? 'pointer' : 'default' }}>
-      <Bar data={data} options={getBaseOptions(title, onClick, isDark)} />
+    <div style={{ height: '100%', minHeight: 220, cursor: onClick ? 'pointer' : 'default' }}>
+      <Bar data={data} options={options} />
     </div>
   )
 }
@@ -189,9 +240,29 @@ export function LineChart({ title, labels, values, onClick }) {
     [labels, values, title, isDark],
   )
 
+  const options = useMemo(() => {
+    const base = getBaseOptions(title, onClick, isDark)
+    const maxVal = Math.max(...(values && values.length > 0 ? values : [0]), 0)
+    return {
+      ...base,
+      scales: {
+        ...base.scales,
+        y: {
+          ...base.scales?.y,
+          beginAtZero: true,
+          suggestedMax: maxVal === 0 ? 5 : undefined,
+          ticks: {
+            ...base.scales?.y?.ticks,
+            precision: 0,
+          }
+        }
+      }
+    }
+  }, [title, onClick, isDark, values])
+
   return (
     <div style={{ height: 300, cursor: onClick ? 'pointer' : 'default' }}>
-      <Line data={data} options={getBaseOptions(title, onClick, isDark)} />
+      <Line data={data} options={options} />
     </div>
   )
 }

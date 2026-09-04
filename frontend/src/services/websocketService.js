@@ -1,5 +1,6 @@
 import { Client } from '@stomp/stompjs'
 import SockJS from 'sockjs-client'
+import { tokenStore } from '../api/tokenStore'
 
 let stompClient = null
 let reconnectAttempts = 0
@@ -36,7 +37,9 @@ export const websocketService = {
       stompClient = null
     }
 
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token')
+    // Read through tokenStore: this used to check sessionStorage under the wrong key ('token'
+    // instead of 'session_token'), so session-only logins connected unauthenticated.
+    const token = tokenStore.getToken()
     const wsUrl = getWsUrl()
 
     stompClient = new Client({

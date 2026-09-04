@@ -42,7 +42,7 @@ public class DocumentController {
     private final DocumentContentRepository documentContentRepository;
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
     @Operation(summary = "Upload a document")
     public ApiResponse<DocumentResponse> upload(
             @RequestParam("file") MultipartFile file,
@@ -67,7 +67,7 @@ public class DocumentController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     @Operation(summary = "Get all documents")
     public ApiResponse<PagedResponse<DocumentResponse>> getAll(
             Pageable pageable,
@@ -90,7 +90,7 @@ public class DocumentController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     @Operation(summary = "Get document by ID")
     public ApiResponse<DocumentResponse> getById(
             @PathVariable Long id,
@@ -103,7 +103,7 @@ public class DocumentController {
     }
 
     @GetMapping("/{id}/download")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     @Operation(summary = "Download a document")
     public ResponseEntity<Resource> download(
             @PathVariable Long id,
@@ -120,7 +120,7 @@ public class DocumentController {
     }
 
     @GetMapping("/{id}/content")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     @Operation(summary = "Get extracted text/content for a document")
     public ApiResponse<DocumentContentResponse> getContent(
             @PathVariable Long id,
@@ -141,7 +141,7 @@ public class DocumentController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TEACHER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_TEACHER')")
     @Operation(summary = "Delete a document")
     public ApiResponse<Void> delete(
             @PathVariable Long id,

@@ -15,12 +15,16 @@ let refreshPromise = null
 
 const refreshAccessToken = async () => {
   const refreshToken = tokenStore.getRefreshToken()
+  if (!refreshToken) {
+    return null
+  }
   const response = await axios.post(`${API_BASE_URL}/auth/refresh`, { refreshToken }, {
     timeout: API_TIMEOUT_MS,
     withCredentials: true,
   })
   const payload = response.data?.data || response.data
   const expiry = resolveTokenExpiry(payload)
+  // rememberMe defaults to the stored preference, so a session-only login stays session-only.
   tokenStore.setToken(payload.token, expiry)
   return payload.token
 }
@@ -41,12 +45,20 @@ httpClient.interceptors.request.use(
   (error) => Promise.reject(error)
 )
 
+// Requests that must never trigger a refresh-then-redirect cycle: logging in, probing the current
+// session, and the AI health poll all legitimately answer 401 while the user is on /login.
+const NO_REDIRECT_PATHS = ['/auth/login', '/auth/refresh', '/auth/me', '/ai/health']
+const isExcluded = (url = '') => NO_REDIRECT_PATHS.some((path) => url.includes(path))
+
+// Only 401 is handled here. A 403 means authenticated-but-not-permitted, so it is passed through for
+// RoleProtectedRoute / the calling page to surface — logging the user out would hide the real problem.
 httpClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config
+    const requestUrl = originalRequest?.url || ''
 
-    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry && !isExcluded(requestUrl)) {
       originalRequest._retry = true
 
       try {
@@ -65,9 +77,8 @@ httpClient.interceptors.response.use(
         tokenStore.clear()
       }
 
-      const requestUrl = originalRequest?.url || ''
-      if (window.location.pathname !== '/login' && !requestUrl.includes('/ai/health')) {
-        window.location.href = '/login'
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login?expired=true'
       }
     }
 

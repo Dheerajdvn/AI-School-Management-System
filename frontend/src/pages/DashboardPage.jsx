@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import StatCard from '../components/StatCard'
 import DashboardSkeleton from '../components/DashboardSkeleton'
 import RecentActivity from '../components/RecentActivity'
@@ -21,6 +21,14 @@ export default function DashboardPage() {
   const [recentDocuments, setRecentDocuments] = useState([])
   const [recentStudents, setRecentStudents] = useState([])
   const [selectedMetric, setSelectedMetric] = useState(null)
+  const [courseLimit, setCourseLimit] = useState(8)
+
+  const displayCourses = useMemo(() => {
+    if (!byCourse || !byCourse.length) return []
+    return [...byCourse]
+      .sort((a, b) => (b.count || b.value || 0) - (a.count || a.value || 0))
+      .slice(0, courseLimit)
+  }, [byCourse, courseLimit])
 
   useEffect(() => {
     let mounted = true
@@ -80,7 +88,7 @@ export default function DashboardPage() {
   return (
     <div className="dashboard-page animate-fade">
       {/* Sleek Top Header & Quick Action Bar */}
-      <div className="card p-3.5 mb-3 border shadow-xs bg-card">
+      <div className="card p-3.5 mb-3 border shadow-xs bg-card position-relative" style={{ zIndex: 1050 }}>
         <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
           <div>
             <div className="d-flex align-items-center gap-2 mb-1">
@@ -115,7 +123,7 @@ export default function DashboardPage() {
               >
                 <i className="bi bi-lightning-charge-fill me-1 text-warning" /> Quick Actions
               </button>
-              <ul className="dropdown-menu dropdown-menu-end shadow border p-1" aria-labelledby="quickActionsDropdown" style={{ fontSize: '0.85rem' }}>
+              <ul className="dropdown-menu dropdown-menu-end shadow border p-1" aria-labelledby="quickActionsDropdown" style={{ fontSize: '0.85rem', zIndex: 1060 }}>
                 <li>
                   <button className="dropdown-item py-2 rounded-2" onClick={() => navigate('/admin/students')}>
                     <i className="bi bi-person-plus me-2 text-primary" /> Add Student
@@ -193,12 +201,37 @@ export default function DashboardPage() {
           <div className="card h-100 p-2">
             <div className="card-body p-0">
               <div className="d-flex justify-content-between align-items-center mb-2">
-                <h5 className="card-title fw-bold mb-0" style={{ fontSize: '13px' }}>Student Enrollment by Course</h5>
-                <span className="badge bg-light text-muted border" style={{ fontSize: '10px' }}>Live Data</span>
+                <div className="d-flex align-items-center gap-2">
+                  <h5 className="card-title fw-bold mb-0" style={{ fontSize: '13px' }}>Top Courses by Enrollment</h5>
+                  <span className="badge bg-primary-subtle text-primary border-0 rounded-pill px-2 py-0.5" style={{ fontSize: '10px' }}>
+                    Top {courseLimit}
+                  </span>
+                </div>
+                <div className="d-flex align-items-center gap-1">
+                  <div className="btn-group btn-group-sm" role="group" aria-label="Course Limit">
+                    {[6, 8, 12].map((lim) => (
+                      <button
+                        key={lim}
+                        type="button"
+                        className={`btn py-0 px-2 ${courseLimit === lim ? 'btn-primary' : 'btn-outline-secondary'}`}
+                        style={{ fontSize: '10px', height: '22px', lineHeight: '20px' }}
+                        onClick={() => setCourseLimit(lim)}
+                      >
+                        Top {lim}
+                      </button>
+                    ))}
+                  </div>
+                  <span className="badge bg-light text-muted border ms-1" style={{ fontSize: '10px' }}>Live Data</span>
+                </div>
               </div>
-              {byCourse && byCourse.length > 0 ? (
+              {displayCourses && displayCourses.length > 0 ? (
                 <div style={{ height: '240px' }}>
-                  <Chart type="bar" labels={byCourse.map((b) => b.courseName || b.label)} values={byCourse.map((b) => b.count || b.value)} onClick={(item) => handleChartClick('Course Enrollment', item)} />
+                  <Chart
+                    type="bar"
+                    labels={displayCourses.map((b) => b.courseName || b.label)}
+                    values={displayCourses.map((b) => b.count || b.value)}
+                    onClick={(item) => handleChartClick('Course Enrollment', item)}
+                  />
                 </div>
               ) : (
                 <div className="text-muted py-4 text-center" style={{ fontSize: '12px' }}>No enrollment data available</div>

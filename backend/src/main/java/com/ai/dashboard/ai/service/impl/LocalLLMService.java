@@ -51,6 +51,13 @@ public class LocalLLMService implements AIService {
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
             String username = auth.getName();
             var configOpt = configRepository.findByUserUsernameOrUserEmail(username, username);
+            if (configOpt.isEmpty()) {
+                var userOpt = userRepository.findByUsername(username)
+                        .or(() -> userRepository.findByEmail(username));
+                if (userOpt.isPresent()) {
+                    configOpt = configRepository.findByUserId(userOpt.get().getId());
+                }
+            }
             if (configOpt.isPresent()) {
                 UserAiConfig config = configOpt.get();
                 String providerName = config.getProvider();
@@ -81,25 +88,85 @@ public class LocalLLMService implements AIService {
             }
 
             GenerationContext ctx = resolveGenerationContext();
-            String response;
-            String modelName;
 
+            // If a custom provider (e.g. Google Gemini, OpenAI, Groq) is configured, invoke it directly.
+            // Do not silently mask provider failures with dummy database mock answers.
             if (ctx != null) {
                 UserAiConfig cfg = ctx.config();
-                modelName = cfg.getModel();
+                String modelName = (cfg.getModel() != null && !cfg.getModel().isBlank()) ? cfg.getModel() : "default";
                 log.info("Generating chat response using provider: {}, model: {}", cfg.getProvider(), modelName);
-                response = ctx.strategy().generate(
-                        cfg.getApiKey(),
-                        cfg.getBaseUrl(),
-                        modelName,
-                        cfg.getTemperature(),
-                        cfg.getMaxTokens(),
-                        "You are a helpful AI assistant in an AI School Management System.",
-                        sanitizedMessage
-                );
-            } else {
+                try {
+                    String response = ctx.strategy().generate(
+                            cfg.getApiKey(),
+                            cfg.getBaseUrl(),
+                            cfg.getModel(),
+                            cfg.getTemperature(),
+                            cfg.getMaxTokens(),
+                            "You are a helpful AI assistant in an AI School Management System.",
+                            sanitizedMessage
+                    );
+                    long responseTime = System.currentTimeMillis() - startTime;
+                    log.info("Chat completed via provider {}, responseTime={}ms", cfg.getProvider(), responseTime);
+                    return ChatResponse.builder()
+                            .answer(response)
+                            .sources(List.of())
+                            .responseTime(responseTime)
+                            .model(cfg.getProvider() + " (" + modelName + ")")
+                            .build();
+                } catch (Exception e) {
+                    long responseTime = System.currentTimeMillis() - startTime;
+                    log.error("AI provider {} failed: {}", cfg.getProvider(), e.getMessage(), e);
+                    return ChatResponse.builder()
+                            .answer("AI Provider Error (" + cfg.getProvider() + "): " + e.getMessage() + ". Please check your API key and connection settings.")
+                            .sources(List.of())
+                            .responseTime(responseTime)
+                            .model(cfg.getProvider() + "-Error")
+                            .build();
+                }
+            }
+
+            // No custom provider configured -> default to local Ollama
+            String response;
+            String modelName;
+            try {
                 response = llmProvider.generate(sanitizedMessage);
                 modelName = llmProvider.getProviderName();
+            } catch (Exception e) {
+                // If local Ollama is offline or unconfigured, fall back to offline database/rule assistant
+                log.warn("Local LLM provider unavailable, falling back to local dataset assistance: {}", e.getMessage());
+                long responseTime = System.currentTimeMillis() - startTime;
+                String msg = request.getMessage() != null ? request.getMessage().toLowerCase() : "";
+                String dbAnswer = getDatabaseAnswer(msg);
+                if (dbAnswer != null) {
+                    return ChatResponse.builder()
+                            .answer(dbAnswer)
+                            .sources(List.of())
+                            .responseTime(responseTime)
+                            .model("EduAI-DB-Assistant")
+                            .build();
+                }
+                String answer;
+                if (msg.contains("student feature") || (msg.contains("student") && msg.contains("feature"))) {
+                    answer = "Student features include: Course enrollment, AI-powered Homework Helper & AI Tutor, assignment submissions, quiz practice, real-time attendance tracking, and grade viewing.";
+                } else if (msg.contains("teacher feature") || (msg.contains("teacher") && msg.contains("feature"))) {
+                    answer = "Teacher features include: Course and curriculum creation, assignment publishing and grading, student analytics monitoring, attendance management, and study material uploads.";
+                } else if (msg.contains("course") || msg.contains("assignment") || msg.contains("courses & assignments")) {
+                    answer = "Courses & Assignments allow teachers to publish structured course materials and assignments, while students can browse enrolled courses, complete homework with AI assistance, and submit their work for grading.";
+                } else if (msg.contains("student") || msg.contains("user") || msg.contains("enrollment")) {
+                    long totalStudents = studentRepository.count();
+                    long totalUsers = userRepository.count();
+                    answer = String.format("Platform analytics show %d total users, %d students, and active course enrollments across multiple departments.", totalUsers, totalStudents);
+                } else if (msg.contains("document") || msg.contains("upload")) {
+                    answer = "There are 100+ documents uploaded in the Knowledge Center with RAG-powered search enabled.";
+                } else {
+                    answer = "Hello! I am your AI School Management Assistant. Local Ollama is offline. To enable full AI chat capabilities, please configure an AI Provider (such as Google Gemini, OpenAI, or Groq) in Settings > AI Intelligence.";
+                }
+                return ChatResponse.builder()
+                        .answer(answer)
+                        .sources(List.of())
+                        .responseTime(responseTime)
+                        .model("EduAI-Offline-Assistant")
+                        .build();
             }
 
             long responseTime = System.currentTimeMillis() - startTime;
@@ -112,59 +179,22 @@ public class LocalLLMService implements AIService {
                     .model(modelName)
                     .build();
         } catch (AIException e) {
-            log.warn("AI service error, attempting DB fallback, errorType={}", e.getErrorType());
-            String msg = request.getMessage() != null ? request.getMessage().toLowerCase() : "";
-            String dbAnswer = getDatabaseAnswer(msg);
-            if (dbAnswer != null) {
-                long responseTime = System.currentTimeMillis() - startTime;
-                return ChatResponse.builder()
-                        .answer(dbAnswer)
-                        .sources(List.of())
-                        .responseTime(responseTime)
-                        .model("EduAI-DB-Assistant")
-                        .build();
-            }
+            log.warn("AI service error, errorType={}", e.getErrorType());
             long responseTime = System.currentTimeMillis() - startTime;
             return ChatResponse.builder()
-                    .answer("AI Service Error: " + e.getMessage() + ". Please check your configuration.")
+                    .answer("AI Service Error: " + e.getMessage())
                     .sources(List.of())
                     .responseTime(responseTime)
                     .model("Error-Assistant")
                     .build();
         } catch (Exception e) {
-            log.warn("LLM service unavailable or failed, checking database: {}", e.getMessage());
+            log.error("Unexpected error in chat: {}", e.getMessage(), e);
             long responseTime = System.currentTimeMillis() - startTime;
-            String msg = request.getMessage() != null ? request.getMessage().toLowerCase() : "";
-            String dbAnswer = getDatabaseAnswer(msg);
-            if (dbAnswer != null) {
-                return ChatResponse.builder()
-                        .answer(dbAnswer)
-                        .sources(List.of())
-                        .responseTime(responseTime)
-                        .model("EduAI-DB-Assistant")
-                        .build();
-            }
-            String answer;
-            if (msg.contains("student feature") || (msg.contains("student") && msg.contains("feature"))) {
-                answer = "Student features include: Course enrollment, AI-powered Homework Helper & AI Tutor, assignment submissions, quiz practice, real-time attendance tracking, and grade viewing.";
-            } else if (msg.contains("teacher feature") || (msg.contains("teacher") && msg.contains("feature"))) {
-                answer = "Teacher features include: Course and curriculum creation, assignment publishing and grading, student analytics monitoring, attendance management, and study material uploads.";
-            } else if (msg.contains("course") || msg.contains("assignment") || msg.contains("courses & assignments")) {
-                answer = "Courses & Assignments allow teachers to publish structured course materials and assignments, while students can browse enrolled courses, complete homework with AI assistance, and submit their work for grading.";
-            } else if (msg.contains("student") || msg.contains("user") || msg.contains("enrollment")) {
-                long totalStudents = studentRepository.count();
-                long totalUsers = userRepository.count();
-                answer = String.format("Platform analytics show %d total users, %d students, and active course enrollments across multiple departments.", totalUsers, totalStudents);
-            } else if (msg.contains("document") || msg.contains("upload")) {
-                answer = "There are 100+ documents uploaded in the Knowledge Center with RAG-powered search enabled.";
-            } else {
-                answer = "Hello! I am your AI School Management Assistant. I can help you with student/teacher features, course details, assignments, analytics, and platform metrics. How can I assist you today?";
-            }
             return ChatResponse.builder()
-                    .answer(answer)
+                    .answer("AI Chat Error: " + e.getMessage())
                     .sources(List.of())
                     .responseTime(responseTime)
-                    .model("EduAI-Smart-Assistant")
+                    .model("Error-Assistant")
                     .build();
         }
     }
@@ -227,16 +257,21 @@ public class LocalLLMService implements AIService {
 
             if (ctx != null) {
                 UserAiConfig cfg = ctx.config();
-                modelName = cfg.getModel();
+                modelName = (cfg.getModel() != null && !cfg.getModel().isBlank()) ? cfg.getModel() : "default";
                 log.info("Generating streaming chat response using provider: {}, model: {}", cfg.getProvider(), modelName);
-                stream = ctx.strategy().stream(
-                        cfg.getApiKey(),
-                        cfg.getBaseUrl(),
-                        modelName,
-                        cfg.getTemperature(),
-                        cfg.getMaxTokens(),
-                        sanitizedMessage
-                );
+                try {
+                    stream = ctx.strategy().stream(
+                            cfg.getApiKey(),
+                            cfg.getBaseUrl(),
+                            cfg.getModel(),
+                            cfg.getTemperature(),
+                            cfg.getMaxTokens(),
+                            sanitizedMessage
+                    );
+                } catch (Exception e) {
+                    log.error("Streaming for provider {} failed: {}", cfg.getProvider(), e.getMessage(), e);
+                    return Stream.of("AI Provider Error (" + cfg.getProvider() + "): " + e.getMessage());
+                }
             } else {
                 stream = llmProvider.stream(sanitizedMessage);
                 modelName = llmProvider.getProviderName();

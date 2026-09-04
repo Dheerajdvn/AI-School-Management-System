@@ -60,7 +60,10 @@ public class KnowledgeDashboardServiceImpl implements KnowledgeDashboardService 
         List<Object[]> rawUploads = documentRepository.countUploadsPerDaySince(sevenDaysAgo);
         for (Object[] row : rawUploads) {
             if (row[0] != null && row[1] != null) {
-                String dateStr = row[0].toString();
+                String dateStr = row[0].toString().trim();
+                if (dateStr.length() > 10) {
+                    dateStr = dateStr.substring(0, 10);
+                }
                 Long count = ((Number) row[1]).longValue();
                 if (last7DaysMap.containsKey(dateStr)) {
                     last7DaysMap.put(dateStr, count);

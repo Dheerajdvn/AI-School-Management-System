@@ -119,6 +119,16 @@ const ROLE_SCHOOL_ADMIN = 'ROLE_SCHOOL_ADMIN'
 const ROLE_TEACHER = 'ROLE_TEACHER'
 const ROLE_STUDENT = 'ROLE_STUDENT'
 
+// ROLE_SUPER_ADMIN is omitted from these sets because RoleProtectedRoute always lets it through.
+// Documents and assignments mirror the @PreAuthorize sets on DocumentController/AssignmentController,
+// so the route guard denies the same roles the API would reject.
+const DOCUMENT_ROLES = [ROLE_ADMIN, ROLE_TEACHER, ROLE_STUDENT]
+const ASSIGNMENT_ROLES = [ROLE_ADMIN, ROLE_TEACHER, ROLE_STUDENT]
+// The exam module has no backend yet, so these sets are the only thing separating authoring from
+// taking. Keep authoring staff-only.
+const EXAM_STAFF_ROLES = [ROLE_ADMIN, ROLE_PRINCIPAL, ROLE_SCHOOL_ADMIN, ROLE_TEACHER]
+const EXAM_VIEWER_ROLES = [...EXAM_STAFF_ROLES, ROLE_STUDENT]
+
 /**
  * Role-based sidebar component that displays navigation based on user role
  */
@@ -652,11 +662,13 @@ function AppRoutes() {
           path="/documents"
           element={
             <ProtectedRoute>
-              <ProtectedLayout>
-                <Suspense fallback={<LoadingIndicator message="Loading..." />}>
-                  <DocumentPage />
-                </Suspense>
-              </ProtectedLayout>
+              <RoleProtectedRoute requiredRoles={DOCUMENT_ROLES}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <DocumentPage />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
             </ProtectedRoute>
           }
         />
@@ -1335,11 +1347,13 @@ function AppRoutes() {
           path="/assignments"
           element={
             <ProtectedRoute>
-              <ProtectedLayout>
-                <Suspense fallback={<LoadingIndicator message="Loading..." />}>
-                  <AssignmentPage />
-                </Suspense>
-              </ProtectedLayout>
+              <RoleProtectedRoute requiredRoles={ASSIGNMENT_ROLES}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <AssignmentPage />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
             </ProtectedRoute>
           }
         />
@@ -1401,11 +1415,13 @@ function AppRoutes() {
           path="/exam"
           element={
             <ProtectedRoute>
-              <ProtectedLayout>
-                <Suspense fallback={<LoadingIndicator message="Loading..." />}>
-                  <ExamDashboard />
-                </Suspense>
-              </ProtectedLayout>
+              <RoleProtectedRoute requiredRoles={EXAM_VIEWER_ROLES}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <ExamDashboard />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
             </ProtectedRoute>
           }
         />
@@ -1413,11 +1429,13 @@ function AppRoutes() {
           path="/exam/create"
           element={
             <ProtectedRoute>
-              <ProtectedLayout>
-                <Suspense fallback={<LoadingIndicator message="Loading..." />}>
-                  <CreateExam />
-                </Suspense>
-              </ProtectedLayout>
+              <RoleProtectedRoute requiredRoles={EXAM_STAFF_ROLES}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <CreateExam />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
             </ProtectedRoute>
           }
         />
@@ -1425,11 +1443,13 @@ function AppRoutes() {
           path="/exam/manage"
           element={
             <ProtectedRoute>
-              <ProtectedLayout>
-                <Suspense fallback={<LoadingIndicator message="Loading..." />}>
-                  <ManageExams />
-                </Suspense>
-              </ProtectedLayout>
+              <RoleProtectedRoute requiredRoles={EXAM_STAFF_ROLES}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <ManageExams />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
             </ProtectedRoute>
           }
         />
@@ -1437,11 +1457,13 @@ function AppRoutes() {
           path="/exam/results"
           element={
             <ProtectedRoute>
-              <ProtectedLayout>
-                <Suspense fallback={<LoadingIndicator message="Loading..." />}>
-                  <ViewResults />
-                </Suspense>
-              </ProtectedLayout>
+              <RoleProtectedRoute requiredRoles={EXAM_STAFF_ROLES}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <ViewResults />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
             </ProtectedRoute>
           }
         />
@@ -1449,11 +1471,13 @@ function AppRoutes() {
           path="/exam/analytics"
           element={
             <ProtectedRoute>
-              <ProtectedLayout>
-                <Suspense fallback={<LoadingIndicator message="Loading..." />}>
-                  <ExamAnalytics />
-                </Suspense>
-              </ProtectedLayout>
+              <RoleProtectedRoute requiredRoles={EXAM_STAFF_ROLES}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <ExamAnalytics />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
             </ProtectedRoute>
           }
         />
@@ -1461,11 +1485,13 @@ function AppRoutes() {
           path="/exam/upcoming"
           element={
             <ProtectedRoute>
-              <ProtectedLayout>
-                <Suspense fallback={<LoadingIndicator message="Loading..." />}>
-                  <UpcomingExams />
-                </Suspense>
-              </ProtectedLayout>
+              <RoleProtectedRoute requiredRoles={EXAM_VIEWER_ROLES}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <UpcomingExams />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
             </ProtectedRoute>
           }
         />
@@ -1473,11 +1499,13 @@ function AppRoutes() {
           path="/exam/my-results"
           element={
             <ProtectedRoute>
-              <ProtectedLayout>
-                <Suspense fallback={<LoadingIndicator message="Loading..." />}>
-                  <MyResults />
-                </Suspense>
-              </ProtectedLayout>
+              <RoleProtectedRoute requiredRoles={EXAM_VIEWER_ROLES}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <MyResults />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
             </ProtectedRoute>
           }
         />
@@ -1485,11 +1513,13 @@ function AppRoutes() {
           path="/exam/practice"
           element={
             <ProtectedRoute>
-              <ProtectedLayout>
-                <Suspense fallback={<LoadingIndicator message="Loading..." />}>
-                  <PracticeTests />
-                </Suspense>
-              </ProtectedLayout>
+              <RoleProtectedRoute requiredRoles={EXAM_VIEWER_ROLES}>
+                <ProtectedLayout>
+                  <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+                    <PracticeTests />
+                  </Suspense>
+                </ProtectedLayout>
+              </RoleProtectedRoute>
             </ProtectedRoute>
           }
         />
