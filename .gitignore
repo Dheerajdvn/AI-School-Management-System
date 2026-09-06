@@ -56,3 +56,8 @@ dev-dashboard.html
 frontend/public/dev-dashboard.html
 start-dev.bat
 stop-listener.ps1
+
+# Interview & private prep guides
+*interview*.md
+*Interview*.md
+AI_INTERVIEW_MASTER_GUIDE.md
