@@ -89,8 +89,8 @@ export default function SchoolDashboard() {
       </div>
 
       {/* Stats Cards Grid */}
-      <div className="row g-3 mb-4.5">
-        <div className="col-md-3 col-sm-6">
+      <div className="row g-2 g-md-3 mb-4">
+        <div className="col-6 col-md-3">
           <div className="stat-card shadow-xs">
             <div className="stat-icon">
               <i className="bi bi-people-fill text-primary" />
@@ -102,7 +102,7 @@ export default function SchoolDashboard() {
             </div>
           </div>
         </div>
-        <div className="col-md-3 col-sm-6">
+        <div className="col-6 col-md-3">
           <div className="stat-card shadow-xs">
             <div className="stat-icon">
               <i className="bi bi-person-badge-fill text-primary" />
@@ -114,7 +114,7 @@ export default function SchoolDashboard() {
             </div>
           </div>
         </div>
-        <div className="col-md-3 col-sm-6">
+        <div className="col-6 col-md-3">
           <div className="stat-card shadow-xs">
             <div className="stat-icon">
               <i className="bi bi-layers-fill text-primary" />
@@ -126,7 +126,7 @@ export default function SchoolDashboard() {
             </div>
           </div>
         </div>
-        <div className="col-md-3 col-sm-6">
+        <div className="col-6 col-md-3">
           <div className="stat-card shadow-xs">
             <div className="stat-icon">
               <i className="bi bi-calendar-check-fill text-primary" />
@@ -138,7 +138,7 @@ export default function SchoolDashboard() {
             </div>
           </div>
         </div>
-        <div className="col-md-3 col-sm-6">
+        <div className="col-6 col-md-3">
           <div className="stat-card shadow-xs">
             <div className="stat-icon">
               <i className="bi bi-card-text text-primary" />
@@ -150,7 +150,7 @@ export default function SchoolDashboard() {
             </div>
           </div>
         </div>
-        <div className="col-md-3 col-sm-6">
+        <div className="col-6 col-md-3">
           <div className="stat-card shadow-xs">
             <div className="stat-icon">
               <i className="bi bi-robot text-primary" />
@@ -162,7 +162,7 @@ export default function SchoolDashboard() {
             </div>
           </div>
         </div>
-        <div className="col-md-3 col-sm-6">
+        <div className="col-6 col-md-3">
           <div className="stat-card shadow-xs">
             <div className="stat-icon">
               <i className="bi bi-hdd-stack-fill text-primary" />
@@ -174,7 +174,7 @@ export default function SchoolDashboard() {
             </div>
           </div>
         </div>
-        <div className="col-md-3 col-sm-6">
+        <div className="col-6 col-md-3">
           <div className="stat-card shadow-xs">
             <div className="stat-icon">
               <i className="bi bi-graph-up-arrow text-primary" />

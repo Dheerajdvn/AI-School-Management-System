@@ -1,43 +1,97 @@
-/* ========== Theme-Adaptive CSS Variables for Landing Page ========== */
+/* ========== Theme-Adaptive CSS Variables for Landing & Login Pages ========== */
 
 [data-theme="dark"] .home-page,
-body.dark-mode .home-page {
+[data-theme="dark"] .login-page,
+body.dark-mode .home-page,
+body.dark-mode .login-page {
+  --primary: #FFFFFF;
+  --primary-hover: #E4E4E7;
+  --primary-rgb: 255, 255, 255;
+  --accent: #FFFFFF;
   --home-bg: #000000;
-  --home-nav-bg: rgba(0, 0, 0, 0.8);
-  --home-card-bg: #0b0b0c;
-  --home-card-hover: #131315;
+  --home-nav-bg: rgba(10, 10, 12, 0.85);
+  --home-card-bg: rgba(13, 13, 16, 0.78);
+  --home-card-hover: rgba(20, 20, 26, 0.92);
   --home-footer-bg: #000000;
-  --home-text: #F8F8FA;
-  --home-heading: #F8F8FA;
-  --home-paragraph: #A8ADB8;
-  --home-muted: #707784;
-  --home-border: rgba(255, 255, 255, 0.08);
-  --home-border-hover: rgba(139, 92, 246, 0.2);
-  --home-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+  --home-text: #F4F4F5;
+  --home-heading: #FFFFFF;
+  --home-paragraph: #A1A1AA;
+  --home-muted: #71717A;
+  --home-border: rgba(255, 255, 255, 0.10);
+  --home-border-hover: rgba(255, 255, 255, 0.35);
+  --home-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+
+  /* Precise inner-box & element tokens */
+  --home-card-border-top: rgba(255, 255, 255, 0.22);
+  --home-card-border-bottom: rgba(255, 255, 255, 0.05);
+  --home-inner-bg: rgba(255, 255, 255, 0.035);
+  --home-inner-border: rgba(255, 255, 255, 0.09);
+  --home-track-bg: rgba(255, 255, 255, 0.15);
+
+  /* Synchronize universal tokens */
+  --text: #F4F4F5;
+  --muted: #71717A;
+  --border: rgba(255, 255, 255, 0.10);
+  --card: rgba(13, 13, 16, 0.78);
+  --surface: rgba(13, 13, 16, 0.78);
+  --hover: rgba(20, 20, 26, 0.92);
 }
 
 [data-theme="light"] .home-page,
-body.light-mode .home-page {
-  --home-bg: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 50%, #E2E8F0 100%);
+[data-theme="light"] .login-page,
+body.light-mode .home-page,
+body.light-mode .login-page {
+  --home-bg: #F8FAFC;
   --home-nav-bg: rgba(255, 255, 255, 0.88);
-  --home-card-bg: rgba(255, 255, 255, 0.88);
+  --home-card-bg: rgba(255, 255, 255, 0.92);
   --home-card-hover: #FFFFFF;
   --home-footer-bg: #F1F5F9;
   --home-text: #0F172A;
   --home-heading: #0F172A;
   --home-paragraph: #334155;
   --home-muted: #64748B;
-  --home-border: rgba(0, 0, 0, 0.08);
-  --home-border-hover: rgba(109, 124, 255, 0.3);
-  --home-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  --home-border: rgba(15, 23, 42, 0.09);
+  --home-border-hover: rgba(99, 102, 241, 0.35);
+  --home-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+
+  /* Precise inner-box & element tokens */
+  --home-card-border-top: rgba(255, 255, 255, 0.95);
+  --home-card-border-bottom: rgba(15, 23, 42, 0.06);
+  --home-inner-bg: rgba(15, 23, 42, 0.035);
+  --home-inner-border: rgba(15, 23, 42, 0.08);
+  --home-track-bg: rgba(15, 23, 42, 0.1);
+
+  /* Synchronize universal tokens */
+  --text: #0F172A;
+  --muted: #64748B;
+  --border: rgba(15, 23, 42, 0.09);
+  --card: rgba(255, 255, 255, 0.92);
+  --surface: rgba(255, 255, 255, 0.92);
+  --hover: #FFFFFF;
 }
 
-.home-page {
+.home-page,
+.login-page {
   position: relative;
   overflow-x: hidden;
-  background: var(--home-bg, linear-gradient(180deg, #09090B 0%, #0C0C0F 50%, #101014 100%));
-  color: var(--home-text, #F8F8FA);
+  background-color: var(--home-bg, #000000);
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% -8%, rgba(255, 255, 255, 0.05), transparent 70%),
+    radial-gradient(circle, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 100% 100%, 28px 28px;
+  color: var(--home-text, #F4F4F5);
   min-height: 100vh;
+}
+
+[data-theme="light"] .home-page,
+[data-theme="light"] .login-page,
+body.light-mode .home-page,
+body.light-mode .login-page {
+  background-color: #F8FAFC;
+  background-image: 
+    radial-gradient(ellipse 90% 55% at 50% -12%, rgba(99, 102, 241, 0.08), transparent 75%),
+    radial-gradient(circle, rgba(15, 23, 42, 0.045) 1px, transparent 1px);
+  background-size: 100% 100%, 28px 28px;
 }
 
 .landing-floating-nav {
@@ -88,12 +142,27 @@ body.light-mode .home-page {
 }
 
 .landing-hero-section {
-  padding-top: 48px !important;
-  padding-bottom: 36px !important;
-  min-height: min(720px, calc(78vh)) !important;
+  padding-top: 56px !important;
+  padding-bottom: 44px !important;
+  min-height: min(780px, calc(82vh)) !important;
   display: flex;
   align-items: center;
-  overflow: hidden;
+  overflow: visible;
+  position: relative;
+}
+
+.landing-hero-section::before {
+  content: "" !important;
+  position: absolute !important;
+  top: -80px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: min(1000px, 92vw) !important;
+  height: 520px !important;
+  background: radial-gradient(ellipse 65% 50% at 50% 12%, rgba(255, 255, 255, 0.09), transparent 70%) !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+  display: block !important;
 }
 
 @media (max-width: 576px) {
@@ -126,11 +195,11 @@ body.light-mode .home-page {
   transform: translateX(-50%) perspective(900px) rotateX(62deg);
   transform-origin: center bottom;
   background-image:
-    linear-gradient(rgba(var(--primary-rgb), 0.20) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(var(--primary-rgb), 0.18) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
   background-size: 42px 42px;
-  border: 1px solid rgba(var(--primary-rgb), 0.10);
-  opacity: 0.45;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  opacity: 0.35;
   animation: landingPlaneMove 16s linear infinite;
 }
 
@@ -138,9 +207,9 @@ body.light-mode .home-page {
   position: absolute;
   width: 56vw;
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(var(--primary-rgb), 0.50), transparent);
-  opacity: 0.35;
-  filter: drop-shadow(0 0 14px rgba(var(--primary-rgb), 0.25));
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  opacity: 0.25;
+  filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.15));
   animation: landingRibbonFloat 9s ease-in-out infinite alternate;
 }
 
@@ -276,38 +345,80 @@ body.light-mode .home-page {
   }
 }
 
-/* ========== Card Styling (Linear/Vercel AI SaaS Theme Adaptive) ========== */
+/* ========== Card Styling (Linear/Vercel Liquid Glass with Specular Edge Light) ========== */
 
 .landing-card {
-  border: 1px solid var(--home-border, rgba(255, 255, 255, 0.08)) !important;
-  background: var(--home-card-bg, rgba(20, 20, 24, 0.8)) !important;
-  backdrop-filter: blur(12px) !important;
-  border-radius: 16px !important;
-  box-shadow: var(--home-shadow, 0 15px 40px rgba(0, 0, 0, 0.35)) !important;
-  transition: all 0.3s ease !important;
-  will-change: transform;
+  border: 1px solid var(--home-border) !important;
+  border-top: 1px solid var(--home-card-border-top) !important;
+  border-bottom: 1px solid var(--home-card-border-bottom) !important;
+  background: var(--home-card-bg) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--home-shadow) !important;
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, box-shadow;
+  position: relative;
+  overflow: hidden;
+  color: var(--home-text);
 }
 
 .landing-card:hover {
-  transform: translateY(-4px) !important;
-  background: var(--home-card-hover, rgba(26, 26, 32, 0.85)) !important;
-  box-shadow: var(--home-shadow, 0 20px 50px rgba(0, 0, 0, 0.45)) !important;
-  border: 1px solid var(--home-border-hover, rgba(255, 255, 255, 0.16)) !important;
+  transform: translateY(-3px) !important;
+  background: var(--home-card-hover) !important;
+  box-shadow: var(--home-shadow), 0 0 0 1px var(--home-border-hover), 0 0 28px -4px rgba(255, 255, 255, 0.08) !important;
+  border-color: var(--home-border-hover) !important;
+  border-top-color: rgba(255, 255, 255, 0.45) !important;
 }
 
 .landing-card-static {
-  border: 1px solid var(--home-border, rgba(255, 255, 255, 0.08)) !important;
-  background: var(--home-card-bg, rgba(20, 20, 24, 0.8)) !important;
-  backdrop-filter: blur(12px) !important;
-  border-radius: 16px !important;
-  box-shadow: var(--home-shadow, 0 15px 40px rgba(0, 0, 0, 0.35)) !important;
-  transition: all 0.3s ease !important;
+  border: 1px solid var(--home-border) !important;
+  border-top: 1px solid var(--home-card-border-top) !important;
+  background: var(--home-card-bg) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--home-shadow) !important;
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  color: var(--home-text);
 }
 
 .landing-card-static:hover {
-  background: var(--home-card-hover, rgba(26, 26, 32, 0.85)) !important;
-  box-shadow: var(--home-shadow, 0 20px 50px rgba(0, 0, 0, 0.45)) !important;
-  border: 1px solid var(--home-border-hover, rgba(255, 255, 255, 0.16)) !important;
+  background: var(--home-card-hover) !important;
+  box-shadow: var(--home-shadow), 0 0 0 1px var(--home-border-hover) !important;
+  border-color: var(--home-border-hover) !important;
+}
+
+/* ========== Inner Sub-Cards & Mini Preview Boxes ========== */
+
+.landing-inner-box {
+  background: var(--home-inner-bg) !important;
+  border: 1px solid var(--home-inner-border) !important;
+  border-radius: 14px;
+  color: var(--home-text);
+  transition: all 0.2s ease;
+}
+
+.landing-inner-box:hover {
+  border-color: var(--home-border-hover) !important;
+  background: color-mix(in srgb, var(--home-inner-bg) 70%, var(--home-card-hover)) !important;
+}
+
+/* ========== Seamless Theme-Adaptive Table Resets ========== */
+
+.home-page .table {
+  --bs-table-bg: transparent !important;
+  --bs-table-accent-bg: transparent !important;
+  --bs-table-striped-bg: transparent !important;
+  --bs-table-hover-bg: transparent !important;
+  color: var(--home-text) !important;
+  border-color: var(--home-border) !important;
+}
+
+.home-page .table > :not(caption) > * > * {
+  background-color: transparent !important;
+  color: inherit !important;
+  border-color: var(--home-border) !important;
 }
 
 /* ========== Step Button Active Pulse ========== */
@@ -695,7 +806,7 @@ body.light-mode .home-page {
   left: 12px;
   right: 12px;
   height: 2px;
-  background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+  background: linear-gradient(90deg, #FFFFFF, #A1A1AA);
   border-radius: 2px;
   transform: scaleX(0);
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -707,12 +818,18 @@ body.light-mode .home-page {
 
 .home-page h1,
 .home-page h2,
-.home-page h3,
+.home-page h3 {
+  color: var(--home-heading, #F8F8FA) !important;
+  line-height: 1.18;
+  letter-spacing: -0.035em !important;
+}
+
 .home-page h4,
 .home-page h5,
 .home-page h6 {
   color: var(--home-heading, #F8F8FA) !important;
   line-height: 1.25;
+  letter-spacing: -0.02em !important;
 }
 
 .home-page p,
@@ -726,47 +843,202 @@ body.light-mode .home-page {
 }
 
 .landing-footer {
-  background: var(--home-footer-bg, #0F1117) !important;
+  background: var(--home-footer-bg, #000000) !important;
   border-top: 1px solid var(--home-border, rgba(255, 255, 255, 0.08)) !important;
 }
 
-.home-page .badge,
+.home-page .badge:not([class*="bg-"]),
 .home-page label {
-  color: var(--home-paragraph, #C8CDD8);
+  color: var(--home-paragraph);
 }
 
 .home-page .btn-primary {
-  background: linear-gradient(135deg, #8b5cf6, #c084fc) !important;
-  border: none !important;
-  color: #FFFFFF !important;
-  font-weight: 600 !important;
+  background: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  color: #000000 !important;
+  font-weight: 700 !important;
   border-radius: 10px !important;
-  transition: all 0.3s ease !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.15) !important;
 }
 
 .home-page .btn-primary:hover,
 .home-page .btn-primary:focus {
-  background: linear-gradient(135deg, #a78bfa, #d8b4fe) !important;
-  color: #FFFFFF !important;
-  box-shadow: 0 0 25px rgba(139, 92, 246, 0.45) !important;
-  transform: translateY(-1px) !important;
+  background: #F4F4F5 !important;
+  color: #000000 !important;
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25) !important;
+  transform: translateY(-2px) !important;
 }
 
 .home-page .btn-secondary,
 .home-page .btn-outline-secondary {
-  background: transparent !important;
-  border: 1px solid var(--home-border, rgba(255, 255, 255, 0.12)) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid var(--home-border, rgba(255, 255, 255, 0.15)) !important;
   color: var(--home-heading, #FFFFFF) !important;
   font-weight: 500 !important;
   border-radius: 10px !important;
-  transition: all 0.3s ease !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .home-page .btn-secondary:hover,
 .home-page .btn-outline-secondary:hover {
-  background: rgba(109, 124, 255, 0.08) !important;
-  border-color: var(--home-border-hover, rgba(255, 255, 255, 0.20)) !important;
-  color: var(--home-heading, #FFFFFF) !important;
+  background: rgba(255, 255, 255, 0.10) !important;
+  border-color: var(--home-border-hover, rgba(255, 255, 255, 0.35)) !important;
+  color: #FFFFFF !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Obsidian Theme Utility Overrides */
+.home-page .bg-primary-subtle {
+  background: rgba(255, 255, 255, 0.07) !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.home-page .text-primary {
+  color: #FFFFFF !important;
+}
+
+.home-page .badge.bg-primary {
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  border: 1px solid #FFFFFF !important;
+  font-weight: 700 !important;
+}
+
+.home-page .btn-outline-primary {
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  color: #FFFFFF !important;
+  background: transparent !important;
+  border-radius: 10px !important;
+  transition: all 0.25s ease !important;
+}
+
+.home-page .btn-outline-primary:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+
+.custom-roi-range {
+  accent-color: #FFFFFF !important;
+}
+
+.custom-roi-range::-webkit-slider-thumb {
+  background: #FFFFFF !important;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.4) !important;
+}
+
+/* ========== Meridian 3D Slanted Console & Saasfly Hero Components ========== */
+
+.saasfly-announcement-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  font-size: 0.82rem;
+  color: #E4E4E7;
+  text-decoration: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.saasfly-announcement-pill:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  color: #FFFFFF !important;
+  transform: translateY(-1px);
+}
+
+.terminal-command-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: rgba(18, 18, 22, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #E4E4E7;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.84rem;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: all;
+  outline: none;
+}
+
+.terminal-command-chip:hover {
+  background: rgba(28, 28, 36, 0.95);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #FFFFFF;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.terminal-command-chip .copy-badge {
+  font-size: 0.72rem;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #A1A1AA;
+}
+
+.meridian-console-perspective {
+  perspective: 1600px;
+  transform-style: preserve-3d;
+  margin-top: 24px;
+}
+
+.meridian-console-card {
+  transform: rotateX(14deg) scale(0.96);
+  transform-origin: 50% 0%;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s ease;
+  box-shadow: 
+    0 30px 90px -15px rgba(0, 0, 0, 0.95),
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 1px 0 0 rgba(255, 255, 255, 0.35) inset !important;
+  border-radius: 20px !important;
+  background: #0B0C0E !important;
+  border: none !important;
+  overflow: hidden;
+}
+
+.meridian-console-card:hover {
+  transform: rotateX(6deg) scale(0.98);
+  box-shadow: 
+    0 40px 110px -10px rgba(0, 0, 0, 0.98),
+    0 0 0 1px rgba(255, 255, 255, 0.22),
+    0 1px 0 0 rgba(255, 255, 255, 0.55) inset !important;
+}
+
+@media (max-width: 768px) {
+  .meridian-console-card {
+    transform: none !important;
+  }
+}
+
+.bento-icon-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  font-size: 1.15rem;
+  transition: all 0.25s ease;
+}
+
+.landing-card:hover .bento-icon-badge {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
 }
 
 /* ========== Comprehensive Responsive Media Queries ========== */
@@ -809,3 +1081,47 @@ body.light-mode .home-page {
     padding-bottom: 24px !important;
   }
 }
+
+/* ========== Enhancements for Modern SaaS Landing Sections ========== */
+
+.institutional-pill:hover {
+  border-color: var(--primary) !important;
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--primary) 8%, transparent) !important;
+}
+
+.trust-badge-chip {
+  transition: all 0.2s ease;
+}
+
+.trust-badge-chip:hover {
+  border-color: rgba(99, 102, 241, 0.3) !important;
+  transform: translateY(-1px);
+}
+
+.pricing-card-popular {
+  border: 1.5px solid var(--primary) !important;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--primary) 4%, var(--home-card-bg)) 0%, var(--home-card-bg) 100%) !important;
+}
+
+.custom-roi-range {
+  height: 8px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--home-text, #fff) 12%, transparent);
+  accent-color: var(--primary, #6366F1);
+}
+
+.custom-roi-range::-webkit-slider-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary, #6366F1);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.custom-roi-range::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+

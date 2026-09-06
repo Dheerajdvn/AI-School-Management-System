@@ -3,9 +3,13 @@ import { Link } from 'react-router-dom'
 import { useTheme } from '../context/ThemeContext'
 
 import Hero from '../components/landing/Hero'
+import TrustComplianceBar from '../components/landing/TrustComplianceBar'
+import InteractiveAiSandbox from '../components/landing/InteractiveAiSandbox'
 import FeatureGrid from '../components/landing/FeatureGrid'
-import RagPipelineShowcase from '../components/landing/RagPipelineShowcase'
+import ComparisonTable from '../components/landing/ComparisonTable'
+import RoiCalculator from '../components/landing/RoiCalculator'
 import RoleShowcase from '../components/landing/RoleShowcase'
+import PricingPlans from '../components/landing/PricingPlans'
 import FAQ from '../components/landing/FAQ'
 import LandingFooter from '../components/landing/LandingFooter'
 import DemoModal from '../components/landing/DemoModal'
@@ -46,6 +50,12 @@ export default function HomePage() {
     }
   }, [mobileMenuOpen])
 
+  useEffect(() => {
+    const handleOpenDemo = () => setDemoModalOpen(true)
+    window.addEventListener('open-demo-modal', handleOpenDemo)
+    return () => window.removeEventListener('open-demo-modal', handleOpenDemo)
+  }, [])
+
   const openDemo = () => {
     setMobileMenuOpen(false)
     setDemoModalOpen(true)
@@ -57,23 +67,39 @@ export default function HomePage() {
       {/* Theme-Adaptive Floating Glass Navbar */}
       <header className="sticky-top transition-all px-2 px-sm-3" style={{ top: 0, zIndex: 1000 }}>
         <div className="landing-floating-nav container-fluid d-flex align-items-center justify-content-between">
-          <Link to="/" className="text-decoration-none fw-bold fs-5 landing-brand-link d-flex align-items-center gap-2 my-auto">
-            <div class="d-flex align-items-center justify-content-center rounded-3 px-2 py-1 brand-icon-badge" style={{ background: 'linear-gradient(135deg, #8b5cf6, #c084fc)', color: '#fff' }}>
-              <i class="bi bi-mortarboard-fill fs-5"></i>
-            </div>
-            <span className="landing-brand-text">AI School OS</span>
+          <Link to="/" className="text-decoration-none fw-bold fs-5 landing-brand-link d-flex align-items-center gap-2.5 my-auto">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0" style={{ color: 'var(--home-heading)' }}>
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.4" />
+              <ellipse cx="12" cy="12" rx="10" ry="4" stroke="currentColor" strokeWidth="1.3" strokeOpacity="0.85" />
+              <ellipse cx="12" cy="12" rx="4" ry="10" stroke="currentColor" strokeWidth="1.3" strokeOpacity="0.85" />
+              <circle cx="12" cy="12" r="2" fill="currentColor" />
+            </svg>
+            <span className="landing-brand-text fw-bold" style={{ letterSpacing: '-0.03em', fontSize: '1.05rem' }}>AI School OS</span>
           </Link>
 
           {/* Centered Desktop Navigation Links */}
-          <div className="d-none d-md-flex align-items-center gap-3 mx-auto my-auto">
+          <div className="d-none d-lg-flex align-items-center gap-3 mx-auto my-auto">
+            <a href="#ai-sandbox" className="landing-nav-link">AI Sandbox</a>
             <a href="#features" className="landing-nav-link">Features</a>
-            <a href="#knowledge-engine" className="landing-nav-link">Knowledge Engine</a>
-            <a href="#roles" className="landing-nav-link">Role Portals</a>
+            <a href="#comparison" className="landing-nav-link">Compare</a>
+            <a href="#roi-calculator" className="landing-nav-link">ROI Calculator</a>
+            <a href="#pricing" className="landing-nav-link">Pricing</a>
             <a href="#faq" className="landing-nav-link">FAQ</a>
           </div>
 
           {/* Right Action Controls - Equal height & theme adaptive */}
           <div className="d-none d-sm-flex align-items-center gap-2.5 my-auto" style={{ height: '40px' }}>
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('open-quick-search'))}
+              className="btn btn-secondary d-none d-xl-inline-flex align-items-center gap-2 px-2.5"
+              style={{ height: '38px', borderRadius: '10px', fontSize: '0.82rem' }}
+              title="Quick Search (Ctrl + K)"
+            >
+              <i className="bi bi-search text-muted" style={{ fontSize: '0.8rem' }}></i>
+              <span className="text-muted">Search</span>
+              <kbd className="badge bg-body-secondary text-muted font-monospace border px-1 py-0.5" style={{ fontSize: '0.64rem' }}>Ctrl K</kbd>
+            </button>
+
             <button
               onClick={toggleTheme}
               className="btn btn-secondary d-inline-flex align-items-center justify-content-center p-0 theme-toggle-btn"
@@ -81,7 +107,7 @@ export default function HomePage() {
               title="Toggle theme"
               aria-label="Toggle theme"
             >
-              <i className={`bi ${theme === 'dark' ? 'bi-sun-fill text-warning' : 'bi-moon-stars-fill text-primary'}`}></i>
+              <i className={`bi ${theme === 'dark' ? 'bi-sun-fill text-warning' : 'bi-moon-stars-fill text-dark'}`}></i>
             </button>
 
             <Link
@@ -145,9 +171,12 @@ export default function HomePage() {
           </button>
         </div>
         <div className="d-flex flex-column gap-2 mb-3">
+          <a href="#ai-sandbox" className="landing-nav-link text-start py-2" onClick={() => setMobileMenuOpen(false)}>AI Sandbox</a>
           <a href="#features" className="landing-nav-link text-start py-2" onClick={() => setMobileMenuOpen(false)}>Features</a>
-          <a href="#knowledge-engine" className="landing-nav-link text-start py-2" onClick={() => setMobileMenuOpen(false)}>Knowledge Engine</a>
+          <a href="#comparison" className="landing-nav-link text-start py-2" onClick={() => setMobileMenuOpen(false)}>Compare</a>
           <a href="#roles" className="landing-nav-link text-start py-2" onClick={() => setMobileMenuOpen(false)}>Role Portals</a>
+          <a href="#roi-calculator" className="landing-nav-link text-start py-2" onClick={() => setMobileMenuOpen(false)}>ROI Calculator</a>
+          <a href="#pricing" className="landing-nav-link text-start py-2" onClick={() => setMobileMenuOpen(false)}>Pricing</a>
           <a href="#faq" className="landing-nav-link text-start py-2" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
         </div>
         <div className="d-flex flex-column gap-2">
@@ -163,9 +192,13 @@ export default function HomePage() {
       {/* Main Page Sections */}
       <main className="flex-grow-1">
         <Hero onOpenDemo={openDemo} />
+        <TrustComplianceBar />
+        <InteractiveAiSandbox onOpenDemo={openDemo} />
         <div id="features"><FeatureGrid /></div>
-        <div id="knowledge-engine"><RagPipelineShowcase /></div>
+        <ComparisonTable onOpenDemo={openDemo} />
         <div id="roles"><RoleShowcase /></div>
+        <RoiCalculator onOpenDemo={openDemo} />
+        <PricingPlans onOpenDemo={openDemo} />
         <div id="faq"><FAQ /></div>
       </main>
 

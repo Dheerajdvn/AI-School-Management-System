@@ -379,7 +379,7 @@ const tpStyles = `
 .tp-page .status-badge.active { background: rgba(16,185,129,0.15); color: #34d399; }
 .tp-page .status-badge.inactive { background: rgba(239,68,68,0.15); color: #f87171; }
 .tp-page .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1050; padding: 1rem; }
-.tp-page .modal-content { background: #1e293b; border-radius: 16px; border: 1px solid rgba(255,255,255,0.15); max-width: 560px; width: 100%; max-height: 90vh; overflow-y: auto; }
+.tp-page .modal-content { background: #0D0D10; border-radius: 16px; border: 1px solid rgba(255,255,255,0.10); max-width: 560px; width: 100%; max-height: 90vh; overflow-y: auto; }
 .tp-page .modal-content.confirm-dialog { max-width: 400px; }
 .tp-page .modal-header-custom { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
 .tp-page .modal-header-custom h5 { margin: 0; }

@@ -148,56 +148,81 @@ export default function Sidebar({ open, onClose }) {
     <>
       <aside className={`sidebar enterprise-sidebar ${open ? 'open' : 'collapsed'}`}>
         <div className="sidebar-brand">
-          <div className="brand-icon-wrapper">
-            <i className="bi bi-cpu-fill" />
-          </div>
-          <div className="brand-text">
-            <span className="brand-title">AI School OS</span>
-            <span className="brand-subtitle">Enterprise SaaS</span>
+          <div className="d-flex align-items-center justify-content-between w-100">
+            <div className="d-flex align-items-center gap-2.5">
+              <div className="dashdark-brand-glyph">
+                <svg width="24" height="24" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="2" y="2" width="16" height="16" rx="5" fill="#00D8F6" fillOpacity="0.85" />
+                  <rect x="10" y="10" width="16" height="16" rx="5" fill="#EC4899" fillOpacity="0.9" />
+                </svg>
+              </div>
+              <div className="brand-text">
+                <span className="brand-title">AI School OS</span>
+                <span className="brand-subtitle">ENTERPRISE CORE</span>
+              </div>
+            </div>
+            <button 
+              className="btn btn-link p-0 text-muted d-flex align-items-center opacity-75 hover-opacity-100 text-decoration-none"
+              title="Toggle view"
+              onClick={onClose}
+              style={{ fontSize: '13px' }}
+            >
+              <i className="bi bi-chevron-left d-lg-none" />
+              <i className="bi bi-code-slash d-none d-lg-inline" />
+            </button>
           </div>
         </div>
 
-        <div className="sidebar-search-hint px-3 mb-2" onClick={() => window.dispatchEvent(new CustomEvent('open-quick-search'))} style={{ cursor: 'pointer' }}>
-          <div className="search-pill">
-            <i className="bi bi-search text-muted me-2" />
-            <span className="text-muted small">Quick search...</span>
-            <kbd className="ms-auto bg-dark text-light px-1 rounded small">⌘K</kbd>
+        {/* Dashdark X Search Capsule */}
+        <div className="sidebar-search-container px-3 pt-2.5 pb-2">
+          <div 
+            className="dashdark-search-bar d-flex align-items-center"
+            onClick={() => window.dispatchEvent(new CustomEvent('open-quick-search'))}
+            title="Search for..."
+          >
+            <i className="bi bi-search text-muted me-2" style={{ fontSize: '12px' }} />
+            <span className="text-muted small flex-grow-1" style={{ fontSize: '12px' }}>Search for...</span>
+            <kbd className="dashdark-kbd">⌘K</kbd>
           </div>
         </div>
 
+        {/* Categorized Navigation */}
         <nav className="sidebar-nav flex-column px-2 py-1">
+          <div className="nav-section-label">COMMAND CENTER</div>
           {links.map((l) => (
             <NavLink
               key={l.to}
               to={l.to}
               end={l.to === '/' || l.to === '/admin' || l.to === '/teacher/dashboard' || l.to === '/student' || l.to === '/school'}
               className={({ isActive }) => `sidebar-nav-link ${isActive ? 'active' : ''}`}
-              onClick={(e) => {
+              onClick={() => {
                 if (window.innerWidth < 992 && onClose) {
                   onClose()
                 }
               }}
             >
-              <i className={`bi ${l.icon} nav-icon`} />
-              <span className="nav-label">{l.label}</span>
               <span className="active-indicator" />
+              <i className={`bi ${l.icon} nav-icon`} />
+              <span className="nav-label flex-grow-1">{l.label}</span>
+              <i className="bi bi-chevron-right nav-arrow" />
             </NavLink>
           ))}
         </nav>
 
-        {/* Bottom User Profile Panel (Cursor / ChatGPT / Slack style) */}
+        {/* Dashdark X Bottom User Profile Card */}
         {user && (
           <div className="sidebar-footer mt-auto p-3 position-relative" ref={userMenuRef}>
             {userMenuOpen && (
-              <div className="user-dropdown-popup shadow-lg">
+              <div className="user-dropdown-popup shadow-2xl">
+                <div className="px-3 py-2 border-bottom" style={{ borderColor: 'var(--border)' }}>
+                  <div className="fw-bold small text-light">{user.username || 'User'}</div>
+                  <div className="text-muted text-xs">{getDisplayRole()}</div>
+                </div>
                 <button className="dropdown-item d-flex align-items-center gap-2 py-2 px-3" onClick={() => { setUserMenuOpen(false); navigate('/profile'); }}>
                   <i className="bi bi-person fs-6 text-primary" /> Profile Settings
                 </button>
                 <button className="dropdown-item d-flex align-items-center gap-2 py-2 px-3" onClick={() => { setUserMenuOpen(false); navigate('/settings'); }}>
-                  <i className="bi bi-gear fs-6 text-primary" /> Preferences & AI Settings
-                </button>
-                <button className="dropdown-item d-flex align-items-center gap-2 py-2 px-3" onClick={() => { setUserMenuOpen(false); navigate('/settings'); }}>
-                  <i className="bi bi-robot fs-6 text-info" /> AI Provider & LLM Config
+                  <i className="bi bi-gear fs-6 text-primary" /> Account & AI Settings
                 </button>
                 <button className="dropdown-item d-flex align-items-center gap-2 py-2 px-3" onClick={() => { setUserMenuOpen(false); toggleTheme(); }}>
                   <i className={`bi ${theme === 'light' ? 'bi-moon-stars' : 'bi-sun'} fs-6 text-warning`} /> 
@@ -211,28 +236,21 @@ export default function Sidebar({ open, onClose }) {
             )}
 
             <div 
-              className="user-profile-card d-flex align-items-center gap-3 p-2 rounded-3 cursor-pointer"
+              className="dashdark-user-card d-flex align-items-center gap-2.5 p-2 rounded-3 cursor-pointer"
               onClick={() => setUserMenuOpen(!userMenuOpen)}
               title="Click for account options"
             >
-              <div className="position-relative">
-                <div className="avatar-circle">
+              <div className="position-relative flex-shrink-0">
+                <div className="dashdark-avatar">
                   {user.username ? user.username.charAt(0).toUpperCase() : 'U'}
                 </div>
-                <span className="online-indicator" title="Online" />
+                <span className="dashdark-online-dot" title="Online" />
               </div>
               <div className="user-info flex-grow-1 overflow-hidden">
-                <div className="user-name text-truncate fw-semibold">{user.username}</div>
-                <div className="user-role text-truncate small text-muted">{getDisplayRole()}</div>
+                <div className="user-name text-truncate fw-bold">{user.username || 'Administrator'}</div>
+                <div className="user-subtext text-truncate">Account settings</div>
               </div>
-              <button 
-                className="btn btn-sm btn-link text-muted p-1 me-1 text-decoration-none" 
-                title="AI & System Settings" 
-                onClick={(e) => { e.stopPropagation(); navigate('/settings'); }}
-              >
-                <i className="bi bi-gear-fill fs-6 text-info" />
-              </button>
-              <i className={`bi bi-chevron-up text-muted transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
+              <i className="bi bi-chevron-right user-chevron text-muted" />
             </div>
           </div>
         )}

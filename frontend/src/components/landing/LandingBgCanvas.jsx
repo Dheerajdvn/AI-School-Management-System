@@ -40,8 +40,8 @@ export default function LandingBgCanvas() {
 
     // Dynamic constellation particles
     const particleCount = Math.min(85, Math.max(50, Math.floor(w / 18)))
-    const darkColors = ['99, 102, 241', '139, 92, 246', '236, 72, 153', '59, 130, 246']
-    const lightColors = ['99, 102, 241', '124, 58, 237', '219, 39, 119', '37, 99, 235']
+    const darkColors = ['255, 255, 255', '228, 228, 231', '161, 161, 170', '212, 212, 216']
+    const lightColors = ['15, 23, 42', '51, 65, 85', '100, 116, 139', '71, 85, 105']
 
     const particles = Array.from({ length: particleCount }, () => {
       const colorIndex = Math.floor(Math.random() * 4)
@@ -71,12 +71,12 @@ export default function LandingBgCanvas() {
         // Hero top aurora glow
         const gradTop = ctx.createRadialGradient(w * 0.5, h * 0.18, 50, w * 0.5, h * 0.18, Math.max(w, h) * 0.6)
         if (isLight) {
-          gradTop.addColorStop(0, 'rgba(99, 102, 241, 0.08)')
-          gradTop.addColorStop(0.4, 'rgba(236, 72, 153, 0.04)')
+          gradTop.addColorStop(0, 'rgba(0, 0, 0, 0.04)')
+          gradTop.addColorStop(0.4, 'rgba(0, 0, 0, 0.015)')
           gradTop.addColorStop(0.8, 'rgba(255, 255, 255, 0)')
         } else {
-          gradTop.addColorStop(0, 'rgba(99, 102, 241, 0.10)')
-          gradTop.addColorStop(0.4, 'rgba(139, 92, 246, 0.05)')
+          gradTop.addColorStop(0, 'rgba(255, 255, 255, 0.04)')
+          gradTop.addColorStop(0.4, 'rgba(255, 255, 255, 0.015)')
           gradTop.addColorStop(0.8, 'rgba(0, 0, 0, 0)')
         }
         ctx.fillStyle = gradTop
@@ -85,7 +85,7 @@ export default function LandingBgCanvas() {
         // Mouse interactive soft spotlight
         if (mouse.x > 0 && mouse.y > 0) {
           const mouseGlow = ctx.createRadialGradient(mouse.x, mouse.y, 10, mouse.x, mouse.y, 220)
-          mouseGlow.addColorStop(0, isLight ? 'rgba(99, 102, 241, 0.08)' : 'rgba(99, 102, 241, 0.07)')
+          mouseGlow.addColorStop(0, isLight ? 'rgba(0, 0, 0, 0.03)' : 'rgba(255, 255, 255, 0.035)')
           mouseGlow.addColorStop(1, 'rgba(0, 0, 0, 0)')
           ctx.fillStyle = mouseGlow
           ctx.fillRect(0, 0, w, h)

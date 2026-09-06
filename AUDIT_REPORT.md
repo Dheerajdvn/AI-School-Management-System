@@ -1,47 +1,54 @@
 # 📋 Production Readiness Audit & Verification Report
 
-**AI School Management & Analytics Platform**  
-**Final Production Verification: August 2026**
+**Platform Status: Production Deployable (Active Development) — 8.7/10**
 
 ---
 
-## 1. Executive Summary
+## 1. Resolved Issues
 
-The **AI School Management & Analytics Platform** has undergone full production hardening and verification. All previously identified security, database, and infrastructure gaps have been **100% resolved**.
-
-### Production Status: ✅ READY FOR PRODUCTION
-
-- **Frontend SPA**: Deployed on **Vercel** (`https://aischoolsystem.vercel.app`)
-- **Backend API**: Deployed on **Render** (`https://ai-school-management-system-l0a0.onrender.com`)
-- **Database**: Neon Serverless PostgreSQL (`PostgreSQLDialect`)
-- **Cache & Rate Limiter**: Upstash Redis (TLS enabled)
-- **Vector DB**: Qdrant Cloud Cluster (`course_documents` 768-dim)
-- **AI Infrastructure**: 9 Multi-Provider Cloud & Local LLMs (`Groq`, `OpenAI`, `Gemini`, `Anthropic`, `OpenRouter`, `Azure`, `DeepSeek`, `Mistral`, `Ollama`)
-
----
-
-## 2. Audit Verification & Resolution Status
-
-| Audit Category | Previous Status | Current Production Status | Resolution Details |
-| :--- | :--- | :--- | :--- |
-| **CORS Security** | ⚠️ Wildcard (`*`) | ✅ **RESOLVED** | Restricted to `CORS_ALLOWED_ORIGINS` (`https://aischoolsystem.vercel.app`). |
-| **API Key Security** | ⚠️ Unencrypted | ✅ **RESOLVED** | User API keys encrypted in DB with **AES-128** (`AesEncryptionConverter`). |
-| **Actuator 503 Errors**| ⚠️ Actuator HTTP 503 | ✅ **RESOLVED** | `OllamaHealthIndicator` returns `OFFLINE` status; Actuator returns clean **200 OK**. |
-| **Render OOM (Exit 137)**| ⚠️ Container Kills | ✅ **RESOLVED** | `JAVA_OPTS` capped at `-Xmx320m -Xms256m -XX:+UseG1GC` within Render 512 MB limit. |
-| **Database Dialect** | ⚠️ Metadata Warning | ✅ **RESOLVED** | `database-platform: PostgreSQLDialect` explicitly declared in `application-prod.yml`. |
-| **JWT Expiration** | ⚠️ 1 Hour | ✅ **RESOLVED** | Extended to **24 Hours** (`86,400,000 ms`) for seamless user experience. |
-| **Mobile Layout** | ⚠️ Vertical Gap | ✅ **RESOLVED** | Added `@media (max-width: 576px)` `min-height: auto` in `landing.css`. |
+| Issue | Resolution |
+| :--- | :--- |
+| **CORS Security** | Configured strict `CORS_ALLOWED_ORIGINS`; removed wildcards |
+| **API Key Encryption** | Field encryption via AES-256-GCM with unique 12-byte IV per value (`gcm:v1:`) |
+| **Actuator 503 Errors** | `OllamaHealthIndicator` returns clean `OFFLINE` status without failing the overall health probe |
+| **Render OOM (Exit 137)** | Constrained JVM via `JAVA_OPTS=-Xmx320m -Xms256m -XX:+UseG1GC -XX:+ExitOnOutOfMemoryError` |
+| **Database Dialect** | Explicit `PostgreSQLDialect` configured for Neon serverless PostgreSQL |
+| **JWT Expiration** | Standardized on 24-hour validity (`86,400,000 ms`) |
+| **Login Page Theme** | Shared monochrome tokens and `<LandingBgCanvas />` across `HomePage` and `LoginPage` |
+| **Sidebar Toggle Restore** | 3 restore mechanisms: Header button, floating edge chevron, and `Ctrl+B` shortcut |
+| **Admin Session Fallback** | Resilient offline session for `admin` and `dheerajdvn` |
+| **MCP Server Support** | Complete MCP Server at `/mcp/sse` and `/mcp/message` with 4 RBAC-governed tools |
 
 ---
 
-## 3. Production Readiness Score
+## 2. Active Limitations
 
-| Category | Score (1-10) | Status |
+| Area | Status | Description |
 | :--- | :--- | :--- |
-| **Architecture** | **10/10** | Clean Spring Boot 3.5 + React 18 separation |
-| **Security & Cryptography** | **10/10** | JWT 24h, RBAC, AES-128 field encryption, Upstash Rate Limiter |
-| **AI & RAG Pipeline** | **10/10** | 9 LLM Provider Strategies, Qdrant Cloud 768-dim RAG |
-| **Database & Caching** | **10/10** | Neon PostgreSQL + Upstash Redis SSL (30m cache TTL) |
-| **Production Infrastructure** | **10/10** | Render backend + Vercel frontend |
+| **Gradebook & Attendance** | Partial | Client-side persistence for some actions; backend API synchronization ongoing |
+| **Exam Management** | Partial | UI views complete; backend exam results ingestion partially wired |
+| **NL-to-SQL (Ask-AI)** | Isolated | Targets standalone demo `student` table (intentionally isolated from user accounts) |
+| **Test Coverage** | Unit Only | 127 backend unit tests passing; integration tests with active Spring context pending |
+| **TypeScript** | None | Frontend codebase uses standard JSX |
 
-### **Overall Score: 10/10 (Production Grade)**
+---
+
+## 3. Production Readiness Scores
+
+| Domain | Score (1–10) | Evaluation |
+| :--- | :---: | :--- |
+| **UI/UX & Design System** | **9/10** | Cohesive dark/light design system with smooth micro-interactions |
+| **Authentication & Security** | **8/10** | JWT, RBAC, AES-256-GCM field encryption, and Upstash rate limiting |
+| **AI & RAG Pipeline** | **9/10** | 9 LLM providers, Qdrant Cloud vector search, and AST SQL validation |
+| **MCP Implementation** | **9/10** | Protocol v2024-11-05 compliant SSE + JSON-RPC 2.0 with agentic routing |
+| **Database & Cache** | **9/10** | Neon PostgreSQL with optimized indexes and Upstash Redis TLS |
+| **Infrastructure** | **9/10** | Vercel and Render deployments with automated keep-alive polling |
+
+---
+
+## 4. Priority Work Items
+
+1. **Privilege Escalation Guard**: Restrict role modification in `PUT /api/users/{id}` strictly to `ROLE_ADMIN`.
+2. **Axios Response Unwrap**: Eliminate duplicate envelope unwrapping in `AskAiPage.jsx`.
+3. **Axios Interceptor Consolidation**: Unify auth interceptors to prevent 403 authorization denials from triggering unexpected logouts.
+4. **Prune Unused WebSocket Code**: Remove inactive STOMP dependencies and hooks to reduce frontend bundle weight.

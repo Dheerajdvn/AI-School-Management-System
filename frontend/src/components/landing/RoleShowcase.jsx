@@ -6,34 +6,31 @@ export default function RoleShowcase() {
   const roles = {
     admin: {
       title: 'School Administrator & Leadership',
-      subtitle: 'Centralized Multi-Campus Oversight & Governance',
+      subtitle: 'Multi-Campus Governance & SIS Operations',
       items: [
-        'Manage academic departments, faculty rosters, and student enrollment records',
-        'Monitor live campus telemetry, enrollment growth, and institutional performance metrics',
-        'Configure system-wide academic calendars, roles, and administrative security logs',
-        'Publish institutional handbooks, policies, and school-wide curriculum libraries'
+        'Centralized multi-campus faculty rosters, enrollment, and department management',
+        'Live institutional telemetry, attendance rates, and academic performance analytics',
+        'Granular role-based permissions, FERPA compliance, and automated audit logs'
       ],
       icon: 'bi-building-gear'
     },
     teacher: {
       title: 'Teachers & Faculty',
-      subtitle: 'Course Management, AI Lesson Planning & Smart Grading',
+      subtitle: 'Lesson Planning, AI Grading & Course Hub',
       items: [
-        'Create and organize interactive courses, class timetables, and assignment modules',
-        'Use AI to generate lesson plans, homework problem sets, and practice exams',
-        'Grade student submissions quickly with objective rubric scoring and personalized feedback',
-        'Upload course syllabi, lecture slides, and study guides for student instant search'
+        '1-click AI generation of lesson plans, homework problem sets, and practice exams',
+        'Fast automated rubric grading with personalized student improvement feedback',
+        'Course syllabus, lecture slides, and study guide repository with instant search'
       ],
       icon: 'bi-journal-check'
     },
     student: {
       title: 'Students & Learners',
-      subtitle: '24/7 AI Personal Tutor & Interactive Learning Portal',
+      subtitle: '24/7 AI Personal Tutor & Study Workspace',
       items: [
-        'Ask the AI Tutor questions about course materials with verified textbook citations',
-        'Submit assignments online and receive immediate structured rubric feedback',
-        'Take self-paced practice quizzes and track academic progress analytics over time',
-        'Access all course syllabi, assignment deadlines, and campus announcements in one place'
+        '24/7 conversational tutor with verified textbook and syllabus page citations',
+        'Instant assignment submission evaluation with objective rubric scoring',
+        'Self-paced practice quizzes and progress analytics across all enrolled courses'
       ],
       icon: 'bi-mortarboard-fill'
     }
@@ -48,7 +45,7 @@ export default function RoleShowcase() {
           <span className="badge bg-primary-subtle text-primary px-3 py-1.5 mb-2 rounded-pill fw-semibold">
             Role-Based Portals
           </span>
-          <h2 className="fw-bold mb-2" style={{ color: 'var(--text)', fontSize: '2rem' }}>Tailored Experiences for Every Role</h2>
+          <h2 className="fw-bold mb-2" style={{ color: 'var(--home-heading)', fontSize: '2rem' }}>Tailored Experiences for Every Role</h2>
           <p className="text-muted mx-auto mb-3" style={{ maxWidth: '600px', fontSize: '1rem', lineHeight: 1.5 }}>
             Dedicated portals tailored specifically for administrative leadership, classroom teachers, and student learners.
           </p>
@@ -77,12 +74,11 @@ export default function RoleShowcase() {
         {/* Role Content Card */}
         <div className="p-4 p-md-5 rounded-4 animate-role-content landing-card shadow-md border">
           <div className="d-flex align-items-center gap-3 mb-4">
-            <div className="d-flex align-items-center justify-content-center rounded-3 bg-primary-subtle text-primary" 
-                 style={{ width: '52px', height: '52px', fontSize: '1.5rem' }}>
+            <div className="bento-icon-badge" style={{ width: '48px', height: '48px', fontSize: '1.4rem' }}>
               <i className={`bi ${current.icon}`}></i>
             </div>
             <div>
-              <h4 className="fw-bold mb-1" style={{ color: 'var(--text)' }}>{current.title}</h4>
+              <h4 className="fw-bold mb-1" style={{ color: 'var(--home-heading)' }}>{current.title}</h4>
               <span className="small text-muted fw-medium">{current.subtitle}</span>
             </div>
           </div>
@@ -90,9 +86,9 @@ export default function RoleShowcase() {
           <div className="row g-3">
             {current.items.map((item, idx) => (
               <div key={idx} className="col-12 col-md-6">
-                <div className="p-3.5 rounded-3 h-100 d-flex align-items-start gap-2.5 bg-card border">
+                <div className="p-3.5 rounded-3 h-100 d-flex align-items-start gap-2.5 landing-inner-box">
                   <i className="bi bi-check-circle-fill text-primary mt-1 flex-shrink-0"></i>
-                  <span className="small fw-medium" style={{ color: 'var(--text)', lineHeight: 1.55 }}>{item}</span>
+                  <span className="small fw-medium" style={{ color: 'var(--home-heading)', lineHeight: 1.55 }}>{item}</span>
                 </div>
               </div>
             ))}

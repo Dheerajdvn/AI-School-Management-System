@@ -1,24 +1,12 @@
 # 🤖 AI & RAG Pipeline Documentation
 
-> *Comprehensive documentation for the AI School Management Platform's multi-provider LLM orchestration, Retrieval-Augmented Generation (RAG), vector embeddings, and prompt engineering.*
-
----
-
-## 💡 Special Note: Cloud AI Providers vs Local Ollama
-
-> [!IMPORTANT]
-> **No Local LLM Required!**
-> If you do not have **Ollama** installed on your local machine, or when running in 24/7 Cloud Production (e.g. Render):
-> 1. Log into your dashboard and navigate to **AI Settings** (`/settings`).
-> 2. Select any Cloud AI Provider such as **Groq** *(Free & Ultra-Fast)*, **OpenAI**, **Google Gemini**, **Anthropic**, **OpenRouter**, **Azure OpenAI**, **DeepSeek**, or **Mistral AI**.
-> 3. Enter your API key, click **Verify Connection**, and click **Save Settings**.
-> Your API key is encrypted with **AES-256-GCM** in the database. The EduAI Assistant will immediately use your chosen cloud provider for all chat, homework assistance, lesson planning, and RAG operations!
+Enterprise multi-provider LLM orchestration, Retrieval-Augmented Generation (RAG), vector embeddings, and prompt engineering architecture.
 
 ---
 
 ## 1. Multi-Provider AI Architecture
 
-The system uses a strategy pattern (`LlmProviderStrategy`) managed by `ProviderRegistry` to support **9 Cloud & Local LLM Providers**:
+The system uses a **Strategy Pattern** (`LlmProviderStrategy`) managed by `ProviderRegistry` to support **9 Cloud & Local LLM Providers** via **LangChain4j 0.34.0**.
 
 ```java
 public interface LlmProviderStrategy {
@@ -31,107 +19,107 @@ public interface LlmProviderStrategy {
 ```
 
 ### Supported Providers
+1. **Groq**: Ultra-fast cloud inference (`llama-3.3-70b-versatile`, `mixtral-8x7b-32768`)
+2. **OpenAI**: GPT-4o, GPT-4o-mini, GPT-3.5-turbo
+3. **Google Gemini**: Gemini 1.5 Pro, Gemini 1.5 Flash
+4. **Anthropic**: Claude 3.5 Sonnet, Claude 3 Opus
+5. **OpenRouter**: Unified API routing across 100+ models
+6. **Azure OpenAI**: Enterprise Azure-hosted endpoints
+7. **DeepSeek**: DeepSeek-V3, DeepSeek-R1 reasoning models
+8. **Mistral AI**: Mistral Large, Mistral Small, Codestral
+9. **Ollama**: Optional local runner (`http://localhost:11434`, e.g. `qwen2.5-coder:3b`)
 
-1. **Groq**: Ultra-fast cloud inference (`llama-3.3-70b-versatile`, `mixtral-8x7b-32768`, `whisper-large-v3-turbo`)
-2. **OpenAI**: GPT-4o, GPT-4o-mini, GPT-3.5-turbo (`https://api.openai.com`)
-3. **Google Gemini**: Gemini 1.5 Pro, Gemini 1.5 Flash (`https://generativelanguage.googleapis.com`)
-4. **Anthropic**: Claude 3.5 Sonnet, Claude 3 Opus (`https://api.anthropic.com`)
-5. **OpenRouter**: Unified API routing across 100+ open-source models (`https://openrouter.ai`)
-6. **Azure OpenAI**: Enterprise Azure-hosted OpenAI endpoints
-7. **DeepSeek**: DeepSeek-V3, DeepSeek-R1 reasoning models (`https://api.deepseek.com`)
-8. **Mistral AI**: Mistral Large, Mistral Small, Codestral (`https://api.mistral.ai`)
-9. **Ollama**: Local privacy-first LLM runner (`http://localhost:11434`, e.g. `qwen2.5-coder:3b`)
-
----
-
-## 2. Per-User AI Configuration & AES Encryption
-
-Each user can store their personalized LLM provider preferences in the `user_ai_configs` database table:
-
-- **Service**: `UserAiConfigServiceImpl` (`getUserConfig`, `saveConfig`, `verifyConnection`, `resetToDefault`)
-- **AES Field Encryption**: `AesEncryptionConverter` encrypts API keys at the column level with
-  **AES-256-GCM** (authenticated encryption, random 12-byte IV per value, `gcm:v1:` prefix) before they
-  reach the database. The key comes from `APP_ENCRYPTION_KEY`, must be at least 32 characters, and has
-  **no default** — the application refuses to start without it. Values written by older builds
-  (AES-128) are still readable, but only while the same secret is in use; rotating the key makes
-  previously stored API keys undecryptable and users must re-enter them.
-- **Lookup Resolution**: Supports lookup by `username` or `email` (`findByUserUsernameOrUserEmail`).
+*Users can configure and verify their preferred cloud provider in **AI Settings** (`/settings`) without needing local GPU hardware.*
 
 ---
 
-## 3. Prompt Templates
+## 2. Per-User AI Configuration & Encryption
 
-Organized in `com.ai.dashboard.ai.prompt`:
+Each user's preferences are stored in the `user_ai_configs` table:
 
-- **`TutorPromptTemplate`**: System prompt for 24/7 AI learning tutor behavior and RAG context grounding.
-- **`HomeworkPromptTemplate`**: Step-by-step homework guidance and hints without giving away direct solutions.
-- **`QuizPromptTemplate`**: Dynamic multiple-choice quiz generator with option selectors and answer explanations.
-- **`LessonPlannerPromptTemplate`**: Outlines structured lesson plans, learning objectives, timing, and classroom activities.
-- **`DocumentQAPromptTemplate`**: Enforces strict context-only document Q&A and citation generation.
-
-`com.ai.dashboard.prompt.PromptTemplates` holds the natural-language-to-SQL prompt used by the Ask-AI
-page (see the next section for its data scope).
+- **AES-256-GCM Encryption**: `AesEncryptionConverter` encrypts API keys at the column level with a random 12-byte IV (`gcm:v1:` prefix). Key source: `APP_ENCRYPTION_KEY` (minimum 32 characters, required at startup).
+- **Service Layer**: `UserAiConfigServiceImpl` manages configuration lookup, testing connections against live provider APIs, and key masking for UI display.
 
 ---
 
-## 3a. Natural-language-to-SQL: data scope
+## 3. Prompt Engineering
 
-The Ask-AI feature (`AiQueryServiceImpl`) queries the **`student` table only**. That table is a
-standalone demo dataset — it is not the platform's user roster, and its rows do not correspond to
-registered accounts, enrolments, or grades. See the "Two separate student populations" note in
-[Database.md](Database.md).
+Structured prompts located in `com.ai.dashboard.ai.prompt`:
 
-Practical consequences:
+- **`TutorPromptTemplate`**: Socratic learning assistant grounded in verified course context.
+- **`HomeworkPromptTemplate`**: Guidance and hints without revealing direct answers.
+- **`QuizPromptTemplate`**: Formats multiple-choice questions with answer keys and rationale.
+- **`LessonPlannerPromptTemplate`**: Generates curriculum objectives, timing, and classroom activities.
+- **`DocumentQAPromptTemplate`**: Enforces strict context-only answers with citations.
 
-- **AI answers will not match dashboard numbers.** "How many students?" via Ask-AI counts `student`
-  rows; the dashboard counts `users` with `ROLE_STUDENT`. Both are right about different data.
-- The UI states this inline on the Ask-AI page so users are not misled by the discrepancy.
+---
 
-Defence in depth around the generated SQL, in `SqlValidator`:
+## 4. Natural-Language-to-SQL (Ask-AI)
 
-| Control | Behaviour |
+Ask-AI queries the **`student` table only** (a standalone demo dataset with name, course, subject, fee, address). It is completely isolated from the live `users` roster.
+
+### `SqlValidator` Safety Controls
+
+| Control | Policy |
 | :--- | :--- |
-| Statement type | JSqlParser must parse it as a single `SELECT`; anything else is rejected |
-| Table whitelist | `student` only — `users` and every operational table are unreachable |
-| Column blocklist | `password`, `password_hash`, `api_key`, `secret`, `token`, `refresh_token` |
-| System schemas | `information_schema`, `pg_*`, `mysql`, `sys*`, `performance_schema` rejected |
-| Result limits | 200-row cap, 5-second query timeout |
-
-The whitelist is intentionally narrower than the physical schema. It should list only the tables the
-system prompt actually describes to the model — every extra entry is surface a prompt-injected query
-could exploit.
+| **Statement Type** | JSqlParser AST analysis; must be a single `SELECT` statement |
+| **Table Whitelist** | `student` table only; all other tables rejected |
+| **Column Blocklist** | Rejects queries referencing `password`, `hash`, `token`, `secret`, `api_key` |
+| **System Schemas** | Rejects `information_schema`, `pg_*`, `mysql`, `sys*` |
+| **Execution Limits** | Maximum 200 rows; 5-second query timeout on a read-only cursor |
 
 ---
 
-## 4. Embeddings & Vector Search
+## 5. Embeddings & Vector Search
 
-- **Embedding Model**: `EmbeddingServiceImpl` uses `nomic-embed-text` (768 dimensions).
-- **Vector Database**: `QdrantProvider` communicates with Qdrant Cloud or local Qdrant container on port `6333`.
-- **Collection Name**: `course_documents` (Cosine distance metric).
+- **Framework**: LangChain4j 0.34.0
+- **Embedding Model**: `EmbeddingServiceImpl` using `nomic-embed-text` (**768 dimensions**)
+- **Vector Store**: `QdrantProvider` connecting to Qdrant Cloud or local instance (`6333`)
+- **Collection**: `course_documents` (Cosine distance metric)
+- **Floor Threshold**: Assistant declines to answer rather than hallucinate when vector similarity falls below the threshold.
 
 ---
 
-## 5. Document RAG Pipeline
+## 6. Document RAG Pipeline
 
 ```mermaid
 flowchart LR
-    A[Document Upload PDF] --> B[Text Extraction]
-    B --> C[Chunking 750 words / 100 overlap]
-    C --> D[Embedding Generation 768-dim]
-    D --> E[Qdrant Vector Storage]
-    E --> F[Processing Complete]
+    A[Upload PDF/DOCX] --> B[Text Extraction\nApache PDFBox / POI]
+    B --> C[Chunking\n750 words / 100 word overlap]
+    C --> D[Embedding\n768-dim Vector]
+    D --> E[Qdrant Upsert\ncourse_documents]
+    E --> F[Status: COMPLETED]
 ```
 
-### Processing Statuses
-- `PENDING`: Initial file upload.
-- `PROCESSING`: Chunking and embedding generation in progress.
-- `COMPLETED`: Indexed in Qdrant and ready for RAG query context retrieval.
-- `FAILED`: Document parsing or embedding failure.
+### RAG Chat Execution
+1. User question embedded into 768-dimensional vector.
+2. Qdrant performs top-5 semantic similarity retrieval.
+3. Chunks + question injected into LLM prompt context.
+4. Response streamed token-by-token via Server-Sent Events (SSE).
+5. Document citations appended to message.
 
 ---
 
-## 6. Conversation Memory & Token Tracking
+## 7. Session Memory & Tracking
 
-- Sessions stored in `conversation_sessions` table (`user_id`, `session_id`, `total_tokens`, `message_count`).
-- Messages stored in `chat_messages` table (`role`, `content`, `token_count`, `context_used`).
-- Context history limit configured via `ai.memory.context-history-limit` (default: 3 recent turns).
+- Context history window tracks the last **3 conversation turns** (`ai.memory.context-history-limit`).
+- Token usage recorded in `conversation_sessions` and `chat_messages` tables.
+
+---
+
+## 8. AI Feature Routes
+
+| Feature | Route | Description |
+| :--- | :--- | :--- |
+| **AI RAG Chat** | `/chat` | Context-grounded assistant with SSE streaming (also global floating widget) |
+| **Ask-AI** | `/ask-ai` | Natural-language query generator for student demo dataset |
+| **AI Homework Helper** | `/ai/homework` | Step-by-step problem guidance |
+| **AI Quiz Generator** | `/ai/quiz` | Automated topic assessment generator |
+| **AI Lesson Planner** | `/ai/lesson-plan` | Structured syllabus and lesson scheduling |
+| **Knowledge Library** | `/knowledge` | Syllabus and textbook ingestion for RAG |
+
+---
+
+## 9. Model Context Protocol (MCP)
+
+The AI layer also exposes its capabilities to external AI clients (Claude Desktop, Cursor, agents) via the Model Context Protocol. See **[MCP.md](MCP.md)** for tool schemas, RBAC matrix, and agentic orchestration.

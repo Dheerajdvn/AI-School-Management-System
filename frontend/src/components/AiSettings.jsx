@@ -203,6 +203,7 @@ const AiSettings = () => {
   const showApiKey = providerInfo.requiresKey
 
   return (
+    <>
     <div className="card">
       <div className="card-header">
         <h5 className="mb-0">
@@ -466,6 +467,96 @@ const AiSettings = () => {
         </div>
       </div>
     </div>
+
+    {/* Model Context Protocol (MCP) Integration Card */}
+    <div className="card shadow-sm border-0 mt-4">
+      <div className="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <div>
+          <h5 className="mb-0 d-flex align-items-center gap-2">
+            <i className="bi bi-cpu text-info" />
+            Model Context Protocol (MCP) Server
+          </h5>
+          <small className="text-white-50">Enterprise JSON-RPC 2.0 & SSE Protocol Integration</small>
+        </div>
+        <span className="badge bg-success bg-opacity-75">Protocol v2024-11-05</span>
+      </div>
+      <div className="card-body">
+        <div className="row g-3 mb-3">
+          <div className="col-md-6">
+            <div className="p-3 rounded border bg-light">
+              <span className="text-muted small d-block">SSE Handshake Endpoint</span>
+              <code className="text-primary fw-bold">GET /api/mcp/sse</code>
+            </div>
+          </div>
+          <div className="col-md-6">
+            <div className="p-3 rounded border bg-light">
+              <span className="text-muted small d-block">JSON-RPC 2.0 Message Dispatch</span>
+              <code className="text-primary fw-bold">POST /api/mcp/message</code>
+            </div>
+          </div>
+        </div>
+
+        <h6 className="fw-bold mb-2">Registered MCP Tools & Role-Based Guardrails (RBAC)</h6>
+        <div className="table-responsive mb-3">
+          <table className="table table-sm table-bordered align-middle">
+            <thead className="table-light">
+              <tr>
+                <th>Tool Name</th>
+                <th>Target Resource</th>
+                <th>Access Level</th>
+                <th>Token Optimization</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>search_course_knowledge</code></td>
+                <td>Qdrant Vector Store (Embeddings)</td>
+                <td><span className="badge bg-success">Students, Teachers, Admins</span></td>
+                <td>Truncated to 350 chars/chunk</td>
+              </tr>
+              <tr>
+                <td><code>get_course_details</code></td>
+                <td>PostgreSQL Course & Teacher Entities</td>
+                <td><span className="badge bg-success">Students, Teachers, Admins</span></td>
+                <td>Structured summary object</td>
+              </tr>
+              <tr>
+                <td><code>get_student_analytics</code></td>
+                <td>PostgreSQL Aggregations (Fees, Cities)</td>
+                <td><span className="badge bg-danger">Teachers & Admins Only</span></td>
+                <td>Pruned from Student prompts</td>
+              </tr>
+              <tr>
+                <td><code>create_assignment_draft</code></td>
+                <td>Assignment Workflow Engine</td>
+                <td><span className="badge bg-danger">Teachers & Admins Only</span></td>
+                <td>Safe DRAFT status, human-in-loop</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className="alert alert-info py-2 small mb-3">
+          <i className="bi bi-shield-check me-2" />
+          <strong>AI Token & Guardrail Defense:</strong> Casual greetings (e.g. "hi", "thanks") bypass tool calling to consume 0 overhead tokens. Tool recursion is capped at 3 hops maximum to prevent infinite generation loops.
+        </div>
+
+        <h6 className="fw-bold mb-2">Claude Desktop / External Host Configuration</h6>
+        <pre className="p-3 rounded bg-dark text-white-50 small mb-0" style={{ fontSize: '11px', maxHeight: '140px', overflow: 'auto' }}>
+{JSON.stringify({
+  "mcpServers": {
+    "ai-school-system": {
+      "url": "http://localhost:8080/api/mcp/sse",
+      "headers": {
+        "Authorization": "Bearer <YOUR_JWT_TOKEN>"
+      }
+    }
+  }
+}, null, 2)}
+        </pre>
+      </div>
+    </div>
+  </>
   )
 }
 

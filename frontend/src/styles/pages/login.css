@@ -1,63 +1,191 @@
+/* ========== 100% Shared Theme with Landing Page ========== */
 .login-page {
+  position: relative;
+  overflow-x: hidden;
+  background-color: var(--home-bg, #000000) !important;
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% -8%, rgba(255, 255, 255, 0.05), transparent 70%),
+    radial-gradient(circle, rgba(255, 255, 255, 0.045) 1px, transparent 1px) !important;
+  background-size: 100% 100%, 28px 28px !important;
+  color: var(--home-text, #F4F4F5) !important;
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  background: var(--bg);
 }
 
-.style-login-input {
-  background-color: var(--input-bg) !important;
-  border: 1px solid var(--input-border) !important;
-  color: var(--text) !important;
-  font-size: 14px;
+[data-theme="light"] .login-page,
+body.light-mode .login-page {
+  background-color: #F8FAFC !important;
+  background-image: 
+    radial-gradient(ellipse 90% 55% at 50% -12%, rgba(99, 102, 241, 0.08), transparent 75%),
+    radial-gradient(circle, rgba(15, 23, 42, 0.045) 1px, transparent 1px) !important;
+  background-size: 100% 100%, 28px 28px !important;
+  color: #0F172A !important;
+}
+
+/* Glassmorphic Landing Card Aesthetic */
+.dashdark-login-card {
+  background: var(--home-card-bg, rgba(13, 13, 16, 0.82)) !important;
+  border: 1px solid var(--home-border, rgba(255, 255, 255, 0.10)) !important;
+  border-top: 1px solid var(--home-card-border-top, rgba(255, 255, 255, 0.22)) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--home-shadow, 0 20px 50px rgba(0, 0, 0, 0.8)) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+[data-theme="light"] .dashdark-login-card,
+body.light-mode .dashdark-login-card {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border: 1px solid rgba(15, 23, 42, 0.09) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08) !important;
+}
+
+/* Demo Role Chips */
+.dashdark-demo-chip {
+  background: var(--home-inner-bg, rgba(255, 255, 255, 0.04)) !important;
+  border: 1px solid var(--home-inner-border, rgba(255, 255, 255, 0.09)) !important;
+  color: var(--home-text, #F4F4F5) !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  padding: 5px 12px !important;
+  border-radius: 8px !important;
+  transition: all 0.18s ease;
+}
+
+.dashdark-demo-chip:hover {
+  background: rgba(255, 255, 255, 0.10) !important;
+  border-color: rgba(255, 255, 255, 0.30) !important;
+  color: #FFFFFF !important;
+  transform: translateY(-1px);
+}
+
+/* Input Fields - Unified with Landing Page Inputs */
+.dashdark-login-input {
+  background-color: var(--home-inner-bg, rgba(255, 255, 255, 0.04)) !important;
+  border: 1px solid var(--home-inner-border, rgba(255, 255, 255, 0.10)) !important;
+  color: var(--home-text, #FFFFFF) !important;
+  font-size: 13.5px !important;
+  border-radius: 10px !important;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.style-login-input:focus {
-  background-color: var(--input-bg) !important;
-  border-color: var(--primary) !important;
-  box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.25) !important;
-  color: var(--text) !important;
-}
-
-.style-login-input::placeholder {
-  color: var(--muted) !important;
-  opacity: 0.7;
-}
-
-.login-btn-primary {
-  height: 52px;
-  border-radius: 14px;
-  background: var(--primary);
+.dashdark-login-input:focus {
+  background-color: rgba(255, 255, 255, 0.07) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12) !important;
   color: #FFFFFF !important;
-  font-weight: 600;
-  font-size: 16px;
-  border: none;
+}
+
+.dashdark-login-input::placeholder {
+  color: var(--home-muted, #71717A) !important;
+  font-size: 13px;
+}
+
+/* Fix browser autofill injecting unwanted light/blue background */
+.dashdark-login-input:-webkit-autofill,
+.dashdark-login-input:-webkit-autofill:hover, 
+.dashdark-login-input:-webkit-autofill:focus, 
+.dashdark-login-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #0D0D10 inset !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: #FFFFFF !important;
+}
+
+/* Primary Submit Button - Matching Landing Page High-Contrast Solid White Button */
+.dashdark-btn-primary {
+  height: 46px;
+  border-radius: 12px;
+  background: #FFFFFF !important;
+  color: #09090B !important;
+  font-weight: 700;
+  font-size: 14.5px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  box-shadow: 0 8px 24px -4px rgba(var(--primary-rgb), 0.45);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
 }
 
-.login-btn-primary:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 14px 32px -4px rgba(var(--primary-rgb), 0.65);
-  color: #FFFFFF !important;
+.dashdark-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(255, 255, 255, 0.25);
+  background: #F4F4F5 !important;
+  color: #000000 !important;
 }
 
-.login-btn-primary:active {
-  transform: translateY(0px) scale(0.98);
+.dashdark-btn-primary:active {
+  transform: translateY(0);
+}
+
+[data-theme="light"] .dashdark-btn-primary,
+body.light-mode .dashdark-btn-primary {
+  background: #09090B !important;
+  color: #FFFFFF !important;
+  border-color: #09090B !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+}
+
+[data-theme="light"] .dashdark-btn-primary:hover,
+body.light-mode .dashdark-btn-primary:hover {
+  background: #27272A !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18) !important;
 }
 
 .style-checkbox {
-  background-color: var(--input-bg);
-  border-color: var(--border);
+  background-color: var(--home-inner-bg, rgba(255, 255, 255, 0.05)) !important;
+  border-color: var(--home-inner-border, rgba(255, 255, 255, 0.15)) !important;
 }
 
 .style-checkbox:checked {
-  background-color: var(--primary);
-  border-color: var(--primary);
+  background-color: #FFFFFF !important;
+  border-color: #FFFFFF !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e") !important;
+}
+
+/* Navigation & Aux controls on Login Page */
+.back-home-btn {
+  background: var(--home-card-bg, rgba(13, 13, 16, 0.82)) !important;
+  border: 1px solid var(--home-border, rgba(255, 255, 255, 0.10)) !important;
+  color: var(--home-text, #F4F4F5) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+}
+
+.back-home-btn:hover {
+  background: var(--home-card-hover, rgba(20, 20, 26, 0.95)) !important;
+  border-color: var(--home-border-hover, rgba(255, 255, 255, 0.35)) !important;
+  color: #FFFFFF !important;
+  transform: translateX(-2px);
+}
+
+.login-page .theme-toggle-btn {
+  background: var(--home-card-bg, rgba(13, 13, 16, 0.82)) !important;
+  border: 1px solid var(--home-border, rgba(255, 255, 255, 0.10)) !important;
+  color: var(--home-text, #F4F4F5) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.login-page .theme-toggle-btn:hover {
+  background: var(--home-card-hover, rgba(20, 20, 26, 0.95)) !important;
+  border-color: var(--home-border-hover, rgba(255, 255, 255, 0.35)) !important;
+  transform: translateY(-1px);
+}
+
+.forgot-link {
+  color: var(--home-muted, #71717A) !important;
+  transition: color 0.15s ease;
+}
+
+.forgot-link:hover {
+  color: var(--home-heading, #FFFFFF) !important;
+  text-decoration: underline !important;
 }

@@ -149,23 +149,31 @@ export default function ChatMessage({
               Sources ({sources.length}):
             </small>
             <div className="mt-1 d-flex flex-wrap gap-1">
-              {sources.map((source, idx) => (
-                <span
-                  key={`${source.documentId}-${source.chunkId}-${idx}`}
-                  className="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 d-inline-flex align-items-center gap-1"
-                  style={{ fontSize: '0.75rem', fontWeight: '500' }}
-                >
-                  <i className="bi bi-file-earmark-text" />
-                  <span className="text-truncate" style={{ maxWidth: '160px' }}>
-                    {source.filename || 'Document'}
-                  </span>
-                  {source.score !== undefined && (
-                    <span className="text-primary fw-bold">
-                      {(source.score * 100).toFixed(0)}%
+              {sources.map((source, idx) => {
+                const label = typeof source === 'string' 
+                  ? source 
+                  : (source?.filename || source?.title || source?.source || 'Document');
+                const docId = source?.documentId || 'doc';
+                const chkId = source?.chunkId || 'chk';
+                const hasScore = source && source.score !== undefined && source.score !== null && !isNaN(source.score);
+                return (
+                  <span
+                    key={`${docId}-${chkId}-${idx}`}
+                    className="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 d-inline-flex align-items-center gap-1"
+                    style={{ fontSize: '0.75rem', fontWeight: '500' }}
+                  >
+                    <i className="bi bi-file-earmark-text" />
+                    <span className="text-truncate" style={{ maxWidth: '160px' }}>
+                      {label}
                     </span>
-                  )}
-                </span>
-              ))}
+                    {hasScore && (
+                      <span className="text-primary fw-bold">
+                        {(source.score * 100).toFixed(0)}%
+                      </span>
+                    )}
+                  </span>
+                );
+              })}
             </div>
           </div>
         )}

@@ -1,34 +1,50 @@
+:root {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
+}
+
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: 13px;
-  line-height: 1.5;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  line-height: 1.55;
   color: var(--text);
   background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6, .topbar-title, .landing-brand-text {
+  font-family: var(--font-heading);
+  letter-spacing: -0.025em;
+  color: var(--text);
 }
 
 h1 {
   font-size: 26px;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   color: var(--text);
 }
 
 h2 {
   font-size: 20px;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   color: var(--text);
 }
 
 h3 {
   font-size: 17px;
   font-weight: 600;
+  letter-spacing: -0.015em;
   color: var(--text);
 }
 
-h4, h5, h6 {
-  color: var(--text);
-  font-weight: 600;
+code, kbd, samp, pre, .font-monospace {
+  font-family: var(--font-mono) !important;
+  letter-spacing: -0.01em;
 }
 
 .card-number {

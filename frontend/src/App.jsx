@@ -140,7 +140,7 @@ function RoleBasedSidebar({ open, onClose }) {
 /**
  * Role-based topbar component that displays title based on current route
  */
-function RoleBasedTopbar({ onMenu }) {
+function RoleBasedTopbar({ onMenu, sidebarOpen }) {
   const { user } = useAuth()
   const { pathname } = useLocation()
   
@@ -180,7 +180,12 @@ function RoleBasedTopbar({ onMenu }) {
     '/student/ai': 'AI Assistant',
     '/unauthorized': 'Access Denied',
     '/admin/chat': 'Chat',
-    '/school': 'School Dashboard',
+    '/school': 'School Overview',
+    '/exam': 'Exams Center',
+    '/knowledge': 'Enterprise AI Knowledge',
+    '/profile': 'Profile Settings',
+    '/settings': 'Platform Settings',
+    '/notifications': 'Notifications',
     '/school/profile': 'School Profile',
     '/school/academic-years': 'Academic Years',
     '/school/classes': 'Classes',
@@ -200,7 +205,6 @@ function RoleBasedTopbar({ onMenu }) {
     '/exam/upcoming': 'Upcoming Exams',
     '/exam/my-results': 'My Results',
     '/exam/practice': 'Practice Tests',
-    '/knowledge': 'AI Knowledge Center',
     '/knowledge/upload': 'Upload Documents',
     '/knowledge/library': 'Knowledge Library',
     '/knowledge/document': 'Document Details',
@@ -212,7 +216,7 @@ function RoleBasedTopbar({ onMenu }) {
   
   const title = TITLES[pathname] || 'AI Student Dashboard'
   
-  return <Topbar title={title} onMenu={onMenu} />
+  return <Topbar title={title} onMenu={onMenu} sidebarOpen={sidebarOpen} />
 }
 
 /**
@@ -221,8 +225,14 @@ function RoleBasedTopbar({ onMenu }) {
 function ProtectedLayout({ children }) {
   const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = React.useState(() => window.innerWidth >= 992)
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen)
+  const toggleSidebar = () => setSidebarOpen(prev => !prev)
   const closeSidebar = () => setSidebarOpen(false)
+
+  React.useEffect(() => {
+    if (window.innerWidth < 992) {
+      setSidebarOpen(false)
+    }
+  }, [location.pathname])
 
   React.useEffect(() => {
     const handleResize = () => {
@@ -240,6 +250,10 @@ function ProtectedLayout({ children }) {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && window.innerWidth < 992) {
         setSidebarOpen(false)
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault()
+        setSidebarOpen(prev => !prev)
       }
     }
     window.addEventListener('keydown', handleKeyDown)
@@ -261,7 +275,18 @@ function ProtectedLayout({ children }) {
     <div className="app-shell">
       <RoleBasedSidebar open={sidebarOpen} onClose={closeSidebar} />
       <div className={`main ${!sidebarOpen ? 'expanded' : ''}`}>
-        <RoleBasedTopbar onMenu={toggleSidebar} />
+        {!sidebarOpen && (
+          <button
+            type="button"
+            className="floating-sidebar-trigger d-none d-lg-flex align-items-center justify-content-center"
+            onClick={toggleSidebar}
+            title="Show sidebar (Ctrl+B)"
+            aria-label="Show sidebar"
+          >
+            <i className="bi bi-chevron-right" />
+          </button>
+        )}
+        <RoleBasedTopbar onMenu={toggleSidebar} sidebarOpen={sidebarOpen} />
         <div className="content">
           <ErrorBoundary key={location.pathname} resetKey={location.pathname}>
             {children}

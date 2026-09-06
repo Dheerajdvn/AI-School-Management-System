@@ -19,13 +19,13 @@ const ThemeSwitcher = () => {
     {
       id: 'dark',
       title: 'Dark Theme',
-      subtitle: 'Modern & sleek deep slate aesthetic',
+      subtitle: 'Obsidian pitch-black & sleek modern aesthetic',
       icon: 'bi-moon-stars-fill',
       iconColor: '#6366f1',
-      bgPreview: '#0b0c10',
-      cardPreview: '#13141b',
-      borderPreview: 'rgba(255, 255, 255, 0.1)',
-      textPreview: '#f8fafc'
+      bgPreview: '#000000',
+      cardPreview: '#0D0D10',
+      borderPreview: 'rgba(255, 255, 255, 0.10)',
+      textPreview: '#F4F4F5'
     }
   ]
 

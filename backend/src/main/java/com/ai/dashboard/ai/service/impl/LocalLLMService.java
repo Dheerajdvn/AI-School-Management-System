@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import com.ai.dashboard.ai.provider.LlmProviderStrategy;
@@ -43,6 +44,7 @@ public class LocalLLMService implements AIService {
     private final CourseRepository courseRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final UserRepository userRepository;
+    private final com.ai.dashboard.mcp.agent.McpAgentService mcpAgentService;
 
     private record GenerationContext(LlmProviderStrategy strategy, UserAiConfig config) {}
 
@@ -87,6 +89,34 @@ public class LocalLLMService implements AIService {
                 log.warn("Prompt injection detected, conversationId={}", conversationId);
             }
 
+            // Model Context Protocol (MCP) Agent execution & AI restriction guard
+            Optional<com.ai.dashboard.mcp.agent.McpAgentService.AgentExecutionResult> mcpOpt = Optional.empty();
+            if (!sanitizedMessage.startsWith("You are an AI learning assistant.")) {
+                mcpOpt = mcpAgentService.executeToolIfApplicable(sanitizedMessage);
+            }
+
+            List<ChatResponse.Source> sources = new java.util.ArrayList<>();
+            String mcpContext = "";
+
+            if (mcpOpt.isPresent()) {
+                var mcpRes = mcpOpt.get();
+                if (mcpRes.isAccessDenied()) {
+                    long responseTime = System.currentTimeMillis() - startTime;
+                    log.warn("Access denied by MCP security guardrail for query: {}", sanitizedMessage);
+                    return ChatResponse.builder()
+                            .answer(mcpRes.getFallbackSummary())
+                            .sources(List.of(new ChatResponse.Source("guardrail", "Security Guardrail: Access Denied")))
+                            .responseTime(responseTime)
+                            .model("AI-RBAC-Guard")
+                            .build();
+                }
+                if (mcpRes.isToolExecuted()) {
+                    sources.add(new ChatResponse.Source("mcp", "MCP Tool: " + mcpRes.getToolName()));
+                    mcpContext = mcpRes.getSynthesizedContext();
+                    log.info("MCP Tool '{}' invoked for conversationId={}", mcpRes.getToolName(), conversationId);
+                }
+            }
+
             GenerationContext ctx = resolveGenerationContext();
 
             // If a custom provider (e.g. Google Gemini, OpenAI, Groq) is configured, invoke it directly.
@@ -95,6 +125,11 @@ public class LocalLLMService implements AIService {
                 UserAiConfig cfg = ctx.config();
                 String modelName = (cfg.getModel() != null && !cfg.getModel().isBlank()) ? cfg.getModel() : "default";
                 log.info("Generating chat response using provider: {}, model: {}", cfg.getProvider(), modelName);
+                String systemPrompt = "You are a helpful AI assistant in an AI School Management System.";
+                if (!mcpContext.isBlank()) {
+                    systemPrompt += "\nAuthoritative MCP Data:\n" + mcpContext +
+                            "\nGround your response strictly in the provided MCP data where applicable.";
+                }
                 try {
                     String response = ctx.strategy().generate(
                             cfg.getApiKey(),
@@ -102,23 +137,31 @@ public class LocalLLMService implements AIService {
                             cfg.getModel(),
                             cfg.getTemperature(),
                             cfg.getMaxTokens(),
-                            "You are a helpful AI assistant in an AI School Management System.",
+                            systemPrompt,
                             sanitizedMessage
                     );
                     long responseTime = System.currentTimeMillis() - startTime;
                     log.info("Chat completed via provider {}, responseTime={}ms", cfg.getProvider(), responseTime);
                     return ChatResponse.builder()
                             .answer(response)
-                            .sources(List.of())
+                            .sources(sources)
                             .responseTime(responseTime)
                             .model(cfg.getProvider() + " (" + modelName + ")")
                             .build();
                 } catch (Exception e) {
                     long responseTime = System.currentTimeMillis() - startTime;
                     log.error("AI provider {} failed: {}", cfg.getProvider(), e.getMessage(), e);
+                    if (mcpOpt.isPresent() && mcpOpt.get().isToolExecuted() && mcpOpt.get().getFallbackSummary() != null) {
+                        return ChatResponse.builder()
+                                .answer(mcpOpt.get().getFallbackSummary())
+                                .sources(sources)
+                                .responseTime(responseTime)
+                                .model("EduAI-MCP-Direct")
+                                .build();
+                    }
                     return ChatResponse.builder()
                             .answer("AI Provider Error (" + cfg.getProvider() + "): " + e.getMessage() + ". Please check your API key and connection settings.")
-                            .sources(List.of())
+                            .sources(sources)
                             .responseTime(responseTime)
                             .model(cfg.getProvider() + "-Error")
                             .build();
@@ -129,18 +172,34 @@ public class LocalLLMService implements AIService {
             String response;
             String modelName;
             try {
-                response = llmProvider.generate(sanitizedMessage);
+                String promptToLlm = sanitizedMessage;
+                if (!mcpContext.isBlank()) {
+                    promptToLlm = "Context from verified School Database (via MCP):\n" + mcpContext +
+                            "\nUser Question: " + sanitizedMessage +
+                            "\nPlease answer concisely based on the verified context above.";
+                }
+                response = llmProvider.generate(promptToLlm);
                 modelName = llmProvider.getProviderName();
             } catch (Exception e) {
-                // If local Ollama is offline or unconfigured, fall back to offline database/rule assistant
+                // If local Ollama is offline or unconfigured, fall back to offline MCP tool or database assistant
                 log.warn("Local LLM provider unavailable, falling back to local dataset assistance: {}", e.getMessage());
                 long responseTime = System.currentTimeMillis() - startTime;
+
+                if (mcpOpt.isPresent() && mcpOpt.get().isToolExecuted() && mcpOpt.get().getFallbackSummary() != null) {
+                    return ChatResponse.builder()
+                            .answer(mcpOpt.get().getFallbackSummary())
+                            .sources(sources)
+                            .responseTime(responseTime)
+                            .model("EduAI-MCP-Direct")
+                            .build();
+                }
+
                 String msg = request.getMessage() != null ? request.getMessage().toLowerCase() : "";
                 String dbAnswer = getDatabaseAnswer(msg);
                 if (dbAnswer != null) {
                     return ChatResponse.builder()
                             .answer(dbAnswer)
-                            .sources(List.of())
+                            .sources(sources)
                             .responseTime(responseTime)
                             .model("EduAI-DB-Assistant")
                             .build();
@@ -163,7 +222,7 @@ public class LocalLLMService implements AIService {
                 }
                 return ChatResponse.builder()
                         .answer(answer)
-                        .sources(List.of())
+                        .sources(sources)
                         .responseTime(responseTime)
                         .model("EduAI-Offline-Assistant")
                         .build();
@@ -174,7 +233,7 @@ public class LocalLLMService implements AIService {
 
             return ChatResponse.builder()
                     .answer(response)
-                    .sources(List.of())
+                    .sources(sources)
                     .responseTime(responseTime)
                     .model(modelName)
                     .build();
@@ -251,6 +310,27 @@ public class LocalLLMService implements AIService {
                 log.warn("Prompt injection detected in stream, conversationId={}", conversationId);
             }
 
+            // Model Context Protocol (MCP) Agent execution & AI restriction guard
+            Optional<com.ai.dashboard.mcp.agent.McpAgentService.AgentExecutionResult> mcpOpt = Optional.empty();
+            if (!sanitizedMessage.startsWith("You are an AI learning assistant.")) {
+                mcpOpt = mcpAgentService.executeToolIfApplicable(sanitizedMessage);
+            }
+
+            if (mcpOpt.isPresent()) {
+                var mcpRes = mcpOpt.get();
+                if (mcpRes.isAccessDenied()) {
+                    return Stream.of(mcpRes.getFallbackSummary());
+                }
+            }
+
+            String mcpContext = (mcpOpt.isPresent() && mcpOpt.get().isToolExecuted()) ? mcpOpt.get().getSynthesizedContext() : "";
+            String promptForStream = sanitizedMessage;
+            if (!mcpContext.isBlank()) {
+                promptForStream = "Context from verified School Database (via MCP):\n" + mcpContext +
+                        "\nUser Question: " + sanitizedMessage +
+                        "\nPlease answer concisely based on the verified context above.";
+            }
+
             GenerationContext ctx = resolveGenerationContext();
             Stream<String> stream;
             String modelName;
@@ -266,15 +346,25 @@ public class LocalLLMService implements AIService {
                             cfg.getModel(),
                             cfg.getTemperature(),
                             cfg.getMaxTokens(),
-                            sanitizedMessage
+                            promptForStream
                     );
                 } catch (Exception e) {
                     log.error("Streaming for provider {} failed: {}", cfg.getProvider(), e.getMessage(), e);
+                    if (mcpOpt.isPresent() && mcpOpt.get().isToolExecuted() && mcpOpt.get().getFallbackSummary() != null) {
+                        return Stream.of(mcpOpt.get().getFallbackSummary());
+                    }
                     return Stream.of("AI Provider Error (" + cfg.getProvider() + "): " + e.getMessage());
                 }
             } else {
-                stream = llmProvider.stream(sanitizedMessage);
-                modelName = llmProvider.getProviderName();
+                try {
+                    stream = llmProvider.stream(promptForStream);
+                    modelName = llmProvider.getProviderName();
+                } catch (Exception ex) {
+                    if (mcpOpt.isPresent() && mcpOpt.get().isToolExecuted() && mcpOpt.get().getFallbackSummary() != null) {
+                        return Stream.of(mcpOpt.get().getFallbackSummary());
+                    }
+                    throw ex;
+                }
             }
 
             long responseTime = System.currentTimeMillis() - startTime;
@@ -289,7 +379,6 @@ public class LocalLLMService implements AIService {
             return Stream.of("I received your message. The AI service provider is currently offline or unconfigured.");
         }
     }
-
     @Override
     public boolean health() {
         boolean healthy = llmProvider.isAvailable();

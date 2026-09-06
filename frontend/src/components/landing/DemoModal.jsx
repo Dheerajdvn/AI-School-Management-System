@@ -73,15 +73,20 @@ export default function DemoModal({ isOpen, onClose }) {
       <div className="modal-dialog modal-dialog-centered" style={{ maxWidth: '520px' }}>
         <div
           ref={dialogRef}
-          className="modal-content border-0 shadow-lg animate-scale-in"
-          style={{ background: 'var(--surface)', color: 'var(--text)' }}
+          className="modal-content border shadow-lg animate-scale-in"
+          style={{
+            background: 'var(--home-card-bg, var(--surface))',
+            color: 'var(--home-text, var(--text))',
+            borderColor: 'var(--home-border, var(--border))',
+            borderRadius: '18px'
+          }}
           role="dialog"
           aria-modal="true"
           aria-labelledby="demo-modal-title"
           aria-describedby="demo-modal-description"
         >
-          <div className="modal-header border-bottom" style={{ borderColor: 'var(--border)' }}>
-            <h5 id="demo-modal-title" className="modal-title fw-bold">Select a Demo Role</h5>
+          <div className="modal-header border-bottom" style={{ borderColor: 'var(--home-border, var(--border))' }}>
+            <h5 id="demo-modal-title" className="modal-title fw-bold" style={{ color: 'var(--home-heading, var(--text))' }}>Select a Demo Role</h5>
             <button type="button" onClick={onClose} className="btn-close" aria-label="Close demo role dialog"></button>
           </div>
           <div className="modal-body p-4">
@@ -93,11 +98,11 @@ export default function DemoModal({ isOpen, onClose }) {
                 <button
                   key={acc.username}
                   onClick={() => handleSelectRole(acc.username)}
-                  className="p-3 rounded border text-start bg-transparent text-reset w-100 transition-all hover-surface d-flex align-items-center justify-content-between"
-                  style={{ borderColor: 'var(--border)' }}
+                  className="p-3 rounded-3 border text-start w-100 transition-all landing-inner-box d-flex align-items-center justify-content-between"
+                  style={{ textDecoration: 'none' }}
                 >
                   <div>
-                    <div className="fw-semibold d-flex align-items-center gap-2">
+                    <div className="fw-semibold d-flex align-items-center gap-2" style={{ color: 'var(--home-heading, var(--text))' }}>
                       <span>{acc.role}</span>
                       <span className="badge bg-primary-subtle text-primary border">{acc.badge}</span>
                     </div>

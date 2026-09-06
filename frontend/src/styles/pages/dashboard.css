@@ -1,3 +1,271 @@
+/* Dashdark X Premium Dashboard Styling (Landing Page Obsidian Theme) */
+
 .dashboard-page {
-  /* Dashboard layout */
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding-bottom: 2rem;
+}
+
+/* Dashdark Header Bar */
+.dashdark-header-bar {
+  background: #0D0D10;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 16px;
+  padding: 1.2rem 1.5rem;
+}
+
+/* Dashdark Stat Cards */
+.dashdark-stat-card {
+  background: #0D0D10;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 16px;
+  padding: 1.15rem 1.25rem;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+}
+
+.dashdark-stat-card:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.7);
+  transform: translateY(-2px);
+}
+
+.dashdark-stat-card.active {
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+.dashdark-stat-icon-wrapper {
+  width: 24px;
+  height: 24px;
+  font-size: 1rem;
+}
+
+.dashdark-stat-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #A1A1AA;
+  letter-spacing: 0.01em;
+}
+
+.dashdark-stat-val {
+  font-size: 1.55rem;
+  letter-spacing: -0.02em;
+  color: #FFFFFF;
+  line-height: 1.1;
+}
+
+.dashdark-trend-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  line-height: 1;
+}
+
+.dashdark-trend-badge.trend-up {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10B981;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.dashdark-trend-badge.trend-down {
+  background: rgba(239, 68, 68, 0.15);
+  color: #EF4444;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+/* Dashdark Main Analytics Cards */
+.dashdark-card {
+  background: #0D0D10;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 16px;
+  padding: 1.35rem 1.5rem;
+  position: relative;
+  height: 100%;
+}
+
+.dashdark-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: -0.01em;
+  margin-bottom: 0;
+}
+
+/* Circular Arc Gauge (Dashdark X "Website Visitors 150k" aesthetic) */
+.dashdark-circular-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 1rem 0;
+}
+
+.dashdark-circular-svg {
+  width: 200px;
+  height: 160px;
+  overflow: visible;
+}
+
+.dashdark-circular-center {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.dashdark-circular-stat {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.dashdark-circular-label {
+  font-size: 0.7rem;
+  color: #A1A1AA;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 4px;
+}
+
+.dashdark-legend-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  font-size: 0.8rem;
+}
+
+.dashdark-legend-row:last-child {
+  border-bottom: none;
+}
+
+.dashdark-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+/* Dashdark Table Architecture */
+.dashdark-table-card {
+  background: #0D0D10;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.dashdark-table-header {
+  padding: 1.1rem 1.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.dashdark-table {
+  width: 100%;
+  margin-bottom: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.dashdark-table th {
+  background: #0D0D10;
+  color: #71717A;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  white-space: nowrap;
+}
+
+.dashdark-table td {
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: #F4F4F5;
+  font-size: 0.82rem;
+  vertical-align: middle;
+  background: transparent;
+  transition: background-color 0.15s ease;
+}
+
+.dashdark-table tr:hover td {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.dashdark-table tr:last-child td {
+  border-bottom: none;
+}
+
+.dashdark-checkbox {
+  width: 16px;
+  height: 16px;
+  background-color: #121216;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.dashdark-checkbox:checked {
+  background-color: #EC4899;
+  border-color: #EC4899;
+}
+
+.dashdark-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.dashdark-status-pill.online {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10B981;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.dashdark-status-pill.offline {
+  background: rgba(255, 255, 255, 0.06);
+  color: #71717A;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dashdark-action-btn {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: #A1A1AA;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dashdark-action-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.1);
 }

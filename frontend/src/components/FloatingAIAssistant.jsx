@@ -13,7 +13,7 @@ const PUBLIC_SUGGESTIONS = [
   'How many clients?'
 ]
 
-const APP_SUGGESTIONS = ['Summarize Syllabus', 'Java OOP Help', 'Generate Quiz']
+const APP_SUGGESTIONS = ['Java Course Details', 'Average Student Fee', 'Java OOP Help', 'Summarize Syllabus']
 
 const PUBLIC_INTENT_RESPONSES = [
   {
@@ -186,13 +186,15 @@ export default function FloatingAIAssistant() {
   const suggestions = isPublicMode ? PUBLIC_SUGGESTIONS : APP_SUGGESTIONS
 
   return (
-    <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 1080 }}>
+    <div style={{ position: 'fixed', bottom: isMobile ? '16px' : '24px', right: isMobile ? '16px' : '24px', zIndex: 1080 }}>
       {isOpen && (
         <div
           className="shadow-lg border overflow-hidden d-flex flex-column animate-fade-in"
           style={{
-            width: window.innerWidth < 480 ? MOBILE_WIDTH : `${DESKTOP_WIDTH}px`,
-            height: isMinimized ? '56px' : `${DESKTOP_HEIGHT}px`,
+            width: isMobile ? 'calc(100vw - 32px)' : `${DESKTOP_WIDTH}px`,
+            maxWidth: `${DESKTOP_WIDTH}px`,
+            height: isMinimized ? '56px' : (isMobile ? '440px' : `${DESKTOP_HEIGHT}px`),
+            maxHeight: isMobile ? 'calc(100vh - 80px)' : `${DESKTOP_HEIGHT}px`,
             borderRadius: '16px',
             backgroundColor: 'var(--card, #17181b)',
             borderColor: 'var(--border, #27272a)',
@@ -244,7 +246,7 @@ export default function FloatingAIAssistant() {
                 className="floating-ai-messages p-3 flex-grow-1 overflow-auto"
                 style={{
                   fontSize: '13px',
-                  backgroundColor: 'var(--surface, #111827)',
+                  backgroundColor: 'var(--surface, #0D0D10)',
                   opacity: 1
                 }}
               >
@@ -259,9 +261,9 @@ export default function FloatingAIAssistant() {
                         ...(m.role === 'user'
                           ? { backgroundColor: 'var(--primary, #4f46e5)', color: '#ffffff' }
                           : {
-                              backgroundColor: 'var(--hover, #1f2937)',
-                              color: 'var(--text, #f3f4f6)',
-                              border: '1px solid var(--border, #374151)'
+                              backgroundColor: 'var(--hover, #14141A)',
+                              color: 'var(--text, #F4F4F5)',
+                              border: '1px solid var(--border, rgba(255, 255, 255, 0.10))'
                             })
                       }}
                     >
@@ -272,9 +274,22 @@ export default function FloatingAIAssistant() {
                       {m.content}
 
                       {m.sources && m.sources.length > 0 && (
-                        <div className="mt-2 pt-1 border-top border-white border-opacity-25 x-small opacity-90">
-                          <i className="bi bi-link-45deg me-1" />
-                          <span>Sources: {m.sources.map(s => s.title || s.filename || s).join(', ')}</span>
+                        <div className="mt-2 pt-1 border-top border-white border-opacity-25 x-small opacity-90 d-flex flex-wrap gap-1 align-items-center">
+                          {m.sources.map((s, sIdx) => {
+                            const label = typeof s === 'string' ? s : (s.title || s.filename || s.reference || s.source || 'Source');
+                            const isMcp = label.toLowerCase().includes('mcp') || label.toLowerCase().includes('tool');
+                            const isSecurity = label.toLowerCase().includes('guardrail') || label.toLowerCase().includes('denied') || label.toLowerCase().includes('restricted');
+                            return (
+                              <span
+                                key={sIdx}
+                                className={`badge ${isSecurity ? 'bg-danger' : (isMcp ? 'bg-success bg-opacity-75' : 'bg-primary bg-opacity-50')} text-white text-wrap`}
+                                style={{ fontSize: '10px' }}
+                              >
+                                <i className={`bi ${isSecurity ? 'bi-shield-slash me-1' : (isMcp ? 'bi-cpu me-1' : 'bi-link-45deg me-1')}`} />
+                                {label}
+                              </span>
+                            );
+                          })}
                         </div>
                       )}
                     </div>
@@ -285,7 +300,7 @@ export default function FloatingAIAssistant() {
                   <div className="d-flex justify-content-start mb-3">
                     <div
                       className="p-2.5 rounded-3 border small text-muted d-flex align-items-center gap-2"
-                      style={{ backgroundColor: 'var(--hover, #1f2937)', borderColor: 'var(--border, #374151)' }}
+                      style={{ backgroundColor: 'var(--hover, #14141A)', borderColor: 'var(--border, rgba(255, 255, 255, 0.10))' }}
                     >
                       <span className="spinner-border spinner-border-sm text-primary" />
                       <span>{isPublicMode ? 'Checking product info...' : 'Thinking and parsing vector chunks...'}</span>
@@ -299,8 +314,8 @@ export default function FloatingAIAssistant() {
                 className="px-2 py-1.5 border-top d-flex gap-1.5 overflow-auto no-scrollbar"
                 style={{
                   fontSize: '11px',
-                  backgroundColor: 'var(--card, #17181b)',
-                  borderColor: 'var(--border, #27272a)'
+                  backgroundColor: 'var(--card, #0D0D10)',
+                  borderColor: 'var(--border, rgba(255, 255, 255, 0.10))'
                 }}
               >
                 {suggestions.map(q => (
@@ -318,8 +333,8 @@ export default function FloatingAIAssistant() {
               <div
                 className="p-2 border-top"
                 style={{
-                  backgroundColor: 'var(--card, #17181b)',
-                  borderColor: 'var(--border, #27272a)'
+                  backgroundColor: 'var(--card, #0D0D10)',
+                  borderColor: 'var(--border, rgba(255, 255, 255, 0.10))'
                 }}
               >
                 <form
@@ -336,9 +351,9 @@ export default function FloatingAIAssistant() {
                     onChange={(e) => setInput(e.target.value)}
                     disabled={loading}
                     style={{
-                      backgroundColor: 'var(--input-bg, #18181b)',
-                      color: 'var(--text, #f3f4f6)',
-                      borderColor: 'var(--input-border, #27272a)'
+                      backgroundColor: 'var(--input-bg, #121216)',
+                      color: 'var(--text, #F4F4F5)',
+                      borderColor: 'var(--input-border, rgba(255, 255, 255, 0.12))'
                     }}
                   />
                   <button

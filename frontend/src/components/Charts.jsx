@@ -76,10 +76,10 @@ const getBaseOptions = (title, onClick, isDark) => ({
     },
     tooltip: {
       enabled: true,
-      backgroundColor: isDark ? '#1e293b' : '#ffffff',
-      titleColor: isDark ? '#f8fafc' : '#0f172a',
-      bodyColor: isDark ? '#cbd5e1' : '#334155',
-      borderColor: isDark ? '#334155' : '#cbd5e1',
+      backgroundColor: isDark ? '#0D0D10' : '#ffffff',
+      titleColor: isDark ? '#FFFFFF' : '#0f172a',
+      bodyColor: isDark ? '#A1A1AA' : '#334155',
+      borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : '#cbd5e1',
       borderWidth: 1,
       padding: 10,
       boxPadding: 4

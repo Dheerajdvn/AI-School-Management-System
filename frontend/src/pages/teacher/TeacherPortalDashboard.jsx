@@ -57,7 +57,7 @@ export default function TeacherPortalDashboard() {
 
       {/* Stats row */}
       <div className="row g-3 mb-4">
-        <div className="col-md-3 col-sm-6">
+        <div className="col-6 col-md-3">
           <div className="stat-card shadow-xs">
             <div className="stat-icon"><i className="bi bi-layers-fill text-primary" /></div>
             <div className="stat-content">
@@ -66,7 +66,7 @@ export default function TeacherPortalDashboard() {
             </div>
           </div>
         </div>
-        <div className="col-md-3 col-sm-6">
+        <div className="col-6 col-md-3">
           <div className="stat-card shadow-xs">
             <div className="stat-icon"><i className="bi bi-people-fill text-primary" /></div>
             <div className="stat-content">
@@ -75,7 +75,7 @@ export default function TeacherPortalDashboard() {
             </div>
           </div>
         </div>
-        <div className="col-md-3 col-sm-6">
+        <div className="col-6 col-md-3">
           <div className="stat-card shadow-xs">
             <div className="stat-icon"><i className="bi bi-card-text text-primary" /></div>
             <div className="stat-content">
@@ -84,7 +84,7 @@ export default function TeacherPortalDashboard() {
             </div>
           </div>
         </div>
-        <div className="col-md-3 col-sm-6">
+        <div className="col-6 col-md-3">
           <div className="stat-card shadow-xs">
             <div className="stat-icon"><i className="bi bi-calendar-check-fill text-primary" /></div>
             <div className="stat-content">
@@ -93,7 +93,7 @@ export default function TeacherPortalDashboard() {
             </div>
           </div>
         </div>
-        <div className="col-md-4 col-sm-6">
+        <div className="col-6 col-md-4">
           <div className="stat-card shadow-xs">
             <div className="stat-icon"><i className="bi bi-pencil-square text-primary" /></div>
             <div className="stat-content">
@@ -102,7 +102,7 @@ export default function TeacherPortalDashboard() {
             </div>
           </div>
         </div>
-        <div className="col-md-4 col-sm-6">
+        <div className="col-6 col-md-4">
           <div className="stat-card shadow-xs">
             <div className="stat-icon"><i className="bi bi-robot text-primary" /></div>
             <div className="stat-content">
@@ -111,12 +111,12 @@ export default function TeacherPortalDashboard() {
             </div>
           </div>
         </div>
-        <div className="col-md-4 col-sm-12">
+        <div className="col-12 col-md-4">
           <div className="stat-card shadow-xs">
-            <div className="stat-icon"><i className="bi bi-bell-fill text-primary" /></div>
+            <div className="stat-icon"><i className="bi bi-folder-fill text-primary" /></div>
             <div className="stat-content">
-              <span className="stat-label">Notifications</span>
-              <strong className="stat-value" style={{ color: 'var(--text)' }}>{stats.notifications} Unread</strong>
+              <span className="stat-label">Study Materials</span>
+              <strong className="stat-value" style={{ color: 'var(--text)' }}>{stats.studyMaterials} Uploads</strong>
             </div>
           </div>
         </div>

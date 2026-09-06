@@ -1,127 +1,77 @@
 # 🗄️ Database Documentation
 
-## ⚠️ Two separate student populations
-
-This schema contains **two unrelated representations of a student**, and they are intentionally kept
-apart:
-
-| | `users` (with `ROLE_STUDENT`) | `student` |
-| :--- | :--- | :--- |
-| Purpose | Real accounts that log in and use the platform | Standalone demo dataset for the natural-language analytics feature |
-| Created by | Registration / admin user management | Seed data |
-| Foreign keys | Referenced by `enrollments`, `submissions`, `documents`, `courses.teacher_id` | **None** — nothing references it and it references nothing |
-| Read by | The whole application | `AiQueryServiceImpl` (Ask-AI) only |
-
-Consequences worth knowing before you touch either:
-
-- **Counts will not agree.** "Total students" on the dashboard counts `users` with `ROLE_STUDENT`.
-  "How many students" asked through Ask-AI counts rows in `student`. Both are correct for their own
-  population. This is expected, not a bug.
-- **Registering a user does not create a `student` row**, and seeding `student` rows does not create
-  logins. There is no synchronisation between the two.
-- **The AI cannot see real users.** `SqlValidator.ALLOWED_TABLES` whitelists `student` and nothing
-  else, so a generated (or prompt-injected) query cannot reach `users` or any operational table.
-
-If the demo dataset is ever retired, the migration path is to point the NL-to-SQL prompt and
-`SqlValidator` at a purpose-built read-only reporting view over the real tables — not to add foreign
-keys to `student`.
-
-## Entity Descriptions
-
-### Student (`student`)
-- Flat demo dataset backing the Ask-AI natural-language-to-SQL feature. **Not** the user roster; see
-  the note above.
-- Fields: `id`, `name`, `course`, `subject`, `fee`, `address`, `joining_date`, `created_at`.
-- No relationships to any other entity.
-
-### User (`users`)
-- Represents system users across all roles (`ROLE_ADMIN`, `ROLE_SCHOOL_ADMIN`, `ROLE_PRINCIPAL`, `ROLE_TEACHER`, `ROLE_STUDENT`).
-- Fields: `id`, `username`, `email`, `password`, `roles`, `enabled`, `school_id`, `created_at`, `updated_at`.
-- Indexed: `enabled`, `email`, `username`.
-
-### UserAiConfig (`user_ai_configs`)
-- Stores per-user AI provider preferences and API credentials.
-- Fields: `id`, `user_id`, `provider` (Groq, OpenAI, Gemini, etc.), `api_key` *(AES-256-GCM encrypted via `AesEncryptionConverter`)*, `base_url`, `model`, `temperature`, `max_tokens`, `streaming_enabled`, `ai_suggestions_enabled`, `is_connected`, `last_verified_at`.
-- Indexed: `user_id`.
-
-### Course (`courses`)
-- Academic course offerings with teacher assignments.
-- Fields: `id`, `courseCode`, `title`, `description`, `teacher_id`, `school_id`, `status`.
-- Indexed: `teacher_id`, `status`, `school_id`.
-
-### Enrollment (`enrollments`)
-- Student enrollment in courses.
-- Fields: `id`, `student_id`, `course_id`, `enrollmentDate`, `status`, `progress`.
-- Unique Constraint: `(student_id, course_id)`.
-- Indexed: `status`, `student_id`, `course_id`.
-
-### Assignment (`assignments`)
-- Course homework, tasks, and examinations.
-- Fields: `id`, `title`, `description`, `instructions`, `dueDate`, `maxMarks`, `status`, `teacher_id`, `course_id`.
-- Indexed: `course_id`, `teacher_id`, `status`, `due_date`.
-
-### Submission (`submissions`)
-- Student assignment submissions and AI/Teacher evaluations.
-- Fields: `id`, `assignment_id`, `student_id`, `status`, `submissionText`, `attachmentUrl`, `obtainedMarks`, `feedback`.
-- Unique Constraint: `(student_id, assignment_id)`.
-- Indexed: `student_id`, `assignment_id`, `status`, `submitted_at`.
-
-### Document (`documents`)
-- Academic file storage for RAG vector processing.
-- Fields: `id`, `filename`, `originalFilename`, `contentType`, `fileSize`, `uploadedBy`, `uploadTime`, `documentType`, `course_id`, `storagePath`, `processingStatus`.
-- Indexed: `uploaded_by`, `course_id`, `document_type`, `processing_status`.
-
-### DocumentChunk (`document_chunks`)
-- Text chunks for vector search.
-- Fields: `id`, `documentId`, `chunkIndex`, `content`, `tokenCount`, `embeddingGenerated`, `createdAt`.
-- Indexed: `document_id`, `embedding_generated`.
-
-### ConversationSession (`conversation_sessions`)
-- Chat conversation sessions.
-- Fields: `id`, `sessionId`, `userId`, `title`, `messageCount`, `totalTokens`, `createdAt`, `updatedAt`.
-- Indexed: `user_id`, `session_id`.
-
-### ChatMessage (`chat_messages`)
-- Individual AI and user chat messages.
-- Fields: `id`, `session_id`, `role`, `content`, `tokenCount`, `contextUsed`, `createdAt`.
-- Indexed: `session_id`, `created_at`, `role`.
+PostgreSQL schema models, entity relationships, indexes, and demographic data partitions.
 
 ---
 
-## Entity Relationships
+## 1. Student Populations Architecture
+
+The schema maintains two intentionally isolated student models:
+
+| Dimension | `users` (Role `ROLE_STUDENT`) | `student` Table |
+| :--- | :--- | :--- |
+| **Purpose** | Operational user accounts for authentication and coursework | Standalone demo dataset for Natural-Language SQL (Ask-AI) |
+| **Created Via** | User registration / Admin user management | Database seed script |
+| **Foreign Keys** | Linked to `enrollments`, `submissions`, `documents` | **None** (isolated standalone table) |
+| **Read By** | Application authentication and academic workflows | `AiQueryServiceImpl` and `StudentAnalyticsMcpTool` only |
+
+> [!NOTE]
+> - Counts differ intentionally: Dashboard metrics count registered users in `users`, while Ask-AI counts records in `student`.
+> - `SqlValidator` allows querying only the `student` table, completely preventing access to user passwords or operational records.
+
+---
+
+## 2. Core Entities
+
+| Entity | Table Name | Key Fields | Indexes / Constraints |
+| :--- | :--- | :--- | :--- |
+| **User** | `users` | `id`, `username`, `email`, `password`, `roles`, `enabled`, `school_id` | Indexes: `email`, `username`, `enabled` |
+| **UserAiConfig** | `user_ai_configs` | `id`, `user_id`, `provider`, `api_key` *(encrypted)*, `model`, `temperature` | Index: `user_id` (AES-256-GCM encrypted key) |
+| **Course** | `courses` | `id`, `course_code`, `title`, `description`, `teacher_id`, `school_id`, `status` | Indexes: `teacher_id`, `status`, `school_id` |
+| **Enrollment** | `enrollments` | `id`, `student_id`, `course_id`, `enrollment_date`, `status`, `progress` | Unique: `(student_id, course_id)`; Index: `status` |
+| **Assignment** | `assignments` | `id`, `title`, `instructions`, `due_date`, `max_marks`, `status`, `course_id` | Indexes: `course_id`, `teacher_id`, `due_date` |
+| **Submission** | `submissions` | `id`, `assignment_id`, `student_id`, `status`, `obtained_marks`, `feedback` | Unique: `(student_id, assignment_id)` |
+| **Document** | `documents` | `id`, `filename`, `content_type`, `file_size`, `course_id`, `processing_status` | Indexes: `course_id`, `processing_status` |
+| **DocumentChunk** | `document_chunks` | `id`, `document_id`, `chunk_index`, `content`, `token_count` | Index: `document_id` |
+| **ChatSession** | `conversation_sessions` | `id`, `session_id`, `user_id`, `title`, `total_tokens` | Indexes: `user_id`, `session_id` |
+| **ChatMessage** | `chat_messages` | `id`, `session_id`, `role`, `content`, `token_count` | Indexes: `session_id`, `created_at` |
+| **Student (Demo)**| `student` | `id`, `name`, `course`, `subject`, `fee`, `address`, `joining_date` | Isolated table for SQL analytics queries |
+
+---
+
+## 3. Entity Relationships
 
 ```mermaid
 erDiagram
     User ||--o| UserAiConfig : "configures"
-    User ||--o{ Course : "teaches"
-    User ||--o{ Enrollment : "enrolled"
+    User ||--o{ Course : "instructs"
+    User ||--o{ Enrollment : "enrolls"
     User ||--o{ Assignment : "creates"
     User ||--o{ Submission : "submits"
     User ||--o{ ConversationSession : "owns"
     User ||--o{ Document : "uploads"
     
-    Course ||--o{ Enrollment : "has"
-    Course ||--o{ Assignment : "contains"
-    Course ||--o{ Document : "has"
+    Course ||--o{ Enrollment : "contains"
+    Course ||--o{ Assignment : "assigns"
+    Course ||--o{ Document : "includes"
     
-    Assignment ||--o{ Submission : "receives"
-    Document ||--o{ DocumentChunk : "split into"
-    ConversationSession ||--o{ ChatMessage : "contains"
+    Assignment ||--o{ Submission : "evaluates"
+    Document ||--o{ DocumentChunk : "segments into"
+    ConversationSession ||--o{ ChatMessage : "holds"
 ```
 
-`student` is deliberately absent from the diagram above: it has no relationships. It is an island.
+*Note: The `student` demo table is completely detached from the operational ER graph.*
 
 ---
 
-## Database Indexes Summary
+## 4. Key Indexes
 
-| Table | Column | Purpose |
+| Table | Indexed Columns | Query Target |
 | :--- | :--- | :--- |
-| `users` | `email`, `username`, `enabled` | User authentication & email lookups |
-| `user_ai_configs` | `user_id` | Quick retrieval of user AI settings |
-| `assignments` | `course_id`, `teacher_id`, `status`, `due_date` | Assignment filtering and sorting |
-| `courses` | `teacher_id`, `status`, `school_id` | Course management queries |
-| `submissions` | `student_id`, `assignment_id`, `status` | Submission grade tracking |
-| `enrollments` | `student_id`, `course_id`, `status` | Student enrollment validation |
-| `documents` | `uploaded_by`, `course_id`, `processing_status` | RAG document pipeline tracking |
-| `conversation_sessions`| `user_id`, `session_id` | AI chat session lookups |
+| `users` | `email`, `username` | Authentication lookups |
+| `user_ai_configs` | `user_id` | AI configuration retrieval |
+| `courses` | `teacher_id`, `status` | Course catalog filtering |
+| `assignments` | `course_id`, `due_date` | Course workload listings |
+| `submissions` | `student_id`, `assignment_id` | Gradebook retrieval |
+| `documents` | `course_id`, `processing_status`| RAG indexing queue |
+| `conversation_sessions`| `user_id`, `session_id` | Chat history lookups |

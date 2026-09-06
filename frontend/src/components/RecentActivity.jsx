@@ -54,9 +54,9 @@ export default function RecentActivity({ documents = [], students = [] }) {
 
   return (
     <div className="card h-100 shadow-sm border-0">
-      <div className="card-body p-4">
+      <div className="card-body p-3 p-md-4">
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <h5 className="card-title fw-bold m-0">Recent AI Activity & Active Users</h5>
+          <h5 className="card-title fw-bold m-0" style={{ fontSize: '14px' }}>Recent AI Activity & Active Users</h5>
           <span className="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 rounded-pill small">Live Stream</span>
         </div>
 
@@ -65,15 +65,15 @@ export default function RecentActivity({ documents = [], students = [] }) {
             <h6 className="text-muted small text-uppercase fw-semibold mb-2">Recent AI Processing & RAG Events</h6>
             <div className="list-group list-group-flush rounded-3 border bg-surface overflow-hidden">
               {aiActivity.map((item) => (
-                <div key={item.id} className="list-group-item d-flex justify-content-between align-items-center py-2 px-3 border-bottom">
-                  <div className="d-flex align-items-center gap-2">
-                    <div className={`spinner-dot bg-${item.type}`} style={{ width: 8, height: 8, borderRadius: '50%' }} />
-                    <div>
-                      <div className="fw-semibold small text-dark">{item.action}</div>
-                      <div className="text-muted text-xs">{item.target}</div>
+                <div key={item.id} className="list-group-item d-flex justify-content-between align-items-center py-2 px-2 px-sm-3 border-bottom gap-2">
+                  <div className="d-flex align-items-center gap-2 min-w-0">
+                    <div className={`spinner-dot bg-${item.type} flex-shrink-0`} style={{ width: 8, height: 8, borderRadius: '50%' }} />
+                    <div className="min-w-0">
+                      <div className="fw-semibold small text-dark text-truncate">{item.action}</div>
+                      <div className="text-muted text-xs text-truncate">{item.target}</div>
                     </div>
                   </div>
-                  <span className="text-muted text-xs">{item.time}</span>
+                  <span className="text-muted text-xs flex-shrink-0 text-nowrap">{item.time}</span>
                 </div>
               ))}
             </div>
@@ -83,17 +83,17 @@ export default function RecentActivity({ documents = [], students = [] }) {
             <h6 className="text-muted small text-uppercase fw-semibold mb-2">Active Users Online</h6>
             <div className="list-group list-group-flush rounded-3 border bg-surface overflow-hidden">
               {activeUsersList.map((u, idx) => (
-                <div key={u.id || idx} className="list-group-item d-flex justify-content-between align-items-center py-2 px-3 border-bottom">
-                  <div className="d-flex align-items-center gap-2">
-                    <div className="avatar-circle" style={{ width: 28, height: 28, fontSize: '11px' }}>
+                <div key={u.id || idx} className="list-group-item d-flex justify-content-between align-items-center py-2 px-2 px-sm-3 border-bottom gap-2">
+                  <div className="d-flex align-items-center gap-2 min-w-0">
+                    <div className="avatar-circle flex-shrink-0" style={{ width: 28, height: 28, fontSize: '11px' }}>
                       {(u.name || 'U').charAt(0)}
                     </div>
-                    <div>
-                      <div className="fw-semibold small text-dark">{u.name}</div>
-                      <div className="text-muted text-xs">{u.role}</div>
+                    <div className="min-w-0">
+                      <div className="fw-semibold small text-dark text-truncate">{u.name}</div>
+                      <div className="text-muted text-xs text-truncate">{u.role}</div>
                     </div>
                   </div>
-                  <span className="badge bg-success-subtle text-success text-xs rounded-pill px-2">{u.status}</span>
+                  <span className="badge bg-success-subtle text-success text-xs rounded-pill px-2 flex-shrink-0">{u.status}</span>
                 </div>
               ))}
             </div>

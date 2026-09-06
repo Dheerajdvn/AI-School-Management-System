@@ -3,38 +3,54 @@
 [data-theme="dark"], body.dark-mode {
   background-color: var(--bg) !important;
   color: var(--text) !important;
-  --primary: #8b5cf6;
-  --primary-hover: #a78bfa;
-  --primary-rgb: 139, 92, 246;
-  --accent: #8b5cf6;
+  --primary: #FFFFFF;
+  --primary-hover: #E4E4E7;
+  --primary-rgb: 255, 255, 255;
+  --accent: #A855F7;
+  --cyan: #00D8F6;
   --bg: #000000;
-  --surface: #0b0b0c;
-  --card: #0b0b0c;
+  --surface: #0D0D10;
+  --card: #0D0D10;
+  --card-hover: #14141A;
   --sidebar-bg: #000000;
-  --sidebar-text: #F8F8FA;
-  --text: #F8F8FA;
-  --paragraph: #A8ADB8;
-  --muted: #707784;
-  --secondary-text: #707784;
-  --border: rgba(255, 255, 255, 0.08);
-  --hover: rgba(26, 26, 32, 0.85);
-  --input-bg: rgba(20, 20, 24, 0.9);
+  --sidebar-text: #F4F4F5;
+  --text: #F4F4F5;
+  --heading: #FFFFFF;
+  --paragraph: #A1A1AA;
+  --muted: #71717A;
+  --secondary-text: #71717A;
+  --border: rgba(255, 255, 255, 0.10);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-hover: rgba(255, 255, 255, 0.30);
+  --hover: rgba(255, 255, 255, 0.04);
+  --input-bg: #121216;
   --input-border: rgba(255, 255, 255, 0.12);
-  --table-hover: rgba(26, 26, 32, 0.85);
-  --modal-bg: #08080a;
-  --shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.45);
-  --radius-card: 18px;
-  --radius-btn: 12px;
+  --table-hover: rgba(255, 255, 255, 0.025);
+  --modal-bg: #0D0D10;
+  --shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+  --shadow-lg: 0 24px 60px -12px rgba(0, 0, 0, 0.85);
+  --radius-card: 16px;
+  --radius-btn: 10px;
 }
 
 [data-theme="dark"] .main,
 body.dark-mode .main,
+[data-theme="dark"] .app-shell,
+body.dark-mode .app-shell {
+  background-color: #000000 !important;
+  color: var(--text) !important;
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% -8%, rgba(255, 255, 255, 0.05), transparent 70%),
+    radial-gradient(circle, rgba(255, 255, 255, 0.045) 1px, transparent 1px) !important;
+  background-size: 100% 100%, 28px 28px !important;
+  background-attachment: fixed !important;
+}
+
 [data-theme="dark"] .content,
 body.dark-mode .content,
 [data-theme="dark"] .dashboard-page,
 body.dark-mode .dashboard-page {
-  background-color: var(--bg) !important;
+  background-color: transparent !important;
   color: var(--text) !important;
 }
 
@@ -85,16 +101,16 @@ body.dark-mode .modal-content {
 /* Topbar user profile button dark mode override */
 [data-theme="dark"] .user-topbar-btn,
 body.dark-mode .user-topbar-btn {
-  background-color: #17181B !important;
-  color: #F3F4F6 !important;
-  border-color: #2A2D31 !important;
+  background-color: #121216 !important;
+  color: #F4F4F5 !important;
+  border-color: rgba(255, 255, 255, 0.10) !important;
 }
 
 [data-theme="dark"] .user-topbar-btn span,
 body.dark-mode .user-topbar-btn span,
 [data-theme="dark"] .user-topbar-btn i,
 body.dark-mode .user-topbar-btn i {
-  color: #F3F4F6 !important;
+  color: #F4F4F5 !important;
 }
 
 /* Adaptive Inputs, Selects, Pre, and Input Groups in Dark Mode */
@@ -107,7 +123,7 @@ body.dark-mode textarea,
 [data-theme="dark"] select,
 body.dark-mode select {
   background-color: var(--input-bg) !important;
-  color: #F3F4F6 !important;
+  color: #F4F4F5 !important;
   border-color: var(--input-border) !important;
 }
 
@@ -124,26 +140,27 @@ body.dark-mode .form-select:focus {
 body.dark-mode .form-control[readonly],
 [data-theme="dark"] .form-control:disabled,
 body.dark-mode .form-control:disabled {
-  background-color: #121316 !important;
-  color: #9CA3AF !important;
+  background-color: #121216 !important;
+  color: #71717A !important;
   opacity: 0.8;
 }
 
 [data-theme="dark"] .input-group-text,
 body.dark-mode .input-group-text {
-  background-color: #121316 !important;
-  color: #9CA3AF !important;
+  background-color: #121216 !important;
+  color: #A1A1AA !important;
   border-color: var(--input-border) !important;
 }
 
 [data-theme="dark"] option,
 body.dark-mode option {
-  background-color: #17181B !important;
-  color: #F3F4F6 !important;
+  background-color: #0D0D10 !important;
+  color: #F4F4F5 !important;
 }
 
 [data-theme="dark"] pre,
 body.dark-mode pre {
-  color: #E5E7EB !important;
-  background-color: #0E0F11 !important;
+  color: #F4F4F5 !important;
+  background-color: #0D0D10 !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
 }

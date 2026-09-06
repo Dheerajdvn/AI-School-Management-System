@@ -94,12 +94,14 @@ const SystemStatus = () => {
         <div className="row g-2">
           {services.map((s) => (
             <div key={s.key} className="col-md-12">
-              <div className="d-flex justify-content-between align-items-center p-2 rounded-3 bg-surface border">
-                <div className="d-flex align-items-center gap-2">
-                  <i className={`bi ${s.icon} text-muted fs-5`} />
-                  <span className="fw-medium text-dark">{s.name}</span>
+              <div className="d-flex justify-content-between align-items-center p-2 rounded-3 bg-surface border gap-2">
+                <div className="d-flex align-items-center gap-2 min-w-0">
+                  <i className={`bi ${s.icon} text-muted fs-5 flex-shrink-0`} />
+                  <span className="fw-medium text-dark text-truncate" style={{ fontSize: '13px' }}>{s.name}</span>
                 </div>
-                {getStatusBadge(status[s.key])}
+                <div className="flex-shrink-0">
+                  {getStatusBadge(status[s.key])}
+                </div>
               </div>
             </div>
           ))}

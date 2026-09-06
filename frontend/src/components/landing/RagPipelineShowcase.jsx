@@ -34,9 +34,9 @@ export default function RagPipelineShowcase() {
                 onClick={() => setActiveStep(idx)}
                 className={`p-3 rounded-4 w-100 text-start transition-all landing-card border ${activeStep === idx ? 'step-button-active' : ''}`}
                 style={{
-                  background: activeStep === idx ? 'var(--hover)' : 'var(--card)',
-                  borderColor: activeStep === idx ? 'var(--primary)' : 'var(--border)',
-                  boxShadow: activeStep === idx ? '0 8px 24px rgba(99, 102, 241, 0.2)' : 'var(--shadow)'
+                  background: activeStep === idx ? 'var(--home-inner-bg)' : 'var(--home-card-bg)',
+                  borderColor: activeStep === idx ? 'var(--primary)' : 'var(--home-border)',
+                  boxShadow: activeStep === idx ? '0 8px 24px rgba(255, 255, 255, 0.12)' : 'none'
                 }}
               >
                 <div className="d-flex align-items-center justify-content-between mb-2">
@@ -45,7 +45,7 @@ export default function RagPipelineShowcase() {
                   </span>
                   <i className={`bi ${s.icon} ${activeStep === idx ? 'text-primary fs-5' : 'text-muted'}`}></i>
                 </div>
-                <div className="fw-semibold small text-truncate" style={{ color: 'var(--text)' }}>{s.title}</div>
+                <div className="fw-semibold small text-truncate" style={{ color: 'var(--home-heading)' }}>{s.title}</div>
               </button>
             </div>
           ))}
@@ -58,7 +58,7 @@ export default function RagPipelineShowcase() {
               <div className="d-inline-flex align-items-center gap-2 px-3 py-1 mb-3 rounded-pill bg-primary-subtle text-primary fw-semibold small">
                 <span>Phase {steps[activeStep].step} of 6</span>
               </div>
-              <h3 className="fw-bold mb-3" style={{ color: 'var(--text)' }}>{steps[activeStep].title}</h3>
+              <h3 className="fw-bold mb-3" style={{ color: 'var(--home-heading)' }}>{steps[activeStep].title}</h3>
               <p className="lead text-muted mb-4" style={{ fontSize: '1.05rem', lineHeight: 1.6 }}>
                 {steps[activeStep].desc}
               </p>
@@ -81,9 +81,9 @@ export default function RagPipelineShowcase() {
             </div>
 
             <div className="col-12 col-md-6">
-              <div className="p-4 rounded-4 shadow-sm border" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-                <div className="d-flex align-items-center justify-content-between pb-2 mb-3 border-bottom" style={{ borderColor: 'var(--border)' }}>
-                  <span className="fw-semibold small d-inline-flex align-items-center gap-1.5" style={{ color: 'var(--text)' }}>
+              <div className="p-4 rounded-4 shadow-sm border landing-inner-box">
+                <div className="d-flex align-items-center justify-content-between pb-2 mb-3 border-bottom" style={{ borderColor: 'var(--home-inner-border)' }}>
+                  <span className="fw-semibold small d-inline-flex align-items-center gap-1.5" style={{ color: 'var(--home-heading)' }}>
                     <i className="bi bi-check-circle-fill text-success" /> Live Simulation Preview
                   </span>
                   <span className="badge bg-success-subtle text-success">Active & Ready</span>
@@ -91,10 +91,10 @@ export default function RagPipelineShowcase() {
 
                 {activeStep === 0 && (
                   <div className="d-flex flex-column gap-2">
-                    <div className="p-3 rounded-3 bg-card border d-flex align-items-center gap-3">
+                    <div className="p-3 rounded-3 landing-inner-box border d-flex align-items-center gap-3">
                       <i className="bi bi-file-earmark-pdf-fill text-danger fs-3" />
                       <div className="flex-grow-1">
-                        <div className="fw-semibold small" style={{ color: 'var(--text)' }}>Physics_Mechanics_Syllabus.pdf</div>
+                        <div className="fw-semibold small" style={{ color: 'var(--home-heading)' }}>Physics_Mechanics_Syllabus.pdf</div>
                         <div className="small text-muted">48 Pages • 4.2 MB • Uploaded by Dr. Smith</div>
                       </div>
                       <span className="badge bg-primary-subtle text-primary">Uploaded</span>
@@ -104,7 +104,7 @@ export default function RagPipelineShowcase() {
 
                 {activeStep === 1 && (
                   <div className="d-flex flex-column gap-2">
-                    <div className="p-3 rounded-3 bg-card border">
+                    <div className="p-3 rounded-3 landing-inner-box border">
                       <div className="fw-semibold small mb-1 text-primary">Text Extraction Complete</div>
                       <div className="small text-muted">Extracted 14,200 words across 12 chapters. Formulas, diagrams, and headings organized.</div>
                     </div>
@@ -113,7 +113,7 @@ export default function RagPipelineShowcase() {
 
                 {activeStep === 2 && (
                   <div className="d-flex flex-column gap-2">
-                    <div className="p-3 rounded-3 bg-card border">
+                    <div className="p-3 rounded-3 landing-inner-box border">
                       <div className="fw-semibold small mb-1 text-primary">Topic & Concept Breakdown</div>
                       <div className="d-flex flex-wrap gap-1.5 mt-2">
                         <span className="badge bg-secondary-subtle text-secondary">Newton's 1st Law</span>
@@ -127,7 +127,7 @@ export default function RagPipelineShowcase() {
 
                 {activeStep === 3 && (
                   <div className="d-flex flex-column gap-2">
-                    <div className="p-3 rounded-3 bg-card border">
+                    <div className="p-3 rounded-3 landing-inner-box border">
                       <div className="fw-semibold small mb-1 text-primary">Knowledge Graph Created</div>
                       <div className="small text-muted">Cross-referenced formulas with practice problem banks and lesson summaries.</div>
                     </div>
@@ -136,9 +136,9 @@ export default function RagPipelineShowcase() {
 
                 {activeStep === 4 && (
                   <div className="d-flex flex-column gap-2">
-                    <div className="p-3 rounded-3 bg-card border">
+                    <div className="p-3 rounded-3 landing-inner-box border">
                       <div className="fw-semibold small mb-1 text-muted">Student Query:</div>
-                      <div className="fw-bold mb-2" style={{ color: 'var(--text)' }}>"How is momentum conserved in elastic collisions?"</div>
+                      <div className="fw-bold mb-2" style={{ color: 'var(--home-heading)' }}>"How is momentum conserved in elastic collisions?"</div>
                       <div className="small text-success d-flex align-items-center gap-1">
                         <i className="bi bi-check2-circle" /> Found 3 matching chapters in Physics Syllabus
                       </div>
@@ -148,12 +148,12 @@ export default function RagPipelineShowcase() {
 
                 {activeStep === 5 && (
                   <div className="d-flex flex-column gap-2">
-                    <div className="p-3 rounded-3 bg-card border">
+                    <div className="p-3 rounded-3 landing-inner-box border">
                       <div className="d-flex align-items-center gap-2 mb-2">
                         <i className="bi bi-robot text-primary" />
                         <span className="fw-semibold small text-primary">AI Tutor Response:</span>
                       </div>
-                      <p className="small mb-2" style={{ color: 'var(--text)', lineHeight: 1.5 }}>
+                      <p className="small mb-2" style={{ color: 'var(--home-heading)', lineHeight: 1.5 }}>
                         In an elastic collision, total linear momentum (p = mv) remains constant because the net external force is zero.
                       </p>
                       <div className="d-inline-flex align-items-center gap-1.5 px-2.5 py-1 rounded bg-secondary-subtle text-secondary small">

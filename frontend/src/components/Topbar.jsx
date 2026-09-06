@@ -4,7 +4,7 @@ import { aiChatService } from '../services/aiService'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
 
-export default function Topbar({ title, onMenu }) {
+export default function Topbar({ title, onMenu, sidebarOpen = true }) {
   const { user, logout } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
@@ -62,9 +62,16 @@ export default function Topbar({ title, onMenu }) {
 
   return (
     <header className="topbar enterprise-topbar">
-      <div className="d-flex align-items-center gap-3">
-        <button className="hamburger btn btn-link p-0 text-body" onClick={onMenu} aria-label="Toggle menu">
-          <i className="bi bi-list fs-5" />
+      <div className="d-flex align-items-center gap-2.5">
+        {/* Universal Sidebar Toggle Button (Always visible on mobile & desktop) */}
+        <button 
+          type="button"
+          className={`sidebar-toggle-btn btn p-0 ${!sidebarOpen ? 'is-collapsed' : ''}`}
+          onClick={onMenu} 
+          aria-label={sidebarOpen ? "Hide sidebar (Ctrl+B)" : "Show sidebar (Ctrl+B)"}
+          title={sidebarOpen ? "Hide sidebar (Ctrl+B)" : "Show sidebar (Ctrl+B)"}
+        >
+          <i className={`bi ${sidebarOpen ? 'bi-layout-sidebar-inset' : 'bi-layout-sidebar'} fs-5`} />
         </button>
         <div className="d-flex flex-column">
           <h1 className="topbar-title">{title}</h1>
@@ -85,6 +92,24 @@ export default function Topbar({ title, onMenu }) {
       </div>
 
       <div className="d-flex align-items-center gap-2 gap-md-3">
+        {/* Dashdark X Academic Period Pill */}
+        <div className="dropdown d-none md-inline-block">
+          <button 
+            className="btn btn-sm d-flex align-items-center gap-1.5 px-3 py-1.5 rounded-3 fw-semibold"
+            style={{
+              backgroundColor: 'rgba(139, 92, 246, 0.15)',
+              color: '#C4B5FD',
+              border: '1px solid rgba(139, 92, 246, 0.3)',
+              fontSize: '11.5px',
+              letterSpacing: '0.01em'
+            }}
+          >
+            <i className="bi bi-calendar3 small text-primary" />
+            <span>Academic Term 2026</span>
+            <i className="bi bi-chevron-down small opacity-75 ms-1" />
+          </button>
+        </div>
+
         {/* AI Provider Status & Model Badges */}
         <div className="d-none sm-flex align-items-center gap-2">
           <span className={`enterprise-badge ${status.cls}`}>
@@ -155,6 +180,7 @@ export default function Topbar({ title, onMenu }) {
                   position: 'absolute',
                   right: 0,
                   minWidth: '220px',
+                  maxWidth: 'calc(100vw - 24px)',
                   zIndex: 1050
                 }}
               >

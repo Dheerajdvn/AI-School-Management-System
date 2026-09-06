@@ -68,15 +68,29 @@ export default function AIChat() {
                   <div key={msg.id} className={"d-flex " + (msg.role === 'user' ? 'justify-content-end' : 'justify-content-start')}>
                     <div className={"p-3 rounded " + (msg.role === 'user' ? 'bg-primary text-white' : 'bg-light')} style={{ maxWidth: '80%' }}>
                       <p className="mb-0">{msg.content}</p>
-                      {msg.sources && (
+                      {msg.sources && msg.sources.length > 0 && (
                         <div className="mt-2 pt-2 border-top">
-                          <small><strong>Sources:</strong></small>
+                          <small><strong>Sources & MCP Signals:</strong></small>
                           <div className="d-flex flex-wrap gap-1 mt-1">
-                            {msg.sources.map((source) => (
-                              <span key={source} className="badge bg-info">{source}</span>
-                            ))}
+                            {msg.sources.map((source, sIdx) => {
+                              const label = typeof source === 'string' 
+                                ? source 
+                                : (source?.title || source?.filename || source?.source || 'Source');
+                              const isMcp = label.toLowerCase().includes('mcp') || label.toLowerCase().includes('tool');
+                              const isSecurity = label.toLowerCase().includes('guardrail') || label.toLowerCase().includes('denied') || label.toLowerCase().includes('restricted');
+                              return (
+                                <span 
+                                  key={sIdx} 
+                                  className={`badge ${isSecurity ? 'bg-danger' : (isMcp ? 'bg-success' : 'bg-info')}`}
+                                >
+                                  {label}
+                                </span>
+                              );
+                            })}
                           </div>
-                          <small className="d-block mt-1"><strong>Confidence:</strong> {(msg.confidence * 100).toFixed(1)}%</small>
+                          {msg.confidence !== undefined && msg.confidence !== null && !isNaN(msg.confidence) && (
+                            <small className="d-block mt-1"><strong>Confidence:</strong> {(msg.confidence * 100).toFixed(1)}%</small>
+                          )}
                         </div>
                       )}
                     </div>

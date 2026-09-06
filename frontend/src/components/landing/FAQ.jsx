@@ -29,7 +29,7 @@ export default function FAQ() {
           <span className="badge bg-primary-subtle text-primary px-3 py-1.5 mb-2 rounded-pill fw-semibold">
             Common Questions
           </span>
-          <h2 className="fw-bold mb-2" style={{ color: 'var(--text)', fontSize: '2rem' }}>Frequently Asked Questions</h2>
+          <h2 className="fw-bold mb-2" style={{ color: 'var(--home-heading)', fontSize: '2rem' }}>Frequently Asked Questions</h2>
           <p className="text-muted mb-3" style={{ fontSize: '1rem', lineHeight: 1.5 }}>Everything you need to know about the platform and how it empowers your school.</p>
         </div>
 
@@ -40,13 +40,13 @@ export default function FAQ() {
                 type="button"
                 onClick={() => setOpenFaq(openFaq === idx ? -1 : idx)}
                 className="w-100 p-3.5 text-start bg-transparent border-0 d-flex align-items-center justify-content-between"
-                style={{ color: 'var(--text)', fontSize: '1rem' }}
+                style={{ color: 'var(--home-heading)', fontSize: '1rem' }}
               >
                 <span className="fw-semibold">{faq.q}</span>
                 <i className={`bi ${openFaq === idx ? 'bi-dash-circle-fill text-primary' : 'bi-plus-circle text-muted'} fs-5`}></i>
               </button>
               {openFaq === idx && (
-                <div className="px-3.5 pb-3.5 pt-0 text-muted small" style={{ lineHeight: 1.65, fontSize: '0.92rem' }}>
+                <div className="px-3.5 pb-3.5 pt-0 small" style={{ color: 'var(--home-paragraph)', lineHeight: 1.65, fontSize: '0.92rem' }}>
                   {faq.a}
                 </div>
               )}

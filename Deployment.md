@@ -1,129 +1,97 @@
 # 🚀 Deployment Guide
 
-## Production Architecture Overview
-
-The AI School Management System is deployed across cloud infrastructure:
-
-- **Frontend**: [Vercel](https://vercel.com) (`https://aischoolsystem.vercel.app`)
-- **Backend API Gateway**: [Render](https://render.com) (`https://ai-school-management-system-l0a0.onrender.com`)
-- **Database**: [Neon PostgreSQL Cloud](https://neon.tech)
-- **Redis Cache & Rate Limiting**: [Upstash Redis Cloud](https://upstash.com)
-- **Vector Database**: [Qdrant Cloud](https://qdrant.tech)
+Cloud deployment procedures for Render (Backend), Vercel (Frontend), Neon PostgreSQL, Upstash Redis, and Qdrant Cloud.
 
 ---
 
-## Backend Deployment (Render)
+## 🌐 Live Infrastructure
 
-### Production `application-prod.yml`
-```yaml
-spring:
-  datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
-    driver-class-name: org.postgresql.Driver
+| Component | Provider | URL / Host |
+| :--- | :--- | :--- |
+| **Frontend** | Vercel | [https://aischoolsystem.vercel.app](https://aischoolsystem.vercel.app) |
+| **Backend API** | Render | [https://ai-school-management-system-l0a0.onrender.com](https://ai-school-management-system-l0a0.onrender.com) |
+| **Database** | Neon Cloud | Serverless PostgreSQL 16+ (SSL enabled) |
+| **Cache & Throttling**| Upstash Redis | Serverless Redis (TLS enabled) |
+| **Vector Index** | Qdrant Cloud | `course_documents` 768-dim collection |
 
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:none}
-    open-in-view: false
+---
 
-  data:
-    redis:
-      host: ${SPRING_REDIS_HOST}
-      port: ${SPRING_REDIS_PORT}
-      password: ${SPRING_REDIS_PASSWORD:}
-      ssl:
-        enabled: ${SPRING_REDIS_SSL:true}
+## ⚙️ Backend Environment Variables (Render)
 
-ai:
-  vector:
-    provider: qdrant
-    host: ${QDRANT_HOST}
-    port: ${QDRANT_PORT}
-    api-key: ${QDRANT_API_KEY:}
+Configure under **Render Dashboard** → **Environment**:
 
-management:
-  endpoint:
-    health:
-      show-details: always
+| Variable | Description | Value / Format |
+| :--- | :--- | :--- |
+| `SPRING_PROFILES_ACTIVE` | Active profile | `prod` |
+| `SPRING_DATASOURCE_URL` | PostgreSQL JDBC connection | `jdbc:postgresql://<host>/neondb?sslmode=require` |
+| `SPRING_DATASOURCE_USERNAME` | Database username | Neon owner username |
+| `SPRING_DATASOURCE_PASSWORD` | Database password | Neon owner password |
+| `SPRING_REDIS_HOST` | Upstash Redis host | `<id>.upstash.io` |
+| `SPRING_REDIS_PORT` | Upstash Redis port | `6379` |
+| `SPRING_REDIS_PASSWORD` | Upstash Redis auth token | Upstash token string |
+| `SPRING_REDIS_SSL` | Enable Redis TLS | `true` |
+| `QDRANT_HOST` | Qdrant Cloud endpoint | `<cluster-id>.cloud.qdrant.io` |
+| `QDRANT_PORT` | Qdrant port | `6333` |
+| `QDRANT_API_KEY` | Qdrant Cloud API key | Qdrant secret key |
+| `CORS_ALLOWED_ORIGINS` | Permitted frontend origins | `https://aischoolsystem.vercel.app` |
+| `JWT_SECRET` | Token signature secret | 256-bit cryptographically secure string |
+| `JWT_EXPIRATION` | Token expiry in ms | `86400000` (24 Hours) |
+| `APP_ENCRYPTION_KEY` | AES-256 field encryption key | 32+ character key (`openssl rand -base64 32`) |
+| `JAVA_OPTS` | Render memory constraints | `-Xmx320m -Xms256m -XX:+UseG1GC -XX:+ExitOnOutOfMemoryError` |
+
+> [!IMPORTANT]
+> **Preventing Render Exit Code 137 (OOM)**: Always set `JAVA_OPTS` to cap JVM heap at 320 MB, leaving overhead for off-heap and native memory on Render's 512 MB Free Tier.
+
+---
+
+## 💻 Frontend Deployment (Vercel)
+
+1. Import GitHub repository into Vercel.
+2. Configure settings:
+   - **Framework Preset**: `Vite`
+   - **Root Directory**: `frontend`
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+3. Environment Variables:
+   - `VITE_API_BASE_URL`: `https://ai-school-management-system-l0a0.onrender.com`
+
+---
+
+## 🤖 CI/CD Automation (Jenkins)
+
+The included [`Jenkinsfile`](Jenkinsfile) automates build, test, and cloud redeployment upon commits to `main`.
+
+### Required Jenkins Credentials
+| Credential ID | Kind | Value |
+| :--- | :--- | :--- |
+| `RENDER_DEPLOY_HOOK` | Secret text | Render Web Service deploy hook URL |
+| `VERCEL_DEPLOY_HOOK` | Secret text | Vercel Git deploy hook URL |
+
+---
+
+## ⏱️ Keep-Alive Job
+
+Render free-tier instances sleep after inactivity. A GitHub Actions workflow (`.github/workflows/keep-alive.yml`) pings the health endpoint every 5 minutes:
+
+```text
+GET https://ai-school-management-system-l0a0.onrender.com/api/actuator/health
 ```
 
 ---
 
-## Required Production Environment Variables
+## 🐳 Local Development Setup
 
-Configure these environment variables in your **Render Web Service**:
+```bash
+# 1. Start database, cache, and vector store
+docker-compose up -d
 
-| Variable | Description | Example Value |
-| :--- | :--- | :--- |
-| `SPRING_PROFILES_ACTIVE` | Active Spring Profile | `prod` |
-| `SPRING_DATASOURCE_URL` | Neon PostgreSQL JDBC URL | `jdbc:postgresql://ep-flat-union-...tech/neondb?sslmode=require` |
-| `SPRING_DATASOURCE_USERNAME` | Database username | `neondb_owner` |
-| `SPRING_DATASOURCE_PASSWORD` | Database password | `your-neon-password` |
-| `SPRING_REDIS_HOST` | Upstash Redis Host | `popular-tahr-164365.upstash.io` |
-| `SPRING_REDIS_PORT` | Upstash Redis Port | `6379` |
-| `SPRING_REDIS_PASSWORD` | Upstash Redis Password | `your-upstash-token` |
-| `SPRING_REDIS_SSL` | Enable Redis TLS | `true` |
-| `QDRANT_HOST` | Qdrant Cloud Endpoint | `85d77988-d01f-4e95-8771-...cloud.qdrant.io` |
-| `QDRANT_PORT` | Qdrant Port | `6333` |
-| `QDRANT_API_KEY` | Qdrant Cloud API Key | `your-qdrant-api-key` |
-| `CORS_ALLOWED_ORIGINS` | Allowed Frontend Origin | `https://aischoolsystem.vercel.app` |
-| `JWT_SECRET` | JWT Secret Key | `your-secure-jwt-secret-key` |
-| `JWT_EXPIRATION` | Token Expiry (ms) | `86400000` (24 Hours) |
-| `APP_ENCRYPTION_KEY` | AES-256 Field Key (32+ chars, required in prod) | `openssl rand -base64 32` |
-| `ADMIN_INIT_PASSWORD` | Initial admin password (admin creation skipped if unset) | `openssl rand -base64 24` |
-| `JAVA_OPTS` | **Render Memory Heap Limit** | `-Xmx320m -Xms256m -XX:+UseG1GC -XX:+ExitOnOutOfMemoryError` |
+# 2. Run backend
+cd backend
+export APP_ENCRYPTION_KEY="your-32-char-local-development-key"
+mvn spring-boot:run
 
-> [!IMPORTANT]
-> **Preventing Render Exit Code 137 (OOM)**:
-> Setting `JAVA_OPTS` to `-Xmx320m -Xms256m -XX:+UseG1GC -XX:+ExitOnOutOfMemoryError` caps the Java heap at 320 MB, leaving 192 MB for off-heap and native memory. This guarantees your backend will **never** crash with Out-Of-Memory (Exit 137) on Render's 512 MB Free Tier!
-
----
-
-## Frontend Deployment (Vercel)
-
-1. Push your code to GitHub.
-2. Import repository into [Vercel](https://vercel.com).
-3. Set **Framework Preset**: `Vite`.
-4. Set **Build Command**: `npm run build`.
-5. Deploy. Vercel automatically proxies API calls using `vercel.json` rewrites to Render.
-
----
-
-## 🤖 Automated CI/CD Deployment via Jenkins
-
-The repository contains a [`Jenkinsfile`](file:///f:/ZCodeProject/Jenkinsfile) configured to automatically compile, build, test, and deploy the application to Render (Backend) and Vercel (Frontend) when changes are pushed to the `main` branch.
-
-To enable the deployment triggers in Jenkins, you must configure the following credentials in Jenkins:
-
-### 1. Backend Deployment (Render)
-Render uses a unique deploy hook URL to trigger a redeploy of your service.
-1. Go to your **Render Dashboard** and select your **Web Service**.
-2. Scroll down to the **Deploy Hook** section and copy the URL (looks like `https://api.render.com/deploy/srv-...`).
-3. Open your **Jenkins Server** -> **Manage Jenkins** -> **Credentials** -> **System** -> **Global credentials**.
-4. Click **Add Credentials**:
-   * **Kind**: `Secret text`
-   * **Secret**: *Paste your Render Deploy Hook URL*
-   * **ID**: `RENDER_DEPLOY_HOOK`
-   * **Description**: `Render deploy hook URL for backend service`
-
-### 2. Frontend Deployment (Vercel)
-You can deploy to Vercel via **Deploy Hooks** (recommended for simplicity) or **Vercel API Token** (for direct CLI deployments).
-
-#### Option A: Vercel Deploy Hook (Recommended)
-1. Go to your **Vercel Dashboard** -> Select your project -> **Settings** -> **Git**.
-2. Scroll down to **Deploy Hooks**, enter a name (e.g., `jenkins-deploy`), select your branch (`main`), and click **Create**.
-3. Copy the generated webhook URL.
-4. In **Jenkins** -> **Credentials** -> **Global credentials**, click **Add Credentials**:
-   * **Kind**: `Secret text`
-   * **Secret**: *Paste your Vercel Deploy Hook URL*
-   * **ID**: `VERCEL_DEPLOY_HOOK`
-   * **Description**: `Vercel deploy hook URL for frontend project`
-
-#### Option B: Vercel CLI & API Token
-If you want Jenkins to deploy using the Vercel CLI directly, add the following credential in Jenkins:
-1. **`VERCEL_TOKEN`**: Go to your Vercel Account Settings -> **Tokens** -> Create a token.
-2. In **Jenkins**, add the token as a `Secret text` credential with the ID `VERCEL_TOKEN`.
-
+# 3. Run frontend
+cd frontend
+npm install
+npm run dev
+```
